@@ -22,6 +22,8 @@ export const game = {
   name: '',
   mode: 'basic',
   ops: ['+'],
+  format: 'classic', // 'classic' (N questions) | 'blitz' (battle clock)
+  duration: 0, // blitz clock length in seconds
   total: 10,
   current: 0,
   score: 0,
@@ -38,7 +40,10 @@ export function resetGame(settings) {
   game.name = settings.name || '';
   game.mode = settings.mode || 'basic';
   game.ops = Array.isArray(settings.ops) && settings.ops.length ? [...settings.ops] : ['+'];
-  game.total = settings.total || 10;
+  game.format = settings.format === 'blitz' ? 'blitz' : 'classic';
+  game.duration = Number.isFinite(settings.duration) && settings.duration > 0 ? settings.duration : 0;
+  // 0 is valid for blitz (uncapped) — only fall back when unset.
+  game.total = Number.isFinite(settings.total) ? settings.total : 10;
   game.current = 0;
   game.score = 0;
   game.streak = 0;

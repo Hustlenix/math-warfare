@@ -2,7 +2,8 @@
 // Owns the DOM; engine/fx/api modules stay pure.
 // Phase machine: 'question' -> 'feedback' (correct/fail feedback window) ->
 // 'question' (advance). On a miss the player enters 'revenge' (REDEEM YOUR
-// PRIDE!) before the fail feedback. Timers only run in question/revenge.
+// PRIDE!) before the fail feedback (classic only). Blitz replaces the
+// per-question timer with a battle clock that never stops until zero.
 
 import './styles.css';
 import confetti from 'canvas-confetti';
@@ -37,6 +38,7 @@ const els = {
   form: $('start-form'),
   name: $('player-name'),
   difficulty: $('difficulty'),
+  battleType: $('battle-type'),
   totalQs: $('total-qs'),
   qCount: $('q-count'),
   combo: $('combo-text'),
@@ -54,6 +56,7 @@ const els = {
   revengeBtn: $('revenge-btn'),
   revengeCount: $('revenge-count'),
   finalScore: $('final-score'),
+  resultsTitle: $('results-title'),
   finalXp: $('final-xp'),
   pbStamp: $('pb-stamp'),
   rankText: $('rank-text'),
@@ -131,7 +134,7 @@ function showBossBanner() {
 }
 
 function newQuestion() {
-  if (game.current >= game.total) return endBattle();
+  if (game.format === 'classic' && game.current >= game.total) return endBattle();
   // If the player paused mid-feedback, the pause is lifted when the next
   // question arrives (timer semantics stay clean).
   if (!els.pause.classList.contains('hidden')) {
@@ -142,14 +145,18 @@ function newQuestion() {
   const boss = isBossQuestion(game.current);
   q = generateQuestion(game.mode, game.ops, { boss });
   phase = 'question';
-  els.qCount.textContent = `${game.current}/${game.total}${boss ? ' ⚠ BOSS' : ''}`;
+  if (game.format === 'blitz') {
+    els.qCount.textContent = `⚡ ${Math.ceil(game.timeLeft)}s${boss ? ' ⚠' : ''}`;
+  } else {
+    els.qCount.textContent = `${game.current}/${game.total}${boss ? ' ⚠ BOSS' : ''}`;
+  }
   els.equation.textContent = q.text;
   els.equation.classList.toggle('boss-equation', boss);
   els.combo.textContent = comboText();
   els.streak.textContent = '';
   els.answer.value = '';
   els.answer.classList.remove('shake-anim');
-  els.equation.classList.remove('eq-bounce');
+  els.equation.classList.remove('eq-bounce', 'hit-punch');
   els.revealFlash.classList.add('hidden');
   hideRevenge();
 
@@ -162,7 +169,7 @@ function newQuestion() {
   if (game.boost === 'bomb') {
     game.boost = null;
     els.streak.textContent = '💣 BOMB — QUESTION DODGED!';
-    updateTimer(0);
+    if (game.format === 'classic') updateTimer(0);
     scheduleAdvance(800);
     return;
   }
@@ -173,6 +180,13 @@ function newQuestion() {
     els.revealFlash.textContent = `ANSWER: ${q.answer}`;
     els.revealFlash.classList.remove('hidden');
     window.setTimeout(() => els.revealFlash.classList.add('hidden'), 1000);
+  }
+
+  // Blitz: no per-question timer — the battle clock (started in startBattle)
+  // keeps running through every question.
+  if (game.format === 'blitz') {
+    els.answer.focus();
+    return;
   }
 
   const time = boss ? settingsFor(game.mode).bossTime : settingsFor(game.mode).time;
@@ -187,12 +201,43 @@ function newQuestion() {
 function updateTimer(timeLeft) {
   els.timerFill.style.width = `${(timeLeft / game.maxTime) * 100}%`;
   els.timerBar.setAttribute('aria-valuenow', String(Math.round(timeLeft)));
+  els.timerBar.classList.toggle('timer-low', timeLeft <= game.maxTime * 0.25);
+  if (game.format === 'blitz') {
+    els.qCount.textContent = `⚡ ${Math.ceil(timeLeft)}s${q.boss ? ' ⚠' : ''}`;
+  }
 }
 
 function playFlash(className) {
   els.quizCard.classList.remove('flash-good', 'flash-bad');
   void els.quizCard.offsetWidth;
   els.quizCard.classList.add(className);
+}
+
+// Floating reward text: spawns over the equation, drifts up, dies. Random
+// horizontal jitter keeps simultaneous popups from stacking on one spot.
+function floatText(text, { variant = '' } = {}) {
+  const el = document.createElement('div');
+  el.className = `float-text${variant ? ` float-${variant}` : ''}`;
+  el.textContent = text;
+  el.style.left = `calc(50% + ${Math.round(Math.random() * 90 - 45)}px)`;
+  els.quizCard.appendChild(el);
+  window.setTimeout(() => el.remove(), 1200);
+}
+
+// Confetti burst anchored at an element's on-screen position.
+function confettiAt(el, { count = 40, spread = 70, startVelocity = 32 } = {}) {
+  const r = el.getBoundingClientRect();
+  confetti({
+    particleCount: count,
+    spread,
+    startVelocity,
+    ticks: 150,
+    gravity: 0.8,
+    origin: {
+      x: (r.left + r.width / 2) / window.innerWidth,
+      y: (r.top + r.height / 2) / window.innerHeight,
+    },
+  });
 }
 
 function submitAnswer() {
@@ -208,7 +253,7 @@ function submitAnswer() {
 
 function correct() {
   phase = 'feedback';
-  stopTimer();
+  if (game.format === 'classic') stopTimer(); // blitz: the battle clock never stops
   game.score += 1;
   game.streak += 1;
 
@@ -224,20 +269,35 @@ function correct() {
     game.shield += 1;
     updateShield();
     els.streak.textContent = `🛡 SHIELD EARNED! (${game.shield}/${MAX_SHIELDS})`;
+    floatText('🛡 SHIELD!');
   }
 
-  els.equation.classList.remove('eq-bounce');
+  // Equation reaction: slam (boss) or bounce. The punch doubles as the
+  // hit-stop — the advance is also held ~200ms longer on boss kills.
+  els.equation.classList.remove('eq-bounce', 'hit-punch');
   void els.equation.offsetWidth;
-  els.equation.classList.add('eq-bounce');
+  if (q.boss) {
+    els.equation.classList.add('hit-punch');
+    confettiAt(els.answer, { count: 120, spread: 120, startVelocity: 40 });
+    floatText(`BOSS DOWN! +${xp} XP`, { variant: 'boss' });
+  } else {
+    els.equation.classList.add('eq-bounce');
+    floatText(`+${xp} XP`);
+  }
   playFlash('flash-good');
 
-  if (isComboUp(game.streak)) playCombo();
-  else playCorrect();
+  // Audio climbs with the streak; combo-ups also pop a small burst.
+  if (isComboUp(game.streak)) {
+    playCombo(game.streak);
+    confettiAt(els.answer, { count: 36, spread: 70 });
+  } else {
+    playCorrect(game.streak);
+  }
 
   if (isMemeStreak(game.streak)) showMeme(els.meme, 'win');
   if (isBoostDrop(game.streak)) rollBoost();
 
-  scheduleAdvance(500);
+  scheduleAdvance(q.boss ? 700 : 500);
 }
 
 function rollBoost() {
@@ -247,10 +307,11 @@ function rollBoost() {
 }
 
 // Miss (wrong answer or timer out). A held shield absorbs the miss without
-// breaking the streak; otherwise the player gets a REVENGE window.
+// breaking the streak; otherwise the player gets a REVENGE window (classic)
+// or goes straight to the fail feedback (blitz — the clock keeps running).
 function judgeFail(reason) {
   if (phase !== 'question') return;
-  stopTimer();
+  if (game.format === 'classic') stopTimer();
 
   if (game.shield > 0) {
     phase = 'feedback';
@@ -258,6 +319,7 @@ function judgeFail(reason) {
     updateShield();
     els.combo.textContent = comboText();
     els.streak.textContent = '🛡 SHIELD SAVED YOUR STREAK!';
+    floatText('🛡 SAVED!');
     playWrong();
     playFlash('flash-bad');
     scheduleAdvance(1100);
@@ -268,7 +330,30 @@ function judgeFail(reason) {
   els.combo.textContent = comboText();
   playWrong();
   shakeScreen();
-  startRevenge(reason);
+  if (game.format === 'blitz') failFeedback(reason);
+  else startRevenge(reason);
+}
+
+// Shared miss feedback window. Never touches the timer — classic callers
+// already stopped theirs, and in blitz the battle clock must keep running.
+function failFeedback(reason) {
+  phase = 'feedback';
+  hideRevenge();
+  els.streak.textContent = reason === 'TIME OUT!' ? 'TIME OUT!' : 'WRONG!';
+  playWrong();
+  els.answer.classList.remove('shake-anim');
+  void els.answer.offsetWidth;
+  els.answer.classList.add('shake-anim');
+  playFlash('flash-bad');
+  shakeScreen();
+  showMeme(els.meme, 'fail');
+  scheduleAdvance(1800);
+}
+
+function failCommitted(reason) {
+  if (phase !== 'revenge') return;
+  stopTimer(); // stops the revenge countdown — blitz never reaches this path
+  failFeedback(reason);
 }
 
 function startRevenge(reason) {
@@ -305,33 +390,17 @@ function revengeCorrect() {
   const xp = xpForCorrect(0, { boss: q.boss, revenge: true });
   game.xp += xp;
   els.streak.textContent = `PRIDE RESTORED! +${xp} XP`;
+  floatText(`PRIDE +${xp} XP`);
   playCorrect();
-  els.equation.classList.remove('eq-bounce');
+  els.equation.classList.remove('eq-bounce', 'hit-punch');
   void els.equation.offsetWidth;
   els.equation.classList.add('eq-bounce');
   playFlash('flash-good');
   scheduleAdvance(600);
 }
 
-function failCommitted(reason) {
-  if (phase !== 'revenge') return;
-  phase = 'feedback';
-  stopTimer();
-  hideRevenge();
-  els.combo.textContent = comboText();
-  els.streak.textContent = reason === 'TIME OUT!' ? 'TIME OUT!' : 'WRONG!';
-  playWrong();
-  els.answer.classList.remove('shake-anim');
-  void els.answer.offsetWidth;
-  els.answer.classList.add('shake-anim');
-  playFlash('flash-bad');
-  shakeScreen();
-  showMeme(els.meme, 'fail');
-  scheduleAdvance(1800);
-}
-
 function advance() {
-  if (game.current >= game.total) endBattle();
+  if (game.format === 'classic' && game.current >= game.total) endBattle();
   else newQuestion();
 }
 
@@ -349,7 +418,9 @@ function endBattle() {
   addBattleResult(game.name, game.xp);
   const newRank = rankFor(getPlayerXp(game.name));
 
-  els.finalScore.textContent = `${game.score}/${game.total}`;
+  els.resultsTitle.textContent = game.format === 'blitz' ? "TIME'S UP!" : 'BATTLE ENDED!';
+  els.finalScore.textContent =
+    game.format === 'blitz' ? `${game.score} ✓ / ${game.current} SEEN` : `${game.score}/${game.total}`;
   els.finalXp.textContent = `XP EARNED: ${game.xp}`;
 
   const isNewPb = game.xp > 0 && game.xp > prevBest;
@@ -386,16 +457,32 @@ function startBattle() {
     alert('PICK YOUR WEAPONS! Choose at least one operation.');
     return;
   }
+  const battleType = els.battleType.value;
+  const isBlitz = battleType !== 'classic';
+  const duration = isBlitz ? parseInt(battleType, 10) : 0;
   let total = parseInt(els.totalQs.value, 10);
   if (Number.isNaN(total) || total < 1) total = 10;
   if (total > 100) total = 100;
 
   unlockAudio();
   clearAdvance();
-  resetGame({ name, mode, ops, total, time: settingsFor(mode).time });
+  resetGame({
+    name,
+    mode,
+    ops,
+    total: isBlitz ? 0 : total,
+    format: isBlitz ? 'blitz' : 'classic',
+    duration,
+    time: isBlitz ? duration : settingsFor(mode).time,
+  });
   updateShield();
   showScreen(SCREENS.QUIZ);
   setChaos(mode === 'god', els.quizCard);
+  if (isBlitz) {
+    // Battle clock: never stops until it hits zero — every second counts.
+    els.timerBar.setAttribute('aria-valuemax', String(duration));
+    startTimer(updateTimer, endBattle);
+  }
   newQuestion();
 }
 
@@ -406,11 +493,17 @@ function rematch() {
     mode: game.mode,
     ops: game.ops,
     total: game.total,
-    time: settingsFor(game.mode).time,
+    format: game.format,
+    duration: game.duration,
+    time: game.format === 'blitz' ? game.duration : settingsFor(game.mode).time,
   });
   updateShield();
   showScreen(SCREENS.QUIZ);
   setChaos(game.mode === 'god', els.quizCard);
+  if (game.format === 'blitz') {
+    els.timerBar.setAttribute('aria-valuemax', String(game.duration));
+    startTimer(updateTimer, endBattle);
+  }
   newQuestion();
 }
 
@@ -440,8 +533,10 @@ function resume() {
   els.pause.classList.add('hidden');
   els.pause.setAttribute('aria-hidden', 'true');
   if (currentScreen !== SCREENS.QUIZ) return;
-  if (phase === 'revenge') {
-    game.timeLeft = Math.max(0.1, game.timeLeft);
+  game.timeLeft = Math.max(0.1, game.timeLeft);
+  if (game.format === 'blitz') {
+    startTimer(updateTimer, endBattle); // battle clock resumes
+  } else if (phase === 'revenge') {
     startTimer(
       (t) => {
         els.revengeCount.textContent = String(Math.ceil(t));
@@ -449,7 +544,6 @@ function resume() {
       () => failCommitted('TIME OUT!')
     );
   } else if (phase === 'question') {
-    game.timeLeft = Math.max(0.1, game.timeLeft);
     startTimer(updateTimer, () => judgeFail('TIME OUT!'));
   }
   els.answer.focus();
@@ -536,6 +630,12 @@ function init() {
     e.preventDefault();
     startBattle();
   });
+  // TIME ATTACK ignores the question count — grey it out.
+  const syncTotalQs = () => {
+    els.totalQs.disabled = els.battleType.value !== 'classic';
+  };
+  els.battleType.addEventListener('change', syncTotalQs);
+  syncTotalQs();
   els.name.addEventListener('input', () => {
     updatePlayerStatus();
     renderLocalLB();

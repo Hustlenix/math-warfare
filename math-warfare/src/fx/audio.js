@@ -56,11 +56,26 @@ function tone({ f0, f1, dur, type = 'square', volume = 0.12 }) {
   }
 }
 
-// correct: 600 -> 1200 Hz ramp over 0.2s
-export const playCorrect = () => tone({ f0: 600, f1: 1200, dur: 0.2, type: 'square' });
+// Rising-pitch combo: each correct answer in a streak lands a slightly higher
+// tone (+4.5% per streak, capped at 2x) with ±5% random jitter so repeated
+// sounds never feel identical. The climb itself is the reward audio.
+const MAX_PITCH = 2.0;
+function pitchFor(streak) {
+  const ramp = Math.min(MAX_PITCH, 1 + (streak || 0) * 0.045);
+  return ramp * (0.95 + Math.random() * 0.1);
+}
 
-// combo: 800 -> 1500 Hz over 0.1s
-export const playCombo = () => tone({ f0: 800, f1: 1500, dur: 0.1, type: 'square', volume: 0.14 });
+// correct: 600 -> 1200 Hz ramp over 0.2s (pitched up with the streak)
+export const playCorrect = (streak = 0) => {
+  const p = pitchFor(streak);
+  tone({ f0: 600 * p, f1: 1200 * p, dur: 0.2, type: 'square' });
+};
+
+// combo: 800 -> 1500 Hz over 0.1s (pitched up with the streak)
+export const playCombo = (streak = 0) => {
+  const p = pitchFor(streak);
+  tone({ f0: 800 * p, f1: 1500 * p, dur: 0.1, type: 'square', volume: 0.14 });
+};
 
 // wrong / time out: sawtooth 150 -> 50 Hz over 0.3s
 export const playWrong = () => tone({ f0: 150, f1: 50, dur: 0.3, type: 'sawtooth', volume: 0.16 });
