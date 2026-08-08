@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MATH WARFARE: OMEGA ULTRA</title>
+  <meta name="description" content="MATH WARFARE: OMEGA ULTRA — a neo-brutalist math battle game. Settle the score with your bro!">
+  <meta name="theme-color" content="#FFDE59">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <p class="logo">MATH WARFARE<span class="logo-sub">OMEGA ULTRA</span></p>
+  </header>
+
+  <main class="app-main" id="app">
+    <section id="screen-start" class="screen active" aria-label="Start screen">
+      <article class="card">
+        <h1 class="title" id="start-title">ENTER YOUR CALLSIGN</h1>
+        <p class="tagline">Settle the score with your bro!</p>
+
+        <form id="start-form">
+          <label class="field-label" for="player-name">CALLSIGN</label>
+          <input class="text-field" id="player-name" name="player-name" type="text" autocomplete="nickname" placeholder="WHO ARE YOU?" required>
+
+          <label class="field-label" for="difficulty">DIFFICULTY</label>
+          <select class="field" id="difficulty" name="difficulty">
+            <option value="basic">BASIC</option>
+            <option value="pro">PRO</option>
+            <option value="god">GOD (CHAOS)</option>
+          </select>
+
+          <fieldset class="ops-fieldset">
+            <legend class="field-label">OPERATIONS</legend>
+            <div class="chip-grid">
+              <label class="chip"><input type="checkbox" name="ops" value="+" checked><span>+ ADD</span></label>
+              <label class="chip"><input type="checkbox" name="ops" value="-"><span>- SUB</span></label>
+              <label class="chip"><input type="checkbox" name="ops" value="*"><span>× MUL</span></label>
+              <label class="chip"><input type="checkbox" name="ops" value="/"><span>÷ DIV</span></label>
+            </div>
+          </fieldset>
+
+          <label class="field-label" for="total-qs">QUESTIONS (1-100)</label>
+          <input class="text-field" id="total-qs" name="total-qs" type="number" min="1" max="100" value="10" inputmode="numeric">
+
+          <button class="btn" type="submit">ENTER BATTLE!</button>
+        </form>
+      </article>
+
+      <section class="card lb-card" aria-label="Hall of fame">
+        <h2 class="lb-heading">🏆 HALL OF FAME 🏆</h2>
+        <div class="lb-grid">
+          <article class="lb-panel">
+            <h3 class="lb-title">LOCAL</h3>
+            <ol class="lb-list" id="lb-local"></ol>
+          </article>
+          <article class="lb-panel">
+            <h3 class="lb-title">GLOBAL (SIM)</h3>
+            <ol class="lb-list" id="lb-global"></ol>
+          </article>
+        </div>
+        <p class="player-status" id="player-status" aria-live="polite">ENTER YOUR CALLSIGN TO SEE YOUR RANK</p>
+      </section>
+    </section>
+
+    <section id="screen-quiz" class="screen hidden" aria-label="Quiz screen">
+      <article class="card quiz-card" id="quiz-card">
+        <div class="quiz-top">
+          <h1 class="q-count" id="q-count">1/10</h1>
+          <span class="combo" id="combo-text">x1 COMBO</span>
+          <span class="shield-chip" id="shield-chip" title="STREAK SHIELDS">🛡×0</span>
+          <button class="mute-btn" id="mute-btn" type="button" aria-label="Mute sound" aria-pressed="false">🔊</button>
+        </div>
+
+        <div class="timer-bar" id="timer-bar" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="10" aria-valuenow="10">
+          <div class="timer-fill" id="timer-fill"></div>
+        </div>
+
+        <p class="boss-banner hidden" id="boss-banner" aria-live="polite">⚠ BOSS EQUATION ⚠</p>
+
+        <p class="equation" id="equation" aria-live="polite">0 + 0</p>
+
+        <label class="sr-only" for="answer">Your answer</label>
+        <input class="answer-input" id="answer" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="?" aria-label="Your answer">
+
+        <div id="reveal-flash" class="reveal-flash hidden" aria-live="polite"></div>
+
+        <div id="revenge-box" class="revenge-box hidden">
+          <p class="tagline revenge-tagline">WRONG! REDEEM YOUR PRIDE!</p>
+          <button class="btn revenge-btn" id="revenge-btn" type="button">
+            REDEEM YOUR PRIDE! <span class="revenge-count" id="revenge-count">5</span>
+          </button>
+        </div>
+
+        <p class="streak-text" id="streak-text" aria-live="polite"></p>
+        <p class="hints">ENTER = FIRE · ESC = PAUSE</p>
+      </article>
+    </section>
+
+    <section id="screen-results" class="screen hidden" aria-labelledby="results-title">
+      <article class="card">
+        <h1 class="title" id="results-title">BATTLE ENDED!</h1>
+        <p class="score-big" id="final-score">0/0</p>
+        <p class="final-xp" id="final-xp">XP EARNED: 0</p>
+        <p class="pb-stamp hidden" id="pb-stamp" aria-live="polite">★ NEW PERSONAL BEST! ★</p>
+        <p class="rank-text" id="rank-text"></p>
+        <p class="pb-delta" id="pb-delta"></p>
+        <button class="btn" id="rematch-btn" type="button">REMATCH!</button>
+        <button class="btn btn-ghost" id="menu-btn" type="button">MAIN MENU</button>
+      </article>
+    </section>
+
+    <div id="pause-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pause-title" aria-hidden="true">
+      <article class="card pause-card">
+        <h2 class="title" id="pause-title">PAUSED</h2>
+        <p class="tagline">The war waits for no one... except you.</p>
+        <button class="btn" id="resume-btn" type="button">RESUME</button>
+        <button class="btn btn-ghost" id="quit-btn" type="button">QUIT</button>
+      </article>
+    </div>
+
+    <div id="meme-overlay" class="overlay meme-overlay hidden" aria-hidden="true"></div>
+  </main>
+
+  <footer class="app-footer">
+    <p>SETTLE THE SCORE WITH YOUR BRO! — MATH WARFARE: OMEGA ULTRA</p>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

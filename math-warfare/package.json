@@ -1,0 +1,20 @@
+{
+  "name": "math-warfare-omega-ultra",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MATH WARFARE: OMEGA ULTRA — neo-brutalist math battle game",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "tailwindcss": "^4.1.11",
+    "vite": "^6.3.5"
+  }
+}

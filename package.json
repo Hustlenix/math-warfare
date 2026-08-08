@@ -1,0 +1,11 @@
+{
+  "name": "math-warfare-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root wrapper to run the math-warfare Vite project from the repo root",
+  "scripts": {
+    "dev": "npm run dev --prefix math-warfare",
+    "build": "npm run build --prefix math-warfare",
+    "preview": "npm run preview --prefix math-warfare"
+  }
+}
