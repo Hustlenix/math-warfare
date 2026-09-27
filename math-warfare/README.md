@@ -14,7 +14,7 @@ No account is required. Enter a callsign, choose a difficulty and battle type, p
 
 I started MATH-Warefare because I kept losing exam time on calculations that should have been automatic. I wanted practice to feel less like another worksheet, so I turned it into a small arcade battle.
 
-The game deliberately looks like a messy school notebook / MS Paint drawing instead of a polished dashboard. Equations live on ruled paper, controls are crooked, labels look taped on, and the main artwork is a rough calculator character fighting math problems.
+The game deliberately uses the visual language of simple student-made MS Paint drawings instead of a polished dashboard: basic rectangles/circles/triangles, black outlines, flat bucket-filled colors, bright scenery, crude proportions, and an intentionally simple calculator-vs-math battle scene.
 
 ## Features
 
@@ -76,17 +76,18 @@ The battle flow is a small state machine: **question → feedback → next quest
 
 The current visual system was rebuilt after Stardance ship feedback that the original neo-brutalist CSS looked too similar to common AI-generated sites.
 
-The replacement is intentionally specific to this game:
+The replacement follows simple MS Paint school-project drawings more closely:
 
-- graph-paper / ruled-paper textures
-- rough black outlines and uneven radii
-- slightly rotated cards and controls
-- tape-like section labels
-- hand-written display typography
-- an original MS-Paint-style calculator battle illustration
-- no glassmorphism, generic SaaS dashboard layout, or component-library look
+- plain black outlines
+- basic geometric shapes
+- solid bucket-fill colors
+- bright sky/grass scenery
+- simple Arial-style text
+- square controls with no designer shadows or glass effects
+- an original calculator-vs-equation battle image built from simple Paint-like shapes
+- intentionally low-tech visual composition rather than a UI-kit aesthetic
 
-The layout is still responsive and includes `prefers-reduced-motion` handling.
+The layout remains responsive and includes `prefers-reduced-motion` handling.
 
 ## Project structure
 
@@ -131,7 +132,7 @@ Live URL: **https://hustlenix.github.io/math-warfare/**
 - Celebration particles use **canvas-confetti**.
 - Meme reactions use external meme data with fallbacks.
 - AI/LLM assistance was used for coding support, review, troubleshooting, and deployment. The project structure, game direction, iteration decisions, and Stardance submission are maintained in this repository.
-- The current visual system and `paint-battle.svg` were made specifically for MATH-Warefare rather than copied from a UI template.
+- The current visual system and `paint-battle.svg` were made specifically for MATH-Warefare, using simple Paint-like shapes and flat fills rather than a UI template.
 
 ## Why I built it
 
