@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+<title id="title">Math Warfare hand-drawn battle art</title>
+<desc id="desc">A deliberately rough MS Paint style calculator character fighting flying equations.</desc>
+<rect width="1200" height="520" fill="#fff8df"/>
+<path d="M0 75 C160 60 250 95 430 76 S780 63 1200 88" fill="none" stroke="#b9d8ff" stroke-width="5"/>
+<path d="M0 150 C210 138 360 167 570 149 S910 137 1200 159" fill="none" stroke="#b9d8ff" stroke-width="5"/>
+<path d="M0 225 C190 213 400 242 612 224 S965 210 1200 236" fill="none" stroke="#b9d8ff" stroke-width="5"/>
+<path d="M0 300 C180 286 395 315 625 298 S945 285 1200 309" fill="none" stroke="#b9d8ff" stroke-width="5"/>
+<path d="M0 375 C220 363 430 393 650 374 S970 360 1200 388" fill="none" stroke="#b9d8ff" stroke-width="5"/>
+<path d="M0 450 C180 437 395 468 640 448 S980 434 1200 462" fill="none" stroke="#b9d8ff" stroke-width="5"/>
+<path d="M150 28 L143 490" stroke="#ff6b6b" stroke-width="7"/>
+<path d="M165 28 L158 490" stroke="#ff9a9a" stroke-width="3"/>
+
+<g transform="translate(375 65) rotate(-4 210 200)">
+  <path d="M54 36 Q44 32 37 48 L24 329 Q22 346 39 354 L364 370 Q383 371 387 351 L402 65 Q405 47 388 44 Z" fill="#77d8ff" stroke="#171717" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M82 83 Q82 67 100 68 L334 80 Q350 80 349 98 L344 147 Q343 163 326 162 L95 151 Q78 149 79 133 Z" fill="#fff7a8" stroke="#171717" stroke-width="11"/>
+  <path d="M117 109 L294 117" stroke="#171717" stroke-width="10" stroke-linecap="round"/>
+  <g fill="#fff" stroke="#171717" stroke-width="8">
+    <path d="M82 192 Q80 181 94 179 L140 181 Q151 182 150 194 L147 227 Q145 238 133 237 L92 235 Q80 234 80 222 Z"/>
+    <path d="M170 185 Q168 175 181 173 L228 176 Q240 176 239 188 L237 224 Q236 235 224 234 L181 232 Q169 231 169 219 Z"/>
+    <path d="M258 181 Q257 170 269 170 L317 172 Q329 173 328 185 L326 221 Q325 232 313 231 L270 229 Q258 228 258 216 Z"/>
+    <path d="M79 260 Q78 248 91 247 L137 249 Q149 250 148 262 L146 297 Q145 309 132 308 L90 306 Q78 305 78 293 Z"/>
+    <path d="M166 254 Q165 243 178 242 L224 244 Q236 245 236 257 L234 292 Q233 303 220 303 L178 300 Q165 300 165 288 Z"/>
+    <path d="M253 249 Q252 238 265 237 L312 239 Q324 240 323 252 L321 287 Q320 299 307 298 L265 296 Q252 295 252 283 Z"/>
+  </g>
+  <g stroke="#171717" stroke-width="8" stroke-linecap="round">
+    <path d="M107 202 L123 217 M123 202 L107 218"/>
+    <path d="M190 209 L218 210"/>
+    <path d="M278 201 L307 219 M307 201 L278 219"/>
+    <path d="M99 278 L124 278 M112 265 L112 292"/>
+    <path d="M188 273 L217 275"/>
+    <path d="M277 265 L307 287"/>
+  </g>
+  <path d="M25 185 C-35 169 -57 147 -92 121" fill="none" stroke="#171717" stroke-width="15" stroke-linecap="round"/>
+  <path d="M-91 121 C-105 106 -91 92 -74 104 L-43 122 L-59 139 Z" fill="#ff5c5c" stroke="#171717" stroke-width="9"/>
+  <path d="M397 199 C454 183 478 161 514 137" fill="none" stroke="#171717" stroke-width="15" stroke-linecap="round"/>
+  <path d="M512 137 C529 125 543 142 529 157 L500 177 L486 157 Z" fill="#ff5c5c" stroke="#171717" stroke-width="9"/>
+  <path d="M126 370 L108 435 M291 371 L320 437" fill="none" stroke="#171717" stroke-width="15" stroke-linecap="round"/>
+  <path d="M80 437 Q111 425 143 440" fill="none" stroke="#171717" stroke-width="14" stroke-linecap="round"/>
+  <path d="M292 442 Q321 428 354 441" fill="none" stroke="#171717" stroke-width="14" stroke-linecap="round"/>
+</g>
+
+<g font-family="Comic Sans MS, Comic Sans, cursive" font-weight="700" fill="#171717">
+  <text x="80" y="130" font-size="54" transform="rotate(-8 80 130)">7 × 8 ?!</text>
+  <text x="846" y="132" font-size="60" transform="rotate(7 846 132)">√144</text>
+  <text x="82" y="355" font-size="50" transform="rotate(5 82 355)">99 ÷ 9</text>
+  <text x="862" y="355" font-size="55" transform="rotate(-7 862 355)">13²</text>
+</g>
+
+<path d="M245 180 C276 157 311 154 334 166" fill="none" stroke="#ff5757" stroke-width="9" stroke-linecap="round"/>
+<path d="M910 215 C946 191 980 190 1014 207" fill="none" stroke="#7357ff" stroke-width="9" stroke-linecap="round"/>
+<path d="M894 412 C925 392 961 394 995 409" fill="none" stroke="#18a558" stroke-width="9" stroke-linecap="round"/>
+<path d="M215 414 l14 -24 l13 24 l26 4 l-20 18 l5 26 l-24 -12 l-24 12 l5 -26 l-20 -18 z" fill="#ffe056" stroke="#171717" stroke-width="7" stroke-linejoin="round"/>
+
+<g transform="translate(777 220) rotate(-7)">
+  <path d="M0 0 L28 18 L15 50 L49 41 L63 75 L84 47 L110 70 L112 34 L146 35 L126 7 L153 -14 L119 -22 L126 -55 L94 -42 L78 -75 L59 -45 L29 -63 L30 -29 L-4 -24 L17 1 Z" fill="#ffdf54" stroke="#171717" stroke-width="8" stroke-linejoin="round"/>
+  <text x="35" y="7" font-family="Comic Sans MS, Comic Sans, cursive" font-size="25" font-weight="700">BAM!</text>
+</g>
+
+<path d="M542 472 C605 453 661 491 724 467 S853 452 925 472" fill="none" stroke="#171717" stroke-width="8" stroke-linecap="round"/>
+<text x="430" y="503" font-family="Comic Sans MS, Comic Sans, cursive" font-size="28" font-weight="700" fill="#171717">drawn badly on purpose. calculate well on purpose.</text>
+</svg>
