@@ -48,7 +48,7 @@ npm install
 npm run dev
 ```
 
-The repository root contains wrapper npm scripts, so these commands launch the Vite app inside `math-warfare/`.
+The actual Vite app lives in the inner `math-warfare/` directory. The repository root also contains wrapper scripts, but dependencies must be installed in the app folder first.
 
 For a production build:
 
