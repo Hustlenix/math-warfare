@@ -4,38 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MATH WARFARE: OMEGA ULTRA</title>
-  <meta name="description" content="A hand-drawn mental-math battle game where fast calculations power combos, shields, boss fights, and time attacks.">
-  <meta name="theme-color" content="#fff4bf">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+  <meta name="description" content="A colorful MS Paint-style mental-math battle game with combos, boss equations, shields and time attacks.">
+  <meta name="theme-color" content="#87CEEB">
 </head>
 <body>
-  <div class="paper-scribbles" aria-hidden="true">
-    <span class="scribble scribble-a">+ − × ÷</span>
-    <span class="scribble scribble-b">NO CALCULATOR</span>
-    <span class="scribble scribble-c">FAST = DAMAGE</span>
-  </div>
-
   <header class="app-header">
-    <p class="logo">MATH WARFARE<span class="logo-sub">OMEGA ULTRA</span></p>
-    <p class="header-note">mental math, but somebody turned it into a boss fight</p>
+    <div class="paint-title-box">
+      <p class="logo">MATH WARFARE</p>
+      <p class="logo-sub">OMEGA ULTRA</p>
+    </div>
+    <div class="paint-palette" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <p class="header-note">MENTAL MATH BATTLE GAME</p>
   </header>
 
   <main class="app-main" id="app">
     <section id="screen-start" class="screen active" aria-label="Start screen">
       <article class="card start-card">
-        <p class="tape-label">MISSION BRIEF</p>
         <h1 class="title" id="start-title">ENTER YOUR CALLSIGN</h1>
-        <p class="tagline">No calculator. No mercy. Just brain damage.</p>
+        <p class="tagline">Solve fast. Build combos. Beat the boss.</p>
 
-        <figure class="paint-hero" aria-hidden="true">
-          <img src="./paint-battle.svg" alt="">
+        <figure class="paint-hero">
+          <img src="./paint-battle.svg" alt="Simple MS Paint style scene of a calculator fighter battling a math boss">
+          <figcaption>Made to look like a simple MS Paint school drawing: shapes + fill + black outlines.</figcaption>
         </figure>
 
         <form id="start-form">
           <label class="field-label" for="player-name">CALLSIGN</label>
-          <input class="text-field" id="player-name" name="player-name" type="text" autocomplete="nickname" placeholder="WHO ARE YOU?" required>
+          <input class="text-field" id="player-name" name="player-name" type="text" autocomplete="nickname" placeholder="PLAYER NAME" required>
 
           <label class="field-label" for="difficulty">DIFFICULTY</label>
           <select class="field" id="difficulty" name="difficulty">
@@ -55,23 +52,22 @@
           <fieldset class="ops-fieldset">
             <legend class="field-label">PICK YOUR WEAPONS</legend>
             <div class="chip-grid">
-              <label class="chip"><input type="checkbox" name="ops" value="+" checked><span>+ ADD</span></label>
-              <label class="chip"><input type="checkbox" name="ops" value="-"><span>− SUB</span></label>
-              <label class="chip"><input type="checkbox" name="ops" value="*"><span>× MUL</span></label>
-              <label class="chip"><input type="checkbox" name="ops" value="/"><span>÷ DIV</span></label>
+              <label class="chip chip-red"><input type="checkbox" name="ops" value="+" checked><span>+ ADD</span></label>
+              <label class="chip chip-blue"><input type="checkbox" name="ops" value="-"><span>− SUB</span></label>
+              <label class="chip chip-yellow"><input type="checkbox" name="ops" value="*"><span>× MUL</span></label>
+              <label class="chip chip-green"><input type="checkbox" name="ops" value="/"><span>÷ DIV</span></label>
             </div>
           </fieldset>
 
           <label class="field-label" for="total-qs">QUESTIONS (1–100)</label>
           <input class="text-field" id="total-qs" name="total-qs" type="number" min="1" max="100" value="10" inputmode="numeric">
 
-          <button class="btn" type="submit">⚡ ENTER BATTLE!</button>
+          <button class="btn" type="submit">ENTER BATTLE!</button>
         </form>
       </article>
 
       <section class="card lb-card" aria-label="Hall of fame">
-        <p class="tape-label tape-blue">SCRAPBOOK SCOREBOARD</p>
-        <h2 class="lb-heading">🏆 HALL OF FAME 🏆</h2>
+        <h2 class="lb-heading">HALL OF FAME</h2>
         <div class="lb-grid">
           <article class="lb-panel">
             <h3 class="lb-title">LOCAL</h3>
@@ -88,8 +84,6 @@
 
     <section id="screen-quiz" class="screen hidden" aria-label="Quiz screen">
       <article class="card quiz-card" id="quiz-card">
-        <p class="tape-label tape-red">LIVE FIRE</p>
-
         <div class="quiz-top">
           <h1 class="q-count" id="q-count">1/10</h1>
           <span class="combo" id="combo-text">x1 COMBO</span>
@@ -101,7 +95,7 @@
           <div class="timer-fill" id="timer-fill"></div>
         </div>
 
-        <p class="boss-banner hidden" id="boss-banner" aria-live="polite">⚠ BOSS EQUATION ⚠</p>
+        <p class="boss-banner hidden" id="boss-banner" aria-live="polite">BOSS EQUATION!</p>
 
         <div class="equation-sheet">
           <p class="equation" id="equation" aria-live="polite">0 + 0</p>
@@ -126,11 +120,10 @@
 
     <section id="screen-results" class="screen hidden" aria-labelledby="results-title">
       <article class="card results-card">
-        <p class="tape-label tape-yellow">AFTER-ACTION REPORT</p>
         <h1 class="title" id="results-title">BATTLE ENDED!</h1>
         <p class="score-big" id="final-score">0/0</p>
         <p class="final-xp" id="final-xp">XP EARNED: 0</p>
-        <p class="pb-stamp hidden" id="pb-stamp" aria-live="polite">★ NEW PERSONAL BEST! ★</p>
+        <p class="pb-stamp hidden" id="pb-stamp" aria-live="polite">NEW PERSONAL BEST!</p>
         <p class="rank-text" id="rank-text"></p>
         <p class="pb-delta" id="pb-delta"></p>
         <button class="btn" id="rematch-btn" type="button">REMATCH!</button>
@@ -140,9 +133,8 @@
 
     <div id="pause-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pause-title" aria-hidden="true">
       <article class="card pause-card">
-        <p class="tape-label">TIME OUT</p>
         <h2 class="title" id="pause-title">PAUSED</h2>
-        <p class="tagline">The war waits for no one... except you.</p>
+        <p class="tagline">The battle is waiting.</p>
         <button class="btn" id="resume-btn" type="button">RESUME</button>
         <button class="btn btn-ghost" id="quit-btn" type="button">QUIT</button>
       </article>
@@ -152,7 +144,7 @@
   </main>
 
   <footer class="app-footer">
-    <p>HAND-DRAWN CHAOS · MENTAL MATH · ZERO CALCULATORS</p>
+    <p>MS PAINT MODE • MENTAL MATH • NO CALCULATORS</p>
   </footer>
 
   <script type="module" src="/src/main.js"></script>
