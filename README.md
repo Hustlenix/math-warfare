@@ -43,18 +43,23 @@ To run it locally, use **Node.js 20+**:
 
 ```bash
 git clone https://github.com/Hustlenix/math-warfare.git
-cd math-warfare
-npm install
+cd math-warfare/math-warfare
+npm ci
 npm run dev
 ```
 
-The actual Vite app lives in the inner `math-warfare/` directory. The repository root also contains wrapper scripts, but dependencies must be installed in the app folder first.
+Vite will print a local address (usually `http://localhost:5173/`). The inner
+`math-warfare/` folder is the actual app. Installing dependencies only in the
+outer repository folder does **not** install the Vite app.
 
-For a production build:
+For a production build (from the same inner folder):
 
 ```bash
 npm run build
 ```
+
+Alternatively, once inner dependencies are installed, the outer repository
+folder has `npm run dev` and `npm run build` wrapper scripts.
 
 ## How it works
 
