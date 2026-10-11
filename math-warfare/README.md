@@ -52,7 +52,7 @@ node scripts/verify-release.mjs
 npm run preview
 ```
 
-Nine tests cover 24,000 equations across all skills and sizes, input validation, daily determinism, quest prerequisites and duplicate rewards, shop overdrafts, save reloads, NPC reachability, cave gates and scaled canvas pointer coordinates. The deployment workflow verifies source and compiled-release hashes before uploading `math-warfare/release` to GitHub Pages. This allows CI to publish a playable game without possessing the private artwork packs. Rebuild and package again after changing any recorded source file.
+Ten tests cover 24,000 equations across all skills and sizes, input validation, daily determinism, quest prerequisites and duplicate rewards, shop overdrafts, save reloads, NPC reachability, cave gates, scaled canvas pointer coordinates and reliable auto-walking at 20 FPS. The deployment workflow verifies source and compiled-release hashes before uploading `math-warfare/release` to GitHub Pages. This allows CI to publish a playable game without possessing the private artwork packs. Rebuild and package again after changing any recorded source file.
 
 ## Structure
 

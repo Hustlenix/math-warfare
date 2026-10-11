@@ -223,7 +223,8 @@ export class World {
     } else if (this.path.length) {
       const next = this.path[0],
         dist = Math.hypot(next.x - p.x, next.y - p.y);
-      if (dist < 0.07) {
+      // Stop at the next waypoint instead of stepping past it at low frame rates.
+      if (dist <= Math.max(0.07, dt * 4.5)) {
         p.x = next.x;
         p.y = next.y;
         this.path.shift();

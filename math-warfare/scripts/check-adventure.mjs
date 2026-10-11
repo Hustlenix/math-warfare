@@ -16,7 +16,36 @@ import {
   save,
 } from "../src/adventure/progress.js";
 import { QUESTS, SKILLS, NPCS } from "../src/adventure/content.js";
-import { blocked, pathfind, pointerToWorld } from "../src/adventure/world.js";
+import {
+  blocked,
+  pathfind,
+  pointerToWorld,
+  World,
+} from "../src/adventure/world.js";
+
+test("auto-walking reaches a neighbour at 20 FPS without oscillating past tiles", () => {
+  const state = fresh();
+  let talks = 0;
+  const controller = {
+    state,
+    paused: false,
+    keys: new Set(),
+    path: [
+      { x: 15.5, y: 14.5 },
+      { x: 14.5, y: 14.5 },
+    ],
+    target: { id: "welcome" },
+    follow: { ...state.player },
+    onInteract() {
+      talks++;
+    },
+  };
+  for (let i = 0; i < 100; i++) World.prototype.step.call(controller, 0.05);
+  assert.equal(controller.path.length, 0);
+  assert.equal(talks, 1);
+  assert.equal(state.player.x, 14.5);
+  assert.equal(state.player.y, 14.5);
+});
 
 test("pointer coordinates stay correct when a phone scales the canvas bitmap", () => {
   const bounds = { left: 10, top: 20, width: 160, height: 240 };
