@@ -175,13 +175,15 @@ export function setupIntro(art, state, onStart) {
     frame = requestAnimationFrame(draw);
   }
   draw(0);
-  title.onclick = () => {
+  const enter = (mode) => {
     if (!ready || exited) return;
     exited = true;
     cancelAnimationFrame(frame);
     overlay.hidden = true;
-    onStart();
+    onStart(mode);
   };
+  title.onclick = () => enter("solo");
+  document.getElementById("intro-online").onclick = () => enter("online");
   return {
     progress(done, total) {
       fill.style.width = `${Math.round((done / total) * 100)}%`;
@@ -194,6 +196,7 @@ export function setupIntro(art, state, onStart) {
         "The village is ready. Your bright ideas are needed.";
       title.disabled = false;
       document.getElementById("intro-wardrobe").disabled = false;
+      document.getElementById("intro-online").disabled = false;
       title.textContent = state.completed.length
         ? "Continue your adventure →"
         : "Step into Numberglen →";

@@ -4,6 +4,8 @@ A maths adventure by Lalith. Ride into a dusty frontier village, help its neighb
 
 ## What you can play
 
+- A fullscreen world with a compact quest/player HUD, on-demand journal drawer and optional browser fullscreen. The cast intro remains, with solo and online entry choices.
+- Guest online rooms for up to four players: share an eight-character code, explore with visible remote avatars, and play five-question maths races with shared questions, countdowns, feedback and scores.
 - Two explorable maps with collision, click-to-walk routes, keyboard movement and a minimap.
 - Nine connected quests, requiring 49 correct answers to finish the story. Neighbours have dialogue and each quest teaches a different skill.
 - Animated characters, cats, frogs and butterflies; furniture and cave scenery from paid LimeZu packs.
@@ -17,20 +19,35 @@ A maths adventure by Lalith. Ride into a dusty frontier village, help its neighb
 - Wrong-answer explanations, method hints and a revision notebook that clears questions when you answer them correctly.
 - Cat/frog companions, three visible cosmetic upgrades, one-time quest coins, XP, saved progress, mute and reduced motion settings.
 
-The world is playable without an account or maths API. There is no tracking, fake online leaderboard or reward purchase. Completing the story grants **340 in-game coins**; these have no relationship to Hack Club Stardust.
+Solo play needs no account or maths API. Online play uses PeerJS/WebRTC guest rooms, with no login or persistent online leaderboard. There are no reward purchases. Completing the story grants **340 in-game coins**; these have no relationship to Hack Club Stardust.
 
 ## Controls
 
-| Action | Keyboard / mouse | Touch |
-| --- | --- | --- |
-| Walk | WASD, arrow keys, or click a destination | Tap a destination or use touch arrows |
-| Meet someone | E nearby, click a neighbour, or choose a journal entry | Tap the neighbour or journal entry |
-| Answer | Type a number and Enter | Use the keypad or device keyboard |
-| Continue | Enter or the Next button | Next button |
-| Pause challenge | Escape or pause button | Pause button |
-| Change character | Character button in the header, journal wardrobe, or Choose your character on the intro | Same buttons |
+| Action              | Keyboard / mouse                                                          | Touch                                 |
+| ------------------- | ------------------------------------------------------------------------- | ------------------------------------- |
+| Walk                | WASD, arrow keys, or click a destination                                  | Tap a destination or use touch arrows |
+| Meet someone        | E nearby, click a neighbour, or choose a journal entry                    | Tap the neighbour or journal entry    |
+| Answer              | Type a number and Enter                                                   | Use the keypad or device keyboard     |
+| Continue            | Enter or the Next button                                                  | Next button                           |
+| Pause challenge     | Escape or pause button                                                    | Pause button                          |
+| Journal / game menu | J or journal/menu button                                                  | Same buttons                          |
+| Practice / online   | P / O or action bar                                                       | Action bar                            |
+| Browser fullscreen  | F or fullscreen icon                                                      | Fullscreen icon (if supported)        |
+| Change character    | C, character HUD, journal wardrobe, or Choose your character on the intro | Same buttons                          |
 
-Follow “Find next quest” if you get lost. Story quests are untimed and recover after mistakes. The countdown runs only in the sprint. Leaving the browser tab pauses a challenge. Quitting an unfinished challenge gives no quest reward; completed quests stay saved.
+Use “Track quest” if you get lost. Story quests are untimed and recover after mistakes. Solo countdowns run only in the sprint. Leaving the browser tab pauses a solo challenge. Online races keep running for the room. Quitting an unfinished challenge gives no quest reward; completed quests stay saved.
+
+## Play online with friends
+
+1. Select **Play with friends** on the intro, or **Online** / O in the world.
+2. Host selects **Create room**, then shares the eight-character room code.
+3. Friends open the same game and select **Join room** with that code. No account is needed.
+4. Explore together, or let the host choose a skill and difficulty and start a maths race. Everyone receives the same five questions. Each has three tries and 18 seconds; correct answers score once.
+5. Return to the room lobby to rematch or leave. The host must keep their game open.
+
+Online scores are temporary and never change solo coins, XP or quests. Quest progression and NPC routines remain local; online play synchronizes player presence and race state. Guests joining during a race spectate until the next one. Closing the race window returns to exploration; its timer keeps running.
+
+The first online action contacts the public PeerJS signaling service. Room peers receive your nickname, character, position and submitted race answers. WebRTC establishes the data channel; camera/microphone permissions are not requested. Some school firewalls or symmetric NAT combinations block peer connections. No paid TURN relay is configured, so connectivity on every network cannot be guaranteed. Check the code, keep the host open and retry on another network when a connection fails. See [online design and dependencies](docs/ONLINE-DESIGN.md).
 
 ## Develop locally
 
@@ -57,7 +74,7 @@ node scripts/verify-release.mjs
 npm run preview
 ```
 
-Nineteen tests cover 24,000 equations, validation, daily determinism, quest and purchase transactions, saves, routes, cave gates, scaled pointer coordinates, walking at 20 FPS, direction selection, five conversation/return cycles, following a moving neighbour, wardrobe coverage, migration of old saves, character reloads and caravan collision. `python scripts/check-art.py` compares actual normalized sprite pixels against the owned sheets for eleven villagers and four cave characters. `python scripts/check-wardrobe-art.py` checks all 324 baked characters, their 9,072 animation cells, visually unique pixel hashes and matching portraits. Run the pixel checks after importing artwork. The deployment workflow checks source and release hashes before publishing the compiled game, so CI does not need the private artwork packs. Rebuild and package after changing recorded source files.
+Twenty-three tests cover 24,000 equations, validation, daily determinism, quest and purchase transactions, saves, routes, cave gates, scaled pointer coordinates, walking at 20 FPS, direction selection, five conversation/return cycles, following a moving neighbour, wardrobe coverage, migration of old saves, character reloads and caravan collision. Online checks cover safe room profiles, private answers, host-owned scores, duplicates, attempts, deadlines and five-round completion. `python scripts/check-art.py` compares actual normalized sprite pixels against the owned sheets for eleven villagers and four cave characters. `python scripts/check-wardrobe-art.py` checks all 324 baked characters, their 9,072 animation cells, visually unique pixel hashes and matching portraits. Run the pixel checks after importing artwork. The deployment workflow checks source and release hashes before publishing the compiled game, so CI does not need the private artwork packs. Rebuild and package after changing recorded source files.
 
 ## Structure
 
@@ -71,6 +88,9 @@ Nineteen tests cover 24,000 equations, validation, daily determinism, quest and 
 - `src/adventure/intro.js`: ensemble opening scene and real artwork-load progress.
 - `src/adventure/wardrobe-data.json`, `wardrobe.js`, `wardrobe-ui.js`: fixed catalogue, safe appearance selection, browsing and four-direction preview.
 - `src/adventure/frontier.js`, `frontier.css`: frontier scenery and dust/sage interface.
+- `src/adventure/fullscreen.css`: viewport game HUD, journal drawer and touch layout.
+- `src/adventure/online-model.js`, `online-room.js`, `online-ui.js`: host race rules, real WebRTC transport and guest lobby/race interface.
+- `docs/ONLINE-DESIGN.md`: online state ownership, loops, dependencies and test boundaries.
 - `scripts/import-art.py`: local licensed artwork preparation.
 - `scripts/build-wardrobe.py`: offline construction and palette packing of 324 distinct playable looks.
 - `docs/ADVENTURE-DESIGN.md`: loops, state ownership, decisions and verification boundaries.

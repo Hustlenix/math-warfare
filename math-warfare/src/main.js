@@ -2,6 +2,8 @@ import "./styles.css";
 import "./adventure/polish.css";
 import "./adventure/intro.css";
 import "./adventure/frontier.css";
+import "./adventure/fullscreen.css";
+import { setupOnline } from "./adventure/online-ui.js";
 import { setupIntro } from "./adventure/intro.js";
 import { openWardrobe } from "./adventure/wardrobe-ui.js";
 import { portraitStyle } from "./adventure/wardrobe.js";
@@ -58,6 +60,30 @@ let art = {},
   previousFocus,
   toastTimeout,
   audioCtx;
+let online;
+const journal = $("journal-panel");
+function closeJournal() {
+  journal.close();
+  if (world) world.paused = panel.open || !$("intro").hidden;
+  world?.keys.clear();
+}
+function openJournal() {
+  if (panel.open || !$("intro").hidden) return;
+  world.paused = true;
+  world.keys.clear();
+  journal.showModal();
+  $("journal-close").focus();
+}
+async function fullscreen() {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {
+    toast(
+      "Fullscreen is unavailable in this browser. The game still fills this window.",
+    );
+  }
+}
 function toast(text) {
   $("toast").textContent = text;
   $("toast").classList.add("show");
@@ -92,6 +118,7 @@ function chime(good = true) {
   } catch {}
 }
 function open(html) {
+  closeJournal();
   world.paused = true;
   world.keys.clear();
   if (!panel.open) previousFocus = document.activeElement;
@@ -122,9 +149,14 @@ function refresh() {
   $("sound").textContent = `Sound: ${state.muted ? "off" : "on"}`;
   document.body.classList.toggle("reduce-motion", state.reducedMotion);
   $("quest-count").textContent = `${state.completed.length} / ${QUESTS.length}`;
+  $("hud-progress").style.width =
+    `${(state.completed.length / QUESTS.length) * 100}%`;
   $("quest-progress").style.width =
     `${(state.completed.length / QUESTS.length) * 100}%`;
   const next = nextQuest(state);
+  $("hud-quest").textContent = next?.title ?? "All lanterns restored";
+  $("hud-zone").textContent =
+    state.zone === "village" ? "DUSTLIGHT FRONTIER" : "LANTERN HOLLOW";
   $("active-title").textContent = next?.title ?? "The light lives on.";
   $("active-copy").textContent = next
     ? `${next.person} needs your help. ${SKILLS[next.skill]} · ${next.count} bright ideas.`
@@ -162,15 +194,21 @@ function refresh() {
       return `<button data-neighbour="${n.id}" class="neighbour">${portrait}<span>${n.name}<small>${done ? "✓ Helped" : locked ? "Waiting for another quest" : q ? q.title : n.label}</small></span><b>${done ? "✓" : locked ? "·" : "↗"}</b></button>`;
     })
     .join("");
-  document
-    .querySelectorAll("[data-neighbour]")
-    .forEach((b) => (b.onclick = () => world.go(b.dataset.neighbour)));
+  document.querySelectorAll("[data-neighbour]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        closeJournal();
+        world.go(b.dataset.neighbour);
+        $("world").focus();
+      }),
+  );
   $("mistake-count").textContent = state.mistakes.length
     ? `${state.mistakes.length} notes to revisit →`
     : "Nothing to revise yet →";
   persist();
 }
 function route() {
+  closeJournal();
   const q = nextQuest(state);
   if (!q) {
     arena();
@@ -581,9 +619,11 @@ function collection() {
 function settings() {
   open(
     modalHead("A COMFORTABLE ADVENTURE", "Your settings.") +
-      `<label class="setting-row"><input id="mute-setting" type="checkbox" ${state.muted ? "checked" : ""}>Mute game sounds</label><label class="setting-row"><input id="motion-setting" type="checkbox" ${state.reducedMotion ? "checked" : ""}>Reduce motion</label><p class="muted">Progress stays in this browser. No account, tracking or online leaderboard.</p><button id="reset-save">Start a new adventure</button><div id="reset-confirm" hidden><p>This clears adventure progress, coins and learning notes on this device. Your old MATH-Warefare scores are untouched.</p><button id="reset-yes">Clear this adventure</button> <button id="reset-no">Keep my save</button></div>`,
+      `<label class="setting-row"><input id="mute-setting" type="checkbox" ${state.muted ? "checked" : ""}>Mute game sounds</label><label class="setting-row"><input id="motion-setting" type="checkbox" ${state.reducedMotion ? "checked" : ""}>Reduce motion</label><p class="muted">Solo progress stays in this browser. Online room scores disappear when the host leaves. No account is required.</p><button id="settings-fullscreen">Toggle fullscreen</button> <button id="settings-about">About & credits</button><hr><button id="reset-save">Start a new adventure</button><div id="reset-confirm" hidden><p>This clears adventure progress, coins and learning notes on this device. Your old MATH-Warefare scores are untouched.</p><button id="reset-yes">Clear this adventure</button> <button id="reset-no">Keep my save</button></div>`,
   );
   bindClose();
+  $("settings-fullscreen").onclick = fullscreen;
+  $("settings-about").onclick = about;
   $("mute-setting").onchange = () => {
     state.muted = $("mute-setting").checked;
     refresh();
@@ -623,6 +663,7 @@ panel.addEventListener("cancel", (e) => {
 });
 document.addEventListener("keydown", (e) => {
   if (!$("intro").hidden) return;
+  if (journal.open) return;
   if (panel.open) {
     if (battle?.feedback && e.key === "Enter" && !battle.pausedAt) {
       e.preventDefault();
@@ -636,6 +677,21 @@ document.addEventListener("keydown", (e) => {
     e.target.closest("button,a,input,select,textarea")
   )
     return;
+  if (e.target instanceof Element && e.target.closest("input,select,textarea"))
+    return;
+  const shortcut = {
+    j: openJournal,
+    p: arena,
+    o: () => online.open(),
+    c: wardrobe,
+    f: fullscreen,
+    Escape: settings,
+  }[e.key === "Escape" ? e.key : e.key.toLowerCase()];
+  if (shortcut && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    e.preventDefault();
+    shortcut();
+    return;
+  }
   if (
     [
       "ArrowLeft",
@@ -687,6 +743,25 @@ $("daily").onclick = daily;
 $("mistakes").onclick = notes;
 $("collection").onclick = collection;
 $("settings").onclick = settings;
+$("journal-open").onclick = $("menu-open").onclick = openJournal;
+$("journal-close").onclick = () => {
+  closeJournal();
+  $("world").focus();
+};
+journal.addEventListener("cancel", (e) => {
+  e.preventDefault();
+  closeJournal();
+  $("world").focus();
+});
+$("train-open").onclick = arena;
+$("online-open").onclick = $("online-hud").onclick = () => online.open();
+$("fullscreen").onclick = fullscreen;
+document.addEventListener("fullscreenchange", () =>
+  $("fullscreen").setAttribute(
+    "aria-label",
+    document.fullscreenElement ? "Exit fullscreen" : "Enter fullscreen",
+  ),
+);
 $("wardrobe").onclick =
   $("character-open").onclick =
   $("intro-wardrobe").onclick =
@@ -698,9 +773,13 @@ $("sound").onclick = () => {
   chime();
 };
 async function boot() {
-  const intro = setupIntro(art, state, () => {
+  const intro = setupIntro(art, state, (mode) => {
     document.getElementById("app").inert = false;
     world.paused = false;
+    if (mode === "online") {
+      online.open();
+      return;
+    }
     if (!state.completed.length) {
       open(
         '<span class="eyebrow">YOUR FIRST BRIGHT IDEA</span><h2>Meet Mira in the square.</h2><p>Use WASD / arrows, click a place, or choose a neighbour in the field journal. Press E nearby to talk.</p><p>Help the village through short maths quests. Mistakes give you a method and another try. Your progress stays saved here.</p><button id="begin" class="primary full">Let’s explore →</button>',
@@ -737,6 +816,17 @@ async function boot() {
         y: state.zone === "village" ? 14.5 : 20.5,
       };
     world = new World($("world"), state, art, interact, toast);
+    online = setupOnline({
+      state,
+      art,
+      getWorld: () => world,
+      open,
+      close,
+      esc,
+      toast,
+      panel,
+      content,
+    });
     refresh();
     if (matchMedia("(pointer: coarse)").matches)
       $("touch-controls").hidden = false;

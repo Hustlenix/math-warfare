@@ -127,8 +127,9 @@ export class World {
   }
   resize() {
     const b = this.canvas.getBoundingClientRect();
-    this.canvas.width = Math.max(320, Math.round(b.width));
-    this.canvas.height = Math.max(240, Math.round(b.height));
+    const scale = b.width >= 1200 || b.height >= 950 ? 2 : 1;
+    this.canvas.width = Math.max(320, Math.round(b.width / scale));
+    this.canvas.height = Math.max(240, Math.round(b.height / scale));
     this.ctx.imageSmoothingEnabled = false;
   }
   get npcs() {
@@ -604,8 +605,17 @@ export class World {
         py: (n.y + 0.5) * T,
       })),
       { id: "player", px: p.x * T, py: p.y * T },
+      ...(this.remotePlayers ?? [])
+        .filter((r) => r.zone === this.state.zone)
+        .map((r) => ({ ...r, remote: true, px: r.x * T, py: r.y * T })),
     ].sort((a, b) => a.py - b.py);
     for (const n of entities) {
+      if (n.remote) {
+        this.rect(n.px - 14, n.py - 4, 28, 5, "#72d8cfaa");
+        this.character(n.avatar, n.px, n.py, n.dir, n.moving);
+        this.label(n.name, n.px, n.py - 64, "#c9fff1", 10);
+        continue;
+      }
       if (n.id === "player") {
         this.character(
           this.state.appearance.id,
@@ -750,7 +760,9 @@ export class World {
       w = 99,
       h = 75,
       x = this.canvas.width - w - 15,
-      y = 15;
+      y = Math.round(
+        (88 * this.canvas.height) / this.canvas.getBoundingClientRect().height,
+      );
     this.rect(x - 5, y - 5, w + 10, h + 10, "#152a2bdd");
     this.rect(
       x,
@@ -765,6 +777,9 @@ export class World {
           this.rect(x + tx * 3, y + ty * 3, 3, 3, "#233e3b");
     for (const n of this.npcs)
       this.rect(x + n.x * 3, y + n.y * 3, 3, 3, "#ffd275");
+    for (const r of this.remotePlayers ?? [])
+      if (r.zone === this.state.zone)
+        this.rect(x + r.x * 3, y + r.y * 3, 3, 3, "#72d8cf");
     this.rect(
       x + this.state.player.x * 3 - 2,
       y + this.state.player.y * 3 - 2,

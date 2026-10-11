@@ -1,0 +1,506 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #756b4b;
+}
+[hidden] {
+  display: none !important;
+}
+.game-shell {
+  position: fixed;
+  inset: 0;
+  isolation: isolate;
+  height: 100dvh;
+  overflow: hidden;
+}
+.game-shell #world {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  image-rendering: pixelated;
+  touch-action: none;
+  outline-offset: -4px;
+}
+.game-hud {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  right: max(14px, env(safe-area-inset-right));
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+.game-hud button,
+.game-hud .player-hud {
+  pointer-events: auto;
+}
+.quest-hud,
+.player-hud,
+.online-hud {
+  background: #263d35f2;
+  color: #f7e6b8;
+  border: 2px solid #aa9063;
+  border-radius: 2px;
+  box-shadow: 3px 4px 0 #24271b66;
+}
+.quest-hud {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 9px 12px;
+  min-width: 245px;
+  max-width: 350px;
+}
+.quest-hud:hover,
+.player-hud button:hover,
+.online-hud:hover {
+  background: #3a5140;
+}
+.hud-book {
+  font-size: 25px;
+  color: #e6b864;
+}
+.quest-hud > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.quest-hud small {
+  display: block;
+  font: 9px/1.6 monospace;
+  letter-spacing: 1px;
+  color: #dbc794;
+}
+.quest-hud strong {
+  display: block;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hud-progress {
+  display: block;
+  height: 3px;
+  background: #111e1b;
+  margin-top: 6px;
+}
+.hud-progress i {
+  display: block;
+  height: 100%;
+  background: #e9bb60;
+  width: 0;
+}
+.game-shell kbd {
+  font: 10px/1 monospace;
+  padding: 3px 4px;
+  border: 1px solid currentColor;
+  opacity: 0.7;
+  margin-left: 6px;
+}
+.player-hud {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  padding: 3px 5px;
+}
+.hud-wallet {
+  display: grid;
+  font: 11px/1.7 monospace;
+  padding: 0 7px;
+  color: #e6c46e;
+}
+.player-hud button {
+  background: transparent;
+  color: #f7e6b8;
+  box-shadow: none;
+  border: 0;
+  padding: 6px 10px;
+  min-height: 44px;
+}
+.player-hud #character-open {
+  margin: 0;
+  gap: 7px;
+  max-width: 170px;
+}
+.player-hud .hero-mini {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.player-hud #fullscreen,
+.player-hud #settings {
+  font-size: 22px;
+}
+.game-actions {
+  position: absolute;
+  left: 50%;
+  right: auto;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  padding: 0;
+}
+.game-actions button {
+  min-height: 48px;
+  padding: 10px 16px;
+  box-shadow: 2px 4px 0 #3e3b2366;
+  border: 2px solid #a38b60;
+  background: #f3e6c2;
+  color: #2b3d30;
+}
+.game-actions button:hover {
+  background: #fff4d6;
+}
+.game-actions .primary {
+  background: #d9ad62;
+  color: #263b30;
+}
+.game-actions .connected {
+  background: #2c5145;
+  color: #f8e9bc;
+}
+.online-hud {
+  position: absolute;
+  top: 92px;
+  left: 14px;
+  padding: 7px 10px;
+  text-align: left;
+  font: 11px/1.7 monospace;
+}
+.online-hud b {
+  letter-spacing: 2px;
+  margin-right: 10px;
+}
+.game-dpad {
+  position: absolute;
+  left: 18px;
+  bottom: 85px;
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  gap: 4px;
+  background: transparent;
+  padding: 0;
+  border: 0;
+}
+.game-dpad button {
+  background: #283e35e8;
+  color: #f8e9bc;
+  border: 2px solid #c2ac75;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font-size: 20px;
+  box-shadow: none;
+}
+.game-dpad button:nth-child(1) {
+  grid-column: 2;
+}
+.game-dpad button:nth-child(2) {
+  grid-row: 2;
+  grid-column: 1;
+}
+.game-dpad button:nth-child(3) {
+  grid-row: 2;
+  grid-column: 2;
+}
+.game-dpad button:nth-child(4) {
+  grid-row: 2;
+  grid-column: 3;
+}
+.journal-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  width: min(390px, 100%);
+  height: 100dvh;
+  max-height: 100dvh;
+  max-width: 100%;
+  overflow: auto;
+  padding: 30px 24px;
+  border: 0;
+  border-left: 4px solid #ac925f;
+  border-radius: 0;
+  background: #eee4c9;
+  color: #273d32;
+  box-shadow: -8px 0 0 #29362b44;
+}
+.journal-drawer::backdrop {
+  background: #18261c44;
+}
+.drawer-close {
+  float: right;
+  font-size: 22px;
+  padding: 0 10px;
+  margin: 0 0 8px 12px;
+}
+.journal-drawer .journal-top {
+  clear: both;
+}
+.journal-drawer .neighbours,
+.journal-drawer .journal-tools {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+#toast {
+  bottom: 82px;
+  max-width: calc(100% - 24px);
+}
+.journal-menu {
+  margin-top: 24px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.journal-menu small {
+  display: block;
+  width: 100%;
+  font-size: 10px;
+}
+#panel {
+  max-height: calc(100dvh - 24px);
+}
+.online-identity {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 20px 0;
+}
+.online-identity > span:last-child {
+  color: #6b7156;
+  font-size: 11px;
+}
+.online-divider {
+  margin: 22px 0 12px;
+  text-align: center;
+  font: 10px monospace;
+  letter-spacing: 2px;
+}
+#join-room {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+#join-room label {
+  flex: 1;
+}
+#room-input {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+.online-fine {
+  font-size: 11px;
+  line-height: 1.7;
+}
+.online-close {
+  font-size: 24px;
+  padding: 0 10px;
+}
+.room-code {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.room-code span {
+  font: 10px monospace;
+}
+.room-code strong {
+  font: 24px monospace;
+  letter-spacing: 4px;
+}
+.online-players {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 20px 0;
+}
+.online-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: #e0d9b8;
+  border: 1px solid #c3bb99;
+}
+.online-player span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.online-player small {
+  display: block;
+  font: 10px monospace;
+  color: #65704e;
+}
+.online-race-options {
+  display: flex;
+  gap: 12px;
+}
+.online-race-options label {
+  flex: 1;
+  min-width: 0;
+}
+.online-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.race-top {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  font: 13px monospace;
+}
+.race-top strong {
+  color: #745431;
+}
+.online-question {
+  font:
+    32px/1.4 Georgia,
+    serif;
+  margin: 24px 0;
+}
+.online-answer-row {
+  display: flex;
+  gap: 8px;
+}
+.online-answer-row input {
+  min-width: 0;
+  flex: 1;
+  font-size: 22px;
+}
+#online-feedback {
+  min-height: 45px;
+  font-size: 13px;
+}
+.online-scores {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  border-top: 1px solid #bcb68e;
+}
+.online-scores li {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  border-bottom: 1px solid #bcb68e;
+}
+.online-scores li > span {
+  flex: 1;
+}
+.online-scores small {
+  color: #3a6544;
+}
+@media (min-width: 1500px) {
+  .game-actions {
+    bottom: 24px;
+  }
+  .game-hud {
+    top: 20px;
+    left: 20px;
+    right: 20px;
+  }
+}
+@media (max-width: 700px) {
+  .game-hud {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    gap: 6px;
+  }
+  .quest-hud {
+    min-width: 0;
+    max-width: 52%;
+    gap: 6px;
+    padding: 7px 9px;
+  }
+  .quest-hud .hud-book,
+  .quest-hud kbd {
+    display: none;
+  }
+  .quest-hud small {
+    font-size: 8px;
+    letter-spacing: 0;
+  }
+  .quest-hud strong {
+    font-size: 11px;
+  }
+  .player-hud {
+    padding: 2px;
+    gap: 0;
+  }
+  .player-hud button {
+    padding: 4px 6px;
+    min-height: 40px;
+  }
+  .player-hud .character-name,
+  .player-hud #character-open > span:last-child {
+    display: none;
+  }
+  .player-hud #character-open {
+    width: 38px;
+  }
+  .hud-wallet {
+    padding: 0 4px;
+    font-size: 9px;
+  }
+  .game-actions {
+    bottom: max(12px, env(safe-area-inset-bottom));
+    gap: 4px;
+    max-width: calc(100% - 16px);
+  }
+  .game-actions button {
+    padding: 8px 10px;
+    min-height: 44px;
+    font-size: 11px;
+  }
+  .game-actions kbd {
+    display: none;
+  }
+  .game-actions #help-route {
+    max-width: 90px;
+  }
+  .online-hud {
+    top: 78px;
+    left: 8px;
+    display: grid;
+    gap: 0;
+    font-size: 10px;
+  }
+  .online-players {
+    grid-template-columns: 1fr;
+  }
+  .online-identity {
+    flex-wrap: wrap;
+  }
+  .online-question {
+    font-size: 26px;
+  }
+  .online-race-options {
+    flex-direction: column;
+  }
+}
+@media (max-height: 500px) {
+  .game-actions {
+    bottom: 8px;
+  }
+  .game-dpad {
+    bottom: 65px;
+  }
+  .intro {
+    overflow: auto;
+  }
+}

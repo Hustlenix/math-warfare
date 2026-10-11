@@ -6,11 +6,11 @@
     <meta name="theme-color" content="#183c3a" />
     <meta
       name="description"
-      content="A pixel maths adventure. Help Numberglen’s villagers, befriend animals and restore a mysterious mushroom cave through mental maths."
+      content="A pixel maths adventure. Explore a living frontier, solve maths quests and race friends online without a login."
     />
     <title>MATH-Warefare · The Dustlight Frontier</title>
-    <script type="module" crossorigin src="./assets/index-70bkOhji.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-0YApGpnY.css">
+    <script type="module" crossorigin src="./assets/index-Cf2fatpw.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DWaqELDn.css">
   </head>
   <body>
     <section id="intro" class="intro" aria-label="Welcome to Numberglen">
@@ -48,6 +48,7 @@
               </button>
               <button id="intro-start" class="primary" disabled>
                 Loading the adventure…</button
+              ><button id="intro-online" disabled>Play with friends</button
               ><button id="intro-retry" hidden>Reload</button>
             </div>
             <p class="intro-controls">Explore · meet · solve · restore</p>
@@ -55,117 +56,122 @@
         </div>
       </div>
     </section>
-    <div id="app">
-      <header class="topbar">
-        <a class="brand" href="./" aria-label="MATH-Warefare home"
-          ><span class="brand-mark">×</span
-          ><span>MATH-WAREFARE<small>THE DUSTLIGHT FRONTIER</small></span></a
+    <main id="app" class="game-shell">
+      <canvas
+        id="world"
+        tabindex="0"
+        aria-label="Dustlight Frontier. Arrows or WASD to walk. E to talk. J for journal. P for practice. O for online play."
+      ></canvas>
+      <div class="game-hud">
+        <button
+          id="journal-open"
+          class="quest-hud"
+          aria-label="Open field journal"
         >
-        <div class="wallet">
-          <span id="coins">0 coins</span><span id="xp">0 XP</span>
+          <span class="hud-book">▤</span
+          ><span
+            ><small id="hud-zone">DUSTLIGHT FRONTIER</small
+            ><strong id="hud-quest">A little spark</strong
+            ><span class="hud-progress"><i id="hud-progress"></i></span></span
+          ><kbd>J</kbd>
+        </button>
+        <div class="player-hud">
+          <div class="hud-wallet">
+            <span id="coins">0 coins</span><span id="xp">0 XP</span>
+          </div>
+          <button id="character-open" aria-label="Character wardrobe">
+            Your character</button
+          ><button
+            id="fullscreen"
+            aria-label="Enter fullscreen"
+            title="Fullscreen (F)"
+          >
+            ⛶</button
+          ><button id="settings" aria-label="Settings" title="Settings">
+            ⚙
+          </button>
         </div>
-        <button id="character-open" aria-label="Character wardrobe">
-          Your character
+      </div>
+      <div class="world-action game-actions">
+        <button id="interact" class="primary">Talk <kbd>E</kbd></button
+        ><button id="help-route">Track quest ↗</button
+        ><button id="train-open">Practice <kbd>P</kbd></button
+        ><button id="online-open">Online</button
+        ><button id="menu-open" aria-label="Open game menu">☰</button>
+      </div>
+      <button
+        id="online-hud"
+        class="online-hud"
+        hidden
+        aria-label="Open online room"
+      >
+        <b id="online-room-code"></b><span id="online-hud-status"></span>
+      </button>
+      <div id="touch-controls" class="touch-controls game-dpad" hidden>
+        <button data-direction="ArrowUp" aria-label="Walk up">↑</button
+        ><button data-direction="ArrowLeft" aria-label="Walk left">←</button
+        ><button data-direction="ArrowDown" aria-label="Walk down">↓</button
+        ><button data-direction="ArrowRight" aria-label="Walk right">→</button>
+      </div>
+      <div hidden>
+        <span id="zone-label"></span><span id="zone-title"></span
+        ><span id="scene-caption"></span>
+        <div><span id="village-life"></span></div>
+      </div>
+    </main>
+    <dialog
+      id="journal-panel"
+      class="journal journal-drawer"
+      aria-label="Field journal"
+    >
+      <button
+        id="journal-close"
+        class="drawer-close"
+        aria-label="Close journal"
+      >
+        ×
+      </button>
+      <div class="journal-top">
+        <span class="eyebrow">YOUR FIELD JOURNAL</span
+        ><span id="quest-count">0 / 9</span>
+      </div>
+      <h2 id="active-title">A little spark</h2>
+      <p id="active-copy">Start with Mira in the square.</p>
+      <div class="chapter-progress" aria-label="Quest progress">
+        <div id="quest-progress"></div>
+      </div>
+      <button id="next-quest" class="primary full">Meet Mira →</button>
+      <div class="section-title">
+        NEIGHBOURS <span id="neighbour-count"></span>
+      </div>
+      <div id="neighbours" class="neighbours"></div>
+      <div class="section-title">TAKE A BREATHER</div>
+      <div class="journal-tools">
+        <button id="practice">
+          Practice arena <span>Choose your skill →</span></button
+        ><button id="daily">
+          Daily expedition <span>Same trail for everyone →</span></button
+        ><button id="mistakes">
+          My learning notes
+          <span id="mistake-count">Nothing to revise yet →</span></button
+        ><button id="collection">
+          Companions & upgrades <span>Your growing village →</span>
         </button>
-        <button id="settings" class="icon-button" aria-label="Settings">
-          ⚙
+        <button id="wardrobe">
+          Character wardrobe <span>324 looks · make it yours →</span>
         </button>
-      </header>
-      <main class="layout">
-        <section class="play-area" aria-label="Adventure world">
-          <div class="world-heading">
-            <div>
-              <span class="eyebrow" id="zone-label"
-                >CHAPTER 01 · THE VILLAGE</span
-              >
-              <h1 id="zone-title">Welcome to Numberglen.</h1>
-            </div>
-            <span class="save-status" id="save-status"
-              >Saved on this device</span
-            >
-          </div>
-          <div class="canvas-wrap">
-            <canvas
-              id="world"
-              tabindex="0"
-              aria-label="Numberglen world. Use arrows or WASD to walk. E to interact. Or select a neighbour from the journal."
-            ></canvas>
-            <div class="scene-caption" id="scene-caption">
-              A village of small problems. A world of bright ideas.
-            </div>
-            <div class="world-action">
-              <button id="interact" class="primary">
-                Talk / interact <kbd>E</kbd></button
-              ><button id="help-route">Find next quest ↗</button>
-            </div>
-          </div>
-          <div class="village-life-line">
-            <span id="village-life"
-              >A quiet morning · neighbours are out and about</span
-            >
-          </div>
-          <div class="controls-line">
-            <span
-              >WASD / arrows to walk · click a place to move · E to talk</span
-            ><button id="touch-toggle">Touch controls</button
-            ><button id="sound">Sound: on</button>
-          </div>
-          <div id="touch-controls" class="touch-controls" hidden>
-            <button data-direction="ArrowLeft" aria-label="Walk left">←</button
-            ><button data-direction="ArrowUp" aria-label="Walk up">↑</button
-            ><button data-direction="ArrowDown" aria-label="Walk down">↓</button
-            ><button data-direction="ArrowRight" aria-label="Walk right">
-              →
-            </button>
-          </div>
-        </section>
-        <aside class="journal">
-          <div class="journal-top">
-            <span class="eyebrow">YOUR FIELD JOURNAL</span
-            ><span id="quest-count">0 / 9</span>
-          </div>
-          <h2 id="active-title">A little spark</h2>
-          <p id="active-copy">Start with Mira in the square.</p>
-          <div class="chapter-progress" aria-label="Quest progress">
-            <div id="quest-progress"></div>
-          </div>
-          <button id="next-quest" class="primary full">Meet Mira →</button>
-          <div class="section-title">
-            NEIGHBOURS <span id="neighbour-count"></span>
-          </div>
-          <div id="neighbours" class="neighbours"></div>
-          <div class="section-title">TAKE A BREATHER</div>
-          <div class="journal-tools">
-            <button id="practice">
-              Practice arena <span>Choose your skill →</span></button
-            ><button id="daily">
-              Daily expedition <span>Same trail for everyone →</span></button
-            ><button id="mistakes">
-              My learning notes
-              <span id="mistake-count">Nothing to revise yet →</span></button
-            ><button id="collection">
-              Companions & upgrades <span>Your growing village →</span>
-            </button>
-            <button id="wardrobe">
-              Character wardrobe <span>324 looks · make it yours →</span>
-            </button>
-          </div>
-          <p class="journal-note">
-            Accuracy first. Speed comes with practice.<br /><strong
-              >Stay calculated, GNG.</strong
-            >
-          </p>
-        </aside>
-      </main>
-      <footer>
-        <span
-          >A maths adventure by Lalith · pixel art by
-          <a href="https://limezu.itch.io/" target="_blank" rel="noreferrer"
-            >LimeZu</a
-          ></span
-        ><button id="about">About & credits</button>
-      </footer>
-    </div>
+      </div>
+      <div class="journal-menu">
+        <button id="touch-toggle">Touch controls</button
+        ><button id="sound">Sound: on</button
+        ><button id="about">About & credits</button
+        ><small id="save-status">Saved on this device</small
+        ><small
+          >WASD / arrows · E talk · J journal · P practice · O online · C
+          character · F fullscreen</small
+        >
+      </div>
+    </dialog>
     <dialog id="panel"><div id="panel-content"></div></dialog>
     <div id="toast" role="status" aria-live="polite"></div>
   </body>

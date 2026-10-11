@@ -1,6 +1,6 @@
 # MATH-Warefare: The Dustlight Frontier
 
-A mental maths adventure by Lalith: choose from 324 prebuilt character looks, explore a dusty frontier village, meet its neighbours and restore the lanterns in a mushroom cave.
+A fullscreen mental maths adventure by Lalith: choose from 324 prebuilt looks, explore a living frontier, solve village quests and race friends in guest online rooms without a login.
 
 [Play the game](https://hustlenix.github.io/math-warfare/) · [Setup, controls and full README](math-warfare/README.md) · [Credits](math-warfare/CREDITS.md)
 
