@@ -1,8 +1,9 @@
 import { question, matches, parseAnswer } from "./questions.js";
 import { SKILLS } from "./content.js";
 import { normalizeAppearance } from "./wardrobe.js";
+import { dimensions } from "./map-layout.js";
 
-export const PROTOCOL = 1;
+export const PROTOCOL = 2;
 export const MAX_PLAYERS = 4;
 export const ROUND_MS = 18000;
 export const ROOM_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -21,12 +22,13 @@ export function profile(input = {}) {
   });
   const n = (v, min, max, fallback) =>
     Number.isFinite(v) ? Math.max(min, Math.min(max, v)) : fallback;
+  const zone = input.zone === "cave" ? "cave" : "village", bounds = dimensions(zone);
   return {
     name: appearance.name,
     avatar: appearance.id,
-    x: n(input.x, 1, 32, 16.5),
-    y: n(input.y, 2, 24, 14.5),
-    zone: input.zone === "cave" ? "cave" : "village",
+    x: n(input.x, 1, bounds.width - 1, 16.5),
+    y: n(input.y, 2, bounds.height - 1, 14.5),
+    zone,
     dir:
       Number.isInteger(input.dir) && input.dir >= 0 && input.dir < 4
         ? input.dir

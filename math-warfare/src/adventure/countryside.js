@@ -1,20 +1,13 @@
-export function villagePath(x, y) {
-  return (
-    (x >= 14 && x <= 17) ||
-    (y >= 12 && y <= 14) ||
-    ((x === 7 || x === 8 || x === 24 || x === 25) && y >= 8 && y <= 19) ||
-    (y === 19 && x >= 6 && x <= 27) ||
-    (y === 8 && x >= 6 && x <= 26)
-  );
-}
+import { dimensions, villagePath } from "./map-layout.js";
+export { villagePath } from "./map-layout.js";
 export function drawCountryside(w) {
   const T = 32,
     c = w.ctx,
     r = w.rect.bind(w),
     sprite = w.sprite.bind(w);
   // Narrow lanes, chalk stone edges, crops and shelter give the map a rural scale.
-  for (let x = 1; x < 32; x++)
-    for (let y = 2; y < 24; y++)
+  for (let x = Math.max(1, Math.floor(w.camera.x / T) - 1); x < Math.min(dimensions("village").width - 1, Math.ceil((w.camera.x + w.canvas.width) / T) + 1); x++)
+    for (let y = Math.max(2, Math.floor(w.camera.y / T) - 1); y < Math.min(dimensions("village").height - 1, Math.ceil((w.camera.y + w.canvas.height) / T) + 1); y++)
       if (villagePath(x, y)) {
         r(x * T, y * T, T, T, (x + y) % 3 ? "#d2b580" : "#caae78");
         if ((x * 7 + y) % 5 === 0) {
@@ -119,20 +112,7 @@ export function drawCountryside(w) {
   for (let x = 0; x < 6; x++) r(5.5 * T + x * 8, 18.8 * T, 2, 18, "#d3b685");
   const f = w.state.reducedMotion ? 0 : Math.floor(w.time * 5) % 6;
   c.drawImage(w.art.frog, f * 16, 0, 16, 16, 6 * T, 18 * T, 32, 32);
-  // Vegetable plots and a market awning, rather than furniture floating in grass.
-  for (let x = 9; x < 13; x++)
-    for (let y = 18; y < 23; y++) {
-      r(x * T + 2, y * T + 2, 28, 26, "#94784f");
-      r(x * T + 4, y * T + 16, 24, 3, "#6d5a3f");
-      const sway = w.state.reducedMotion ? 0 : Math.sin(w.time + x) * 1.5;
-      for (let i = 0; i < 3; i++) {
-        r(x * T + 6 + i * 8, y * T + 10 + sway, 3, 10, "#466d42");
-        r(x * T + 3 + i * 8, y * T + 9 + sway, 9, 4, "#81a563");
-        if (y % 2) r(x * T + 5 + i * 8, y * T + 7 + sway, 4, 4, "#df9c69");
-      }
-    }
-  fence(9, 17, 4);
-  fence(9, 23, 4);
+  // The farm now lives in Copperfield. This entire former crop patch is open ground.
   w.label("FERN’S POND", 5 * T, 17 * T - 15, "#e8efc8", 10);
   r(22 * T, 17 * T, 5 * T, 36, "#8d714f");
   r(22 * T + 5, 17 * T + 26, 5 * T - 10, 6, "#b49867");
@@ -193,7 +173,6 @@ export function drawCountryside(w) {
     [30, 22],
     [12, 3],
     [18, 3],
-    [9, 22],
     [28, 22],
   ])
     w.tree(x * T, y * T);
@@ -226,26 +205,9 @@ export function drawCountryside(w) {
       r(x, y, 3, 7, "#57774a");
       r(x - 3, y - 4, 9, 5, i % 2 ? "#dca989" : "#c2afc4");
     }
-  if (w.state.upgrades.includes("picnic")) {
-    sprite("rug", 13 * T, 20 * T);
-    sprite("sofa", 15 * T, 21 * T);
-    sprite("books", 17 * T, 20 * T);
-  }
   if (w.state.upgrades.includes("lanterns"))
     for (const x of [13, 18]) for (const y of [8, 18]) w.lantern(x * T, y * T);
-  // Chickens peck and wander in their patch; small birds cross the canopy.
-  for (let i = 0; i < 4; i++) {
-    const t = w.state.reducedMotion ? i : w.time * 0.35 + i * 1.8,
-      x = (8.2 + Math.sin(t) * 0.55) * T,
-      y = (20.2 + i * 0.55 + Math.cos(t) * 0.2) * T,
-      peck = !w.state.reducedMotion && Math.sin(w.time * 3 + i) > 0;
-    r(x, y, 13, 8, "#f2e4bc");
-    r(x + (peck ? 11 : 9), y + (peck ? 4 : -4), 7, 7, "#f7ebcf");
-    r(x + 12, y + (peck ? 3 : -6), 4, 3, "#bd7252");
-    r(x + 15, y + (peck ? 7 : 0), 3, 2, "#d1a361");
-    r(x + 3, y + 8, 2, 4, "#a17b42");
-    r(x + 9, y + 8, 2, 4, "#a17b42");
-  }
+  // Chickens have a dedicated ranch paddock. Small birds cross the canopy.
   if (!w.state.reducedMotion)
     for (let i = 0; i < 3; i++) {
       const x = (w.time * 23 + i * 117) % (33 * T),

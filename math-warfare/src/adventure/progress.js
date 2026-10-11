@@ -1,5 +1,7 @@
 import { QUESTS, SHOP } from "./content.js";
 import { normalizeAppearance } from "./wardrobe.js";
+import { dimensions } from "./map-layout.js";
+import { petName } from "./companion.js";
 export const SAVE_KEY = "math-warfare-adventure-v1";
 export const fresh = () => ({
   version: 1,
@@ -8,6 +10,7 @@ export const fresh = () => ({
   completed: [],
   upgrades: [],
   companion: "none",
+  petNames: { cat: "Pixel", frog: "Pebble" },
   level: 1,
   records: [],
   mistakes: [],
@@ -50,6 +53,7 @@ export function restore(raw) {
   )
     s.companion = "none";
   s.muted = raw.muted === true;
+  s.petNames = { cat: petName(raw.petNames?.cat, "cat"), frog: petName(raw.petNames?.frog, "frog") };
   s.reducedMotion = raw.reducedMotion === true;
   s.appearance = normalizeAppearance(raw.appearance);
   s.dailyDone =
@@ -82,14 +86,15 @@ export function restore(raw) {
     : [];
   s.zone =
     raw.zone === "cave" && s.completed.includes("library") ? "cave" : "village";
+  const bounds = dimensions(s.zone);
   if (
     raw.player &&
     Number.isFinite(raw.player.x) &&
     Number.isFinite(raw.player.y) &&
     raw.player.x > 1 &&
-    raw.player.x < 32 &&
+    raw.player.x < bounds.width - 1 &&
     raw.player.y > 2 &&
-    raw.player.y < 23
+    raw.player.y < bounds.height - 1
   )
     s.player = { x: raw.player.x, y: raw.player.y };
   return s;

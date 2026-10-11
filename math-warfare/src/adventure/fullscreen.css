@@ -6,6 +6,28 @@ body {
   overscroll-behavior: none;
   background: #756b4b;
 }
+.trail-tools { position: absolute; top: 96px; left: 14px; display: flex; gap: 6px; }
+.trail-tools button { background: #263d35ef; color: #f7e6b8; border: 1px solid #aa9063; font: 11px monospace; padding: 9px 12px; min-height: 38px; box-shadow: 2px 3px 0 #24271b55; }
+.pet-card { display: flex; align-items: center; gap: 18px; margin: 20px 0; }
+.pet-card canvas { width: 128px; height: 96px; image-rendering: pixelated; flex: 0 0 128px; border: 2px solid #b6a071; }
+.pet-card p { margin: 8px 0; }
+.pet-name-row { display: flex; gap: 8px; }
+.pet-name-row input { flex: 1; min-width: 0; }
+.pet-commands { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+#country-map { display: block; width: 100%; height: auto; image-rendering: pixelated; border: 3px solid #566650; margin-top: 20px; }
+.map-destinations { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.map-destinations button { text-align: left; padding: 12px; }
+.map-destinations span { display: block; font: 10px monospace; margin-top: 5px; color: #5c6a4e; }
+.place-icon { display: grid; place-items: center; width: 36px; height: 36px; background: #d8c698; font-size: 24px; flex-shrink: 0; }
+.online-hud { top: 146px !important; }
+@media(max-width: 700px) {
+  .trail-tools { top: 75px; left: 8px; gap: 4px; }
+  .trail-tools button { padding: 7px 9px; font-size: 10px; }
+  .online-hud { top: 125px !important; }
+  .pet-card { gap: 12px; }
+  .pet-card canvas { flex-basis: 96px; width: 96px; height: 72px; }
+  .map-destinations { grid-template-columns: 1fr; }
+}
 [hidden] {
   display: none !important;
 }

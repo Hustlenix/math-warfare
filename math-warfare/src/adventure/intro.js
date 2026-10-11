@@ -146,7 +146,7 @@ export function setupIntro(art, state, onStart) {
     image("hero-309", 850, 359, 3);
     if (art.cat) {
       const f = reduced ? 0 : Math.floor(time * 5) % 12;
-      c.drawImage(art.cat, f * 48, 0, 48, 16, 346, 450, 96, 32);
+      c.drawImage(art.cat, f * 48 + 8, 0, 32, 16, 368, 450, 48, 24);
     }
     if (art.frog) {
       const f = reduced ? 0 : Math.floor(time * 4) % 6;

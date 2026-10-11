@@ -16,6 +16,8 @@ The player explores a village, notices a neighbour's problem, solves a short mat
 
 The game opens no online connection during solo loading. Creating or joining a room lazy-loads PeerJS 1.5.5, contacts its public signaling service and establishes data channels. The static GitHub Pages release needs no server account. No camera, microphone, login, persistent online leaderboard or cloud save is requested. A room host can inspect or change their own game; this is friendly private competition, not an anti-cheat platform.
 
+The expanded world uses protocol 2, separating it from earlier small-map rooms. Position bounds come from the shared per-zone map definitions (village 60×44, cave 33×25). Pet movement, names, NPC routines and quests are local and are not room state.
+
 ## Time and feedback
 
 Movement is sent on changes at up to 10 Hz; host snapshots run at 5 Hz. Rendering remains in the local animation loop. Connection attempts time out after 15 seconds; unregistered channels close after seven seconds. The host accepts answers only in the active round before its deadline, rejects stale rounds and throttles retries. Correct answers earn 10 points plus up to three timing points. Solving early never grants persistent coins or XP. Everyone solving ends the round early; otherwise the deadline advances it. A 2.8-second solution phase gives everyone a breather. Late joiners spectate until the next race.

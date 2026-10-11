@@ -2,6 +2,12 @@
 // Quest identity stays separate from an actor's temporary position.
 export const MEETINGS = [
   {
+    pair: ["farmer", "rancher"],
+    places: [[43, 23], [44, 23]],
+    lines: [["Wren", "Three baskets in each row. Want to count with me?"], ["Bo", "After feeding the chickens. They are terrible at fractions."]],
+    activity: "Trading supplies on the farm lane",
+  },
+  {
     pair: ["chemist", "deputy"],
     places: [
       [18, 20],
@@ -63,6 +69,16 @@ export const MEETINGS = [
   },
 ];
 export const AMBIENT = [
+  {
+    id: "farmer", name: "Wren", art: "hero-064", x: 40, y: 23,
+    label: "Copperfield farmer", stops: [[40, 23], [41, 28], [41, 33]],
+    lines: ["The beds are for seedlings. The centre aisle is for boots.", "Six carrots in a basket, four baskets on the cart. That is my kind of times table."],
+  },
+  {
+    id: "rancher", name: "Bo", art: "hero-280", x: 43, y: 11,
+    label: "Sunset rancher", stops: [[43, 11], [45, 15], [44, 23]],
+    lines: ["Small paws are welcome on these trails. Give your pet time to catch up.", "I keep the barn off the lane. A wagon ought to have room to turn."],
+  },
   {
     id: "chemist",
     name: "Cal",

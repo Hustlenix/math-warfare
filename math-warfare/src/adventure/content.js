@@ -52,7 +52,7 @@ export const QUESTS = [
     requires: ["bakery", "garden"],
     intro:
       "Our book of routes has a torn page. Its measurements use decimals. Recover the page and Scout can open the cave trail.",
-    done: "Map recovered. Scout has opened the trail! Visit the cave sign at the east edge.",
+    done: "Map recovered. Scout has opened the trail! Visit the cave sign east of the town square.",
     tip: "Line up place values. Tenths are equal sized pieces, not whole numbers.",
   },
   {
@@ -155,7 +155,7 @@ export const SHOP = [
     id: "picnic",
     name: "Village picnic",
     price: 60,
-    description: "A new reading corner for your neighbours.",
+    description: "A picnic reading corner in the southern green.",
   },
 ];
 export const NPCS = {

@@ -19,3 +19,5 @@ The local Modern Interiors full-version licence permits use/editing in commercia
 Original packs and cropped images are excluded from public source archives and Git. The compiled playable game embeds only the crops used by this project. That does not grant anyone a licence to extract, redistribute, sell or reuse the artwork. Acquire your own pack licences to build from source. Public code access is not an artwork licence.
 
 Pixel typeface: Press Start 2P, licensed under SIL Open Font License. See `public/FONT-LICENSE.txt`. Game sound is synthesised in code; no downloaded music or sound files are used.
+
+The small four-direction walking cat poses are original pixels authored in `companion.js` with Codex assistance. LimeZu’s licensed curled-cat animation is used for its sleeping pose, at a small cropped display size. Frog animation remains LimeZu artwork; its movement and hops are implemented in code. Expanded farm, creek, bridges, barn, tents and companion shelter are code-drawn scenery, mixed with the credited furniture crops.

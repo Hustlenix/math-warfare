@@ -10,8 +10,11 @@ import {
 import { drawCountryside, villagePath } from "./countryside.js";
 import { heroFrame } from "./wardrobe.js";
 import { drawFrontier } from "./frontier.js";
-export const W = 33,
-  H = 25,
+import { dimensions, landscapeBlocked, LANDMARKS } from "./map-layout.js";
+import { drawExpansion } from "./expansion.js";
+import { Companion, drawCompanion, petName } from "./companion.js";
+export const W = 60,
+  H = 44,
   T = 32;
 const key = (x, y) => `${x},${y}`;
 export function pointerToWorld(point, bounds, bitmap, camera) {
@@ -24,8 +27,10 @@ export function pointerToWorld(point, bounds, bitmap, camera) {
 export function blocked(zone, x, y, state) {
   x = Math.floor(x);
   y = Math.floor(y);
-  if (x < 1 || y < 2 || x >= W - 1 || y >= H - 1) return true;
+  const { width, height } = dimensions(zone);
+  if (x < 1 || y < 2 || x >= width - 1 || y >= height - 1) return true;
   if (zone === "village") {
+    if (landscapeBlocked(x, y)) return true;
     for (const bx of [3, 20]) {
       if (y === 3 && x >= bx && x <= bx + 8) return true;
       if (y >= 4 && y <= 9 && (x === bx || x === bx + 8)) return true;
@@ -110,7 +115,10 @@ export class World {
     this.paused = false;
     this.last = 0;
     this.particles = [];
-    this.follow = { ...state.player };
+    this.petKind = state.companion;
+    this.pet = new Companion(state.player,
+      (from, to) => pathfind(this.state.zone, from, to, this.state),
+      (x, y) => blocked(this.state.zone, x, y, this.state));
     this.residents = createResidents(NPCS.village);
     this.lifeTime = 0;
     this.nextMeeting = 6;
@@ -142,6 +150,7 @@ export class World {
         actor: a,
       })),
       ...NPCS.village.filter((n) => !n.art),
+      ...LANDMARKS,
     ];
   }
   nearest() {
@@ -223,6 +232,10 @@ export class World {
       this.go(n.id);
       return;
     }
+    if (this.state.companion !== "none" && Math.hypot(this.pet.x - x, this.pet.y - y) < 0.65) {
+      this.petAnimal();
+      return;
+    }
     this.target = null;
     this.path = pathfind(
       this.state.zone,
@@ -235,7 +248,7 @@ export class World {
     this.state.zone = zone;
     this.state.player =
       zone === "cave" ? { x: 4.5, y: 20.5 } : { x: 29.5, y: 13.5 };
-    this.follow = { ...this.state.player };
+    this.pet.reset(this.state.player);
     this.path = [];
     this.target = null;
   }
@@ -267,10 +280,10 @@ export class World {
           this.target = null;
           this.onInteract(n);
         }
-        return;
+      } else {
+        dx = (next.x - p.x) / dist;
+        dy = (next.y - p.y) / dist;
       }
-      dx = (next.x - p.x) / dist;
-      dy = (next.y - p.y) / dist;
     }
     this.moving = !!(dx || dy);
     if (this.moving) {
@@ -282,11 +295,22 @@ export class World {
       if (!blocked(this.state.zone, p.x + sx, p.y, this.state)) p.x += sx;
       if (!blocked(this.state.zone, p.x, p.y + sy, this.state)) p.y += sy;
     }
-    const d = Math.hypot(p.x - this.follow.x, p.y - this.follow.y);
-    if (d > 1.2) {
-      this.follow.x += (p.x - this.follow.x) * Math.min(1, dt * 4);
-      this.follow.y += (p.y - this.follow.y) * Math.min(1, dt * 4);
+    if (this.pet) {
+      if (this.petKind !== this.state.companion) {
+        this.petKind = this.state.companion;
+        this.pet.reset(p);
+      }
+      this.pet.update(dt, p, this.state.companion !== "none");
     }
+  }
+  petAnimal() {
+    if (this.state.companion === "none") return false;
+    if (!this.pet.pet(this.state.player)) {
+      this.onNotice("Walk closer to your companion, or use Recall in its menu.");
+      return false;
+    }
+    this.onNotice(`${petName(this.state.petNames?.[this.state.companion], this.state.companion)} enjoys a little scratch.`);
+    return true;
   }
   frame(t) {
     const dt = Math.min(0.05, (t - this.last) / 1000 || 0);
@@ -346,7 +370,7 @@ export class World {
         a.wait -= dt;
         if (a.wait <= 0) {
           a.wait = 9 + (this.residents.indexOf(a) % 3);
-          const stops =
+          const stops = a.stops ??
             a.id === "hazel"
               ? [
                   [10, 17],
@@ -544,6 +568,7 @@ export class World {
       p = this.state.player,
       cw = this.canvas.width,
       ch = this.canvas.height;
+    const { width: W, height: H } = dimensions(this.state.zone);
     this.camera.x =
       cw > W * T
         ? (W * T - cw) / 2
@@ -555,16 +580,19 @@ export class World {
     c.fillRect(0, 0, cw, ch);
     c.translate(-Math.round(this.camera.x), -Math.round(this.camera.y));
     const village = this.state.zone === "village";
-    for (let y = 0; y < H; y++)
-      for (let x = 0; x < W; x++) {
+    const left = Math.max(0, Math.floor(this.camera.x / T) - 1), right = Math.min(W, Math.ceil((this.camera.x + cw) / T) + 1),
+      top = Math.max(0, Math.floor(this.camera.y / T) - 1), bottom = Math.min(H, Math.ceil((this.camera.y + ch) / T) + 1);
+    for (let y = top; y < bottom; y++)
+      for (let x = left; x < right; x++) {
         if (village) {
           const road = villagePath(x, y);
+          const green = x > 32 || y > 25;
           this.rect(
             x * T,
             y * T,
             T,
             T,
-            road ? ((x + y) % 3 ? "#cdaa73" : "#c4a06a") : "#b3a16e",
+            road ? ((x + y) % 3 ? "#cdaa73" : "#c4a06a") : green ? "#899867" : "#b3a16e",
           );
           if (!road && (x * 19 + y * 11) % 7 === 0) {
             this.rect(x * T + 7, y * T + 15, 2, 6, "#8f9262");
@@ -579,7 +607,7 @@ export class World {
                 y * T + py,
                 2 + (i % 2),
                 2,
-                i % 2 ? "#bfae78" : "#a79563",
+                green ? (i % 2 ? "#a1ae79" : "#788b5b") : i % 2 ? "#bfae78" : "#a79563",
               );
             }
         } else {
@@ -605,11 +633,17 @@ export class World {
         py: (n.y + 0.5) * T,
       })),
       { id: "player", px: p.x * T, py: p.y * T },
+      ...(this.state.companion !== "none" ? [{ id: "pet", px: this.pet.x * T, py: this.pet.y * T }] : []),
       ...(this.remotePlayers ?? [])
         .filter((r) => r.zone === this.state.zone)
         .map((r) => ({ ...r, remote: true, px: r.x * T, py: r.y * T })),
     ].sort((a, b) => a.py - b.py);
     for (const n of entities) {
+      if (n.id === "pet") {
+        drawCompanion(c, this.pet, this.state.companion, this.art, this.time, this.state.reducedMotion || this.paused);
+        if (this.pet.mode === "stay") this.label("STAY", n.px, n.py - 38, "#ffe5a0", 9);
+        continue;
+      }
       if (n.remote) {
         this.rect(n.px - 14, n.py - 4, 28, 5, "#72d8cfaa");
         this.character(n.avatar, n.px, n.py, n.dir, n.moving);
@@ -655,26 +689,6 @@ export class World {
     if (village)
       for (const a of this.residents)
         if (a.bubble) this.speech(a.bubble, a.x * T, a.y * T - 76);
-    const animal = this.state.companion;
-    if (animal !== "none") {
-      const im = this.art[animal],
-        size = animal === "cat" ? 48 : 16,
-        frames = im.width / size;
-      const frame = this.state.reducedMotion
-        ? 0
-        : Math.floor(this.time * 6) % frames;
-      c.drawImage(
-        im,
-        frame * size,
-        0,
-        size,
-        16,
-        Math.round(this.follow.x * T - size),
-        Math.round(this.follow.y * T - 20),
-        size * 2,
-        32,
-      );
-    }
     if (village) {
       for (let i = 0; i < 3; i++) {
         const im = this.art.butterfly;
@@ -700,6 +714,7 @@ export class World {
   village() {
     drawCountryside(this);
     drawFrontier(this);
+    drawExpansion(this);
   }
   tree(x, y) {
     this.rect(x - 11, y + 40, 59, 13, "#34574044");
@@ -763,6 +778,7 @@ export class World {
       y = Math.round(
         (88 * this.canvas.height) / this.canvas.getBoundingClientRect().height,
       );
+    const { width: W, height: H } = dimensions(this.state.zone), sx = w / W, sy = h / H;
     this.rect(x - 5, y - 5, w + 10, h + 10, "#152a2bdd");
     this.rect(
       x,
@@ -774,15 +790,21 @@ export class World {
     for (let ty = 0; ty < H; ty++)
       for (let tx = 0; tx < W; tx++)
         if (blocked(this.state.zone, tx, ty, this.state))
-          this.rect(x + tx * 3, y + ty * 3, 3, 3, "#233e3b");
+          this.rect(x + tx * sx, y + ty * sy, Math.ceil(sx), Math.ceil(sy), "#233e3b");
     for (const n of this.npcs)
-      this.rect(x + n.x * 3, y + n.y * 3, 3, 3, "#ffd275");
+      this.rect(x + n.x * sx, y + n.y * sy, 2, 2, "#ffd275");
     for (const r of this.remotePlayers ?? [])
       if (r.zone === this.state.zone)
-        this.rect(x + r.x * 3, y + r.y * 3, 3, 3, "#72d8cf");
+        this.rect(x + r.x * sx, y + r.y * sy, 3, 3, "#72d8cf");
+    if (this.state.companion !== "none")
+      this.rect(x + this.pet.x * sx, y + this.pet.y * sy, 2, 2, "#edb2ae");
+    c.strokeStyle = "#fff1c866";
+    c.lineWidth = 1;
+    c.strokeRect(x + Math.max(0, this.camera.x) / T * sx, y + Math.max(0, this.camera.y) / T * sy,
+      Math.min(W, this.canvas.width / T) * sx, Math.min(H, this.canvas.height / T) * sy);
     this.rect(
-      x + this.state.player.x * 3 - 2,
-      y + this.state.player.y * 3 - 2,
+      x + this.state.player.x * sx - 2,
+      y + this.state.player.y * sy - 2,
       4,
       4,
       "#fff",
