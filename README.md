@@ -1,6 +1,6 @@
-# MATH-Warefare
+# MATH-Warefare: The Dustlight Frontier
 
-A mental maths adventure by Lalith: explore Numberglen, help its villagers, befriend animals and restore the lanterns in a mushroom cave.
+A mental maths adventure by Lalith: choose from 324 prebuilt character looks, explore a dusty frontier village, meet its neighbours and restore the lanterns in a mushroom cave.
 
 [Play the game](https://hustlenix.github.io/math-warfare/) · [Setup, controls and full README](math-warfare/README.md) · [Credits](math-warfare/CREDITS.md)
 

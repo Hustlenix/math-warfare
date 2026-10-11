@@ -1,3 +1,4 @@
+import { drawHeroFace } from "./wardrobe.js";
 export function setupIntro(art, state, onStart) {
   const overlay = document.getElementById("intro"),
     canvas = document.getElementById("intro-scene"),
@@ -16,6 +17,18 @@ export function setupIntro(art, state, onStart) {
     c.fillRect(Math.round(x), Math.round(y), w, h);
   };
   const image = (name, x, y, scale = 3) => {
+    if (name === "playerFace" || name.startsWith("hero-")) {
+      if (art.heroFaces)
+        drawHeroFace(
+          c,
+          art,
+          name === "playerFace" ? state.appearance.id : name,
+          x,
+          y,
+          scale,
+        );
+      return;
+    }
     const im = art[name];
     if (im)
       c.drawImage(
@@ -59,9 +72,9 @@ export function setupIntro(art, state, onStart) {
     if (exited) return;
     c.imageSmoothingEnabled = false;
     const time = reduced ? 0 : t / 1000;
-    rect(0, 0, 960, 540, "#cdd8b0");
-    rect(0, 0, 960, 205, "#efd1a2");
-    rect(0, 105, 960, 100, "#dfb987");
+    rect(0, 0, 960, 540, "#c3a56e");
+    rect(0, 0, 960, 205, "#e3bd7e");
+    rect(0, 105, 960, 100, "#c99861");
     rect(460, 74, 112, 112, "#f7e4b2");
     rect(448, 97, 136, 62, "#f7e4b2");
     for (let i = 0; i < 6; i++) {
@@ -71,14 +84,24 @@ export function setupIntro(art, state, onStart) {
     }
     for (let x = 0; x < 960; x += 16) {
       const y = 170 + Math.sin(x * 0.008) * 32;
-      rect(x, y, 16, 370, "#8ea174");
+      rect(x, y, 16, 370, "#a98555");
     }
     for (let x = 0; x < 960; x += 16) {
       const y = 219 + Math.sin(x * 0.012 + 1) * 22;
-      rect(x, y, 16, 325, "#6e8d68");
+      rect(x, y, 16, 325, "#7e8053");
     }
-    rect(0, 308, 960, 232, "#50795b");
-    rect(0, 424, 960, 116, "#345b48");
+    rect(0, 308, 960, 232, "#9b905c");
+    rect(0, 424, 960, 116, "#727c4d");
+    // Sandstone mesas and a distant caravan make the title card a frontier ensemble.
+    for (const [x, y, width, height] of [
+      [80, 157, 130, 60],
+      [273, 173, 92, 60],
+      [625, 155, 174, 67],
+    ]) {
+      rect(x, y, width, height, "#9c754c");
+      rect(x + 12, y - 8, width - 24, 12, "#bd915e");
+      rect(x, y + height - 8, width, 10, "#786f47");
+    }
     for (let y = 302; y < 540; y += 8) {
       const w = (y - 280) * 1.5;
       rect(480 - w / 2, y, w, 9, y % 16 ? "#d5b27b" : "#c9a671");
@@ -108,7 +131,7 @@ export function setupIntro(art, state, onStart) {
       ["person4Face", 190, 350, 3],
       ["person9Face", 270, 355, 3],
       ["person2Face", 333, 335, 3.5],
-      ["person1Face", 424, 289, 5],
+      ["playerFace", 424, 289, 5],
       ["person5Face", 530, 337, 3.5],
       ["person6Face", 613, 350, 3],
       ["person7Face", 678, 362, 3],
@@ -119,6 +142,8 @@ export function setupIntro(art, state, onStart) {
       rect(x + 6, y + 32 * s - 5, 16 * s - 8, 7, "#1b393d55");
       image(n, x, y, s);
     }
+    image("hero-218", 795, 354, 3);
+    image("hero-309", 850, 359, 3);
     if (art.cat) {
       const f = reduced ? 0 : Math.floor(time * 5) % 12;
       c.drawImage(art.cat, f * 48, 0, 48, 16, 346, 450, 96, 32);
@@ -168,6 +193,7 @@ export function setupIntro(art, state, onStart) {
       status.textContent =
         "The village is ready. Your bright ideas are needed.";
       title.disabled = false;
+      document.getElementById("intro-wardrobe").disabled = false;
       title.textContent = state.completed.length
         ? "Continue your adventure →"
         : "Step into Numberglen →";

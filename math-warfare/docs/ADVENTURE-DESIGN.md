@@ -49,3 +49,13 @@ The save is local and editable by its owner. It is not an anti-cheat system. The
 ## Verification and playtesting boundary
 
 Automated checks cover 24,000 independently parsed equations, input validation, deterministic daily seeds, quest gates, duplicate rewards, shop transactions, reload safety and reachable NPCs. Browser verification uses actual UI actions and visible question text rather than editing save state to claim completion. Target-player fun, retention and learning improvements need independent human playtesting; automated completion does not prove them.
+# Dustlight wardrobe and frontier revision
+
+Experience target: players express a personal traveller through a free, immediately readable wardrobe, then help neighbours in a dusty frontier settlement through maths. The catalogue has 12 silhouettes, nine skin tones and three coordinated colourways, baked into 324 unique sprite strips before the release. All walking directions and portraits share those final pixels.
+
+The cosmetic loop is browse → preview → adjust style/skin/colour/name → wear → explore. Appearance is a draft until Apply; cancellation discards it. There is no coin cost, statistical advantage, random unlock or generation wait. The existing maths/quest/economy loop stays intact. Old saves gain an appearance without losing quests or rewards.
+
+The reference portrait informed a black pork-pie hat, glasses and goatee. Western atmosphere comes from sandstone, cacti, timber fronts, dust, a caravan and a deputy. Cal and Mae add a fifth authored meeting, with reciprocal ratio/lemonade dialogue. The caravan is solid; nearby actors and the cave route remain reachable. Paired actors temporarily stop ambient wandering until their meeting ends.
+
+Verification covers legacy save migration, selected-character persistence, catalogue completeness, every atlas coordinate, final-pixel uniqueness, portrait consistency, five routine pairs, caravan collision and mobile wardrobe browsing. Manual browser checks cover cancelling, applying, searching, paging and the intro/world/battle use of the selected character. These checks establish software behaviour, rather than organiser acceptance or learning outcomes.
+

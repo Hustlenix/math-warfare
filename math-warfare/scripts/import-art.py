@@ -44,3 +44,5 @@ for name,box in {'stone':(112,0,128,16),'caveWall':(16,16,32,32),'mushrooms':(0,
 for name,file in [('owl','01'),('slime','16'),('boss','31'),('beetle','19')]:save(name,battlers/(file+'.png'))
 (out/'manifest.json').write_text(json.dumps(manifest,indent=2))
 print('Prepared',len(manifest),'game resources;',sum(p.stat().st_size for p in out.glob('*.png')),'bytes. No original packs copied.')
+import runpy
+runpy.run_path(str(root/'scripts/build-wardrobe.py'),run_name='__main__')

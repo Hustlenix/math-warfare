@@ -3,12 +3,12 @@
   "private": true,
   "version": "2.0.0",
   "type": "module",
-  "description": "MATH WARFARE: OMEGA ULTRA — neo-brutalist math battle game",
+  "description": "A pixel mental-maths adventure in a desert frontier village, with a prebuilt character wardrobe.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test scripts/check-adventure.mjs scripts/check-village.mjs"
+    "test": "node --test scripts/check-adventure.mjs scripts/check-village.mjs scripts/check-wardrobe.mjs"
   },
   "dependencies": {},
   "devDependencies": {

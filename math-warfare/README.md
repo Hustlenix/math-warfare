@@ -1,14 +1,16 @@
-# MATH-Warefare: The Lanterns of Numberglen
+# MATH-Warefare: The Dustlight Frontier
 
-A small maths adventure by Lalith. Numberglen’s lantern has gone dark. Walk around its village, help the baker and gardener, recover a map, and venture into a mushroom cave to restore the last light.
+A maths adventure by Lalith. Ride into a dusty frontier village, help its neighbours and venture into a mushroom cave to restore the last light. The desert palette, black-hatted chemist and caravan pay tribute to desert crime-drama and Western-film imagery while the story remains a friendly maths adventure.
 
 ## What you can play
 
 - Two explorable maps with collision, click-to-walk routes, keyboard movement and a minimap.
 - Nine connected quests, requiring 49 correct answers to finish the story. Neighbours have dialogue and each quest teaches a different skill.
 - Animated characters, cats, frogs and butterflies; furniture and cave scenery from paid LimeZu packs.
+- **324 prebuilt playable looks**: 12 character styles × 9 skin tones × 3 coordinated colourways. Includes curly-haired men and women, long hair, a pixie cut, silver hair, shaved heads, black-fedora chemists/detectives, cowboys and cowgirls. Choose a name, preview all four walking directions, browse/search collections and apply or cancel. Every look is free and available immediately.
 - A countryside settlement with tiled cottages, orchard, vegetable beds, pond landing, market awning and chickens. Villagers walk to deliveries and meetups, face one another, exchange dialogue and return home. Hazel, Jun and Sage wander the lanes and can be spoken to.
 - An ensemble pixel-art intro featuring the playable character and villagers, with real artwork-loading progress and a Continue button for saved adventures.
+- A dust-and-sage frontier palette, cacti, mesas, timber shopfronts, a parked caravan, notice board and wind-blown tumbleweed. Meet Cal the caravan chemist and Mae the deputy. Five paired village routines include their lemonade-ratio conversation.
 - Eight skills: addition/subtraction, multiplication, division, decimals, percentages, order of operations, fractions of amounts, and short everyday word problems. Mixed practice draws from all eight.
 - Three number-size settings; untimed ten-question training and a 60 second sprint with a local personal best.
 - A daily seeded expedition, one coin reward per UTC date.
@@ -26,6 +28,7 @@ The world is playable without an account or maths API. There is no tracking, fak
 | Answer | Type a number and Enter | Use the keypad or device keyboard |
 | Continue | Enter or the Next button | Next button |
 | Pause challenge | Escape or pause button | Pause button |
+| Change character | Character button in the header, journal wardrobe, or Choose your character on the intro | Same buttons |
 
 Follow “Find next quest” if you get lost. Story quests are untimed and recover after mistakes. The countdown runs only in the sprint. Leaving the browser tab pauses a challenge. Quitting an unfinished challenge gives no quest reward; completed quests stay saved.
 
@@ -42,7 +45,7 @@ npm run dev
 
 If your packs are elsewhere, set `MATH_ASSET_HOME` to their parent folder before running the importer. It expects `moderninteriors-win`, `Fungus Cave [16x16]`, and `Fantasy Battlers - Complete/Fantasy Battlers - Complete/Original size`. Pillow can be installed with `python -m pip install Pillow`.
 
-The importer creates small animation strips and selected game-only crops in `.licensed-art/`. That directory is ignored by Git. Vite embeds those crops into the compiled game; no original atlas is hosted by the release. The source zip deliberately excludes artist image files. See [CREDITS.md](CREDITS.md) for rights and attribution.
+The importer creates small animation strips and selected game-only crops in `.licensed-art/`, then runs `scripts/build-wardrobe.py` to bake all 324 characters and their portraits ahead of time. No character is generated on demand and there is no generation API. The packed atlas retains every unique look and is used by the world, battle interface, wardrobe and intro. That directory is ignored by Git. Vite embeds the game-specific artwork into the compiled game; no original artist sheet is hosted by the release. The source zip deliberately excludes artist image files. See [CREDITS.md](CREDITS.md) for rights and attribution.
 
 ## Test and release
 
@@ -54,7 +57,7 @@ node scripts/verify-release.mjs
 npm run preview
 ```
 
-Fourteen tests cover 24,000 equations, validation, daily determinism, quest and purchase transactions, saves, routes, cave gates, scaled pointer coordinates, walking at 20 FPS, direction selection, conversation/return cycles and following a moving quest neighbour. `python scripts/check-art.py` also compares actual normalized sprite pixels against the owned sheets for eleven villagers and four cave characters. Run it after importing artwork. The deployment workflow checks source and release hashes before publishing the compiled game, so CI does not need the private artwork packs. Rebuild and package after changing recorded source files.
+Nineteen tests cover 24,000 equations, validation, daily determinism, quest and purchase transactions, saves, routes, cave gates, scaled pointer coordinates, walking at 20 FPS, direction selection, five conversation/return cycles, following a moving neighbour, wardrobe coverage, migration of old saves, character reloads and caravan collision. `python scripts/check-art.py` compares actual normalized sprite pixels against the owned sheets for eleven villagers and four cave characters. `python scripts/check-wardrobe-art.py` checks all 324 baked characters, their 9,072 animation cells, visually unique pixel hashes and matching portraits. Run the pixel checks after importing artwork. The deployment workflow checks source and release hashes before publishing the compiled game, so CI does not need the private artwork packs. Rebuild and package after changing recorded source files.
 
 ## Structure
 
@@ -66,7 +69,10 @@ Fourteen tests cover 24,000 equations, validation, daily determinism, quest and 
 - `src/adventure/village-life.js`: walking routines, neighbour meetings and normalized sprite frame selection.
 - `src/adventure/countryside.js`: cottages, farm plots, orchard, market and pond scenery.
 - `src/adventure/intro.js`: ensemble opening scene and real artwork-load progress.
+- `src/adventure/wardrobe-data.json`, `wardrobe.js`, `wardrobe-ui.js`: fixed catalogue, safe appearance selection, browsing and four-direction preview.
+- `src/adventure/frontier.js`, `frontier.css`: frontier scenery and dust/sage interface.
 - `scripts/import-art.py`: local licensed artwork preparation.
+- `scripts/build-wardrobe.py`: offline construction and palette packing of 324 distinct playable looks.
 - `docs/ADVENTURE-DESIGN.md`: loops, state ownership, decisions and verification boundaries.
 
 Older engine/fx/API modules remain as project history; the current entry point uses the adventure modules above. The separate mathsheet generator is preserved and is not part of the game runtime.
@@ -74,6 +80,8 @@ Older engine/fx/API modules remain as project history; the current entry point u
 ## Progress, privacy and limitations
 
 Your adventure uses `math-warfare-adventure-v1` in this browser’s localStorage. Original game save keys are untouched. Clearing browser data removes the adventure save; there is no cloud sync. Storage failure shows a notice and falls back to an in-memory session. Local saves are owner-editable and are not an anti-cheat system.
+
+Appearance uses the same save. Existing adventures gain a default cowboy without losing progress. Character changes are cosmetic: there are no stat boosts, paid unlocks or coin costs. Cancelling the wardrobe keeps the current look. The catalogue contains 324 distinct colour/body/style combinations, rather than 324 separately drawn character concepts.
 
 The game practises arithmetic rather than certifying a grade curriculum or measured learning outcome. Accessibility includes focus-visible controls, semantic forms, keyboard navigation, touch controls, readable methods, reduced motion and DOM journal routes. World exploration itself is visual; this is not a fully screen-reader-equivalent adventure.
 

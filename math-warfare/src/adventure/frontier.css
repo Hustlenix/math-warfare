@@ -1,0 +1,386 @@
+/* Dust, timber, sage and amber: the village keeps its legibility in a Western palette. */
+body {
+  background: #ede0c6;
+  color: #342f29;
+}
+.topbar {
+  background: #252c29;
+  border-bottom-color: #b48345;
+}
+.brand-mark,
+button.primary {
+  background: #cfa76b;
+  color: #292d28;
+  border-color: #9d7441;
+  box-shadow: 0 3px 0 #705335;
+}
+button {
+  border-color: #b8a68b;
+  color: #3a3c30;
+  background: #f2e6cf;
+  box-shadow: 0 2px 0 #b3a087;
+}
+button:hover {
+  background: #e2cda8;
+}
+.canvas-wrap {
+  border-color: #665a40;
+  background: #776b4a;
+  box-shadow: 5px 5px 0 #c7ae7c;
+}
+.scene-caption {
+  background: #303b33e8;
+  color: #f6dfae;
+}
+.journal {
+  border-color: #c1a678;
+}
+.chapter-progress {
+  background: #d7c49f;
+}
+.chapter-progress > div {
+  background: #7c8550;
+}
+.eyebrow,
+.save-status,
+.section-title,
+.journal-note,
+.controls-line,
+.village-life-line {
+  color: #73624c;
+}
+.neighbour {
+  background: transparent;
+  border-color: #d7c5a5;
+}
+.neighbour:hover {
+  background: #e0c9a1;
+}
+.journal-tools button {
+  background: #e4d4b4;
+  border-color: #c0a67d;
+}
+#character-open {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #3a4438;
+  color: #f3d9a9;
+  border: 1px solid #9b875d;
+  font-size: 11px;
+  box-shadow: none;
+  min-height: 48px;
+}
+.hero-mini,
+.hero-face {
+  display: inline-block;
+  image-rendering: pixelated;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+}
+.neighbour > .hero-mini {
+  flex: 0 0 16px;
+  overflow: hidden;
+}
+#character-open .hero-mini {
+  transform: scale(0.65);
+  margin: -12px -4px;
+}
+.character-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intro {
+  background: #282d29;
+}
+.intro-card {
+  border-color: #bf945c;
+  background: #343d31;
+  box-shadow: 9px 9px 0 #191d20;
+}
+.intro-bottom {
+  background: #343d31;
+}
+.intro-title h1 {
+  color: #ffe2a5;
+  text-shadow:
+    3px 3px #3f4232,
+    -2px -2px #3f4232,
+    2px -2px #3f4232,
+    -2px 2px #3f4232,
+    5px 6px #8a5b39;
+}
+.intro-title p,
+.intro-title .eyebrow {
+  color: #494934;
+}
+.intro-kicker {
+  background: #3b4435e8;
+}
+.intro-tagline {
+  color: #f7dfae;
+}
+.intro-loading {
+  background: #4c5640;
+}
+.intro-loading > div {
+  background: #d4ac6c;
+}
+.intro-choices {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+#intro-wardrobe {
+  background: #43513e;
+  color: #f6dfae;
+  border-color: #8e986b;
+  font-size: 11px;
+}
+.battle-land {
+  background: linear-gradient(
+    #a99566 70%,
+    #c6aa77 70%,
+    #c6aa77 76%,
+    #777b4c 76%
+  );
+}
+.wardrobe-panel {
+  max-width: 1120px;
+  width: calc(100% - 28px);
+}
+.wardrobe-panel #panel-content {
+  padding: 26px;
+}
+.wardrobe-intro {
+  color: #75634e;
+  margin: 12px 0 22px;
+}
+.wardrobe-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 28px;
+}
+.wardrobe-dressing {
+  background: #e7d6b5;
+  padding: 18px;
+  border: 1px solid #bfa476;
+  align-self: start;
+}
+.wardrobe-dressing label {
+  display: block;
+  margin: 12px 0 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.wardrobe-dressing select,
+.wardrobe-dressing > input,
+.wardrobe-browse input,
+.wardrobe-browse select {
+  width: 100%;
+  background: #fbf2df;
+  color: #393b2e;
+  border: 1px solid #a99470;
+  padding: 10px;
+  border-radius: 2px;
+  min-height: 42px;
+}
+.wardrobe-stage {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #c6ad82;
+}
+.wardrobe-stage > span {
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  background-repeat: no-repeat;
+}
+.wardrobe-stage h3 {
+  font-size: 18px;
+  font-family: Georgia, serif;
+}
+.wardrobe-stage p {
+  font-size: 11px;
+  line-height: 1.55;
+  margin: 8px 0;
+}
+.wardrobe-free {
+  font-size: 10px;
+  color: #616744;
+}
+.wardrobe-angles {
+  display: flex;
+  justify-content: space-around;
+  padding: 14px 4px;
+  background: #d4c49b;
+  margin-top: 16px;
+}
+.wardrobe-angles figure {
+  margin: 0;
+  text-align: center;
+}
+.wardrobe-angles canvas {
+  width: 32px;
+  height: 64px;
+  image-rendering: pixelated;
+}
+.wardrobe-angles figcaption {
+  font-size: 9px;
+  color: #685940;
+}
+.wardrobe-dressing .wardrobe-walk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: normal;
+}
+.wardrobe-save {
+  font-size: 10px;
+  color: #746449;
+  margin: 14px 0 0;
+}
+.wardrobe-dressing .button-row {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.wardrobe-dressing button {
+  font-size: 12px;
+  min-height: 43px;
+}
+.wardrobe-browse {
+  display: grid;
+  grid-template-columns: 1fr 155px;
+  gap: 8px;
+  align-items: center;
+}
+.wardrobe-browse label {
+  grid-column: 1/-1;
+  font-size: 12px;
+  font-weight: bold;
+}
+.wardrobe-catalogue > p {
+  font: 11px monospace;
+  color: #7b664a;
+  margin: 12px 0;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  max-height: 540px;
+  overflow: auto;
+  padding: 4px;
+}
+.hero-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 6px;
+  min-height: 116px;
+  font-size: 10px;
+  box-shadow: none;
+  border: 1px solid #c7b18c;
+  background: #f5ead2;
+  color: #4a4538;
+  text-align: center;
+}
+.hero-card small {
+  display: block;
+  font-size: 9px;
+  margin-top: 3px;
+  font-weight: normal;
+  color: #826b50;
+}
+.hero-card.chosen {
+  border: 2px solid #735839;
+  background: #dbc292;
+  box-shadow: inset 0 0 0 2px #fff1cf;
+}
+.wardrobe-pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 14px;
+  font-size: 11px;
+}
+.wardrobe-pages button {
+  min-width: 42px;
+}
+.wardrobe-panel .modal-heading h2 {
+  font-size: 27px;
+}
+@media (max-width: 780px) {
+  .topbar {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .wallet {
+    margin-left: auto;
+  }
+  #character-open {
+    order: 4;
+    min-height: 37px;
+    padding: 2px 10px;
+  }
+  .character-name {
+    max-width: 160px;
+  }
+  .intro-choices {
+    display: block;
+  }
+  .intro-choices button {
+    width: 100%;
+    margin-top: 10px;
+  }
+  .wardrobe-layout {
+    grid-template-columns: 1fr;
+  }
+  .wardrobe-panel #panel-content {
+    padding: 16px;
+  }
+  .wardrobe-stage {
+    min-height: 130px;
+  }
+  .wardrobe-dressing {
+    padding: 14px;
+  }
+  .hero-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-height: 450px;
+  }
+  .wardrobe-browse {
+    grid-template-columns: 1fr;
+  }
+  .wardrobe-panel .modal-heading h2 {
+    font-size: 23px;
+  }
+  .wardrobe-stage h3 {
+    font-size: 20px;
+  }
+}
+@media (max-width: 380px) {
+  .hero-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wardrobe-panel {
+    width: calc(100% - 12px);
+  }
+  .wardrobe-panel #panel-content {
+    padding: 12px;
+  }
+  .wardrobe-stage {
+    gap: 8px;
+  }
+  .wardrobe-stage h3 {
+    font-size: 17px;
+  }
+}

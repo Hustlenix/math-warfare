@@ -2,6 +2,18 @@
 // Quest identity stays separate from an actor's temporary position.
 export const MEETINGS = [
   {
+    pair: ["chemist", "deputy"],
+    places: [
+      [18, 20],
+      [19, 20],
+    ],
+    lines: [
+      ["Cal", "One part concentrate, four parts water."],
+      ["Mae", "Five parts lemonade. Now that is science."],
+    ],
+    activity: "Sharing lemonade by the caravan",
+  },
+  {
     pair: ["bakery", "market"],
     places: [
       [20, 15],
@@ -51,6 +63,30 @@ export const MEETINGS = [
   },
 ];
 export const AMBIENT = [
+  {
+    id: "chemist",
+    name: "Cal",
+    art: "hero-218",
+    x: 20,
+    y: 20,
+    label: "Caravan chemist",
+    lines: [
+      "Exact ratios, clean work. That is chemistry—and maths.",
+      "The caravan is parked. I am not missing the sunset.",
+    ],
+  },
+  {
+    id: "deputy",
+    name: "Mae",
+    art: "hero-309",
+    x: 28,
+    y: 16,
+    label: "Frontier deputy",
+    lines: [
+      "No duels today. Settle this with times tables.",
+      "A frontier town runs on fair shares and reliable neighbours.",
+    ],
+  },
   {
     id: "hazel",
     name: "Hazel",

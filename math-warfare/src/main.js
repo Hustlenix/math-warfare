@@ -1,7 +1,10 @@
 import "./styles.css";
 import "./adventure/polish.css";
 import "./adventure/intro.css";
+import "./adventure/frontier.css";
 import { setupIntro } from "./adventure/intro.js";
+import { openWardrobe } from "./adventure/wardrobe-ui.js";
+import { portraitStyle } from "./adventure/wardrobe.js";
 import artUrls from "virtual:licensed-art";
 import { QUESTS, SKILLS, SHOP, NPCS } from "./adventure/content.js";
 import {
@@ -98,7 +101,7 @@ function open(html) {
 }
 function close() {
   panel.close();
-  world.paused = false;
+  world.paused = !$("intro").hidden;
   world.keys.clear();
   previousFocus?.focus?.();
 }
@@ -114,6 +117,8 @@ function bindClose() {
 function refresh() {
   $("coins").textContent = `${state.coins} coins`;
   $("xp").textContent = `${state.xp} XP`;
+  $("character-open").innerHTML =
+    `<span aria-hidden="true" class="hero-mini" style="${portraitStyle(art, state.appearance.id, 2)}"></span><span class="character-name">${esc(state.appearance.name)}</span><span aria-hidden="true">✎</span>`;
   $("sound").textContent = `Sound: ${state.muted ? "off" : "on"}`;
   document.body.classList.toggle("reduce-motion", state.reducedMotion);
   $("quest-count").textContent = `${state.completed.length} / ${QUESTS.length}`;
@@ -129,17 +134,17 @@ function refresh() {
     : "Explore the arena →";
   $("zone-label").textContent =
     state.zone === "village"
-      ? "CHAPTER 01 · THE VILLAGE"
+      ? "CHAPTER 01 · THE DUSTLIGHT FRONTIER"
       : "CHAPTER 02 · LANTERN HOLLOW";
   $("village-life").parentElement.hidden = state.zone !== "village";
   $("zone-title").textContent =
     state.zone === "village"
-      ? "Welcome to Numberglen."
+      ? "Numberglen, at high noon."
       : "A light beneath the roots.";
   $("scene-caption").textContent = state.completed.includes("king")
     ? "Every small answer helped bring the light home."
     : state.zone === "village"
-      ? "A village of small problems. A world of bright ideas."
+      ? "Dust on your boots. Bright ideas in your pocket."
       : "Even the strangest neighbours have ordinary problems.";
   $("neighbour-count").textContent =
     state.zone === "village" ? "NUMBERGLEN" : "HOLLOW";
@@ -151,7 +156,10 @@ function refresh() {
       const q = QUESTS.find((q) => q.id === n.id),
         done = state.completed.includes(n.id),
         locked = q && !available(state, n.id);
-      return `<button data-neighbour="${n.id}" class="neighbour"><img alt="" src="${art[n.art + "Face"]?.src ?? art.person2Face.src}" class="portrait"><span>${n.name}<small>${done ? "✓ Helped" : locked ? "Waiting for another quest" : q ? q.title : n.label}</small></span><b>${done ? "✓" : locked ? "·" : "↗"}</b></button>`;
+      const portrait = n.art?.startsWith("hero-")
+        ? `<span aria-hidden="true" class="hero-mini" style="${portraitStyle(art, n.art, 1)}"></span>`
+        : `<img alt="" src="${art[n.art + "Face"]?.src ?? art.person2Face.src}" class="portrait">`;
+      return `<button data-neighbour="${n.id}" class="neighbour">${portrait}<span>${n.name}<small>${done ? "✓ Helped" : locked ? "Waiting for another quest" : q ? q.title : n.label}</small></span><b>${done ? "✓" : locked ? "·" : "↗"}</b></button>`;
     })
     .join("");
   document
@@ -183,7 +191,7 @@ function interact(n) {
   if (AMBIENT.some((a) => a.id === n.id)) {
     open(
       modalHead("A NUMBERGLEN NEIGHBOUR", esc(n.name)) +
-        `<div class="dialogue-art"><img class="speaker" alt="${esc(n.name)}" src="${art[n.art + "Face"].src}"><p>${esc(n.lines[Math.floor(world.lifeTime / 40) % n.lines.length])}</p></div><p class="muted">${esc(n.activity ?? "Taking a village stroll")}</p><button id="back" class="primary">See you around →</button>`,
+        `<div class="dialogue-art">${n.art.startsWith("hero-") ? `<span role="img" aria-label="${esc(n.name)}" class="hero-face" style="${portraitStyle(art, n.art, 3)}"></span>` : `<img class="speaker" alt="${esc(n.name)}" src="${art[n.art + "Face"].src}">`}<p>${esc(n.lines[Math.floor(world.lifeTime / 40) % n.lines.length])}</p></div><p class="muted">${esc(n.activity ?? "Taking a village stroll")}</p><button id="back" class="primary">See you around →</button>`,
     );
     bindClose();
     $("back").onclick = close;
@@ -301,7 +309,7 @@ function renderBattle() {
     isQuest = b.mode === "quest",
     boss = b.quest?.boss;
   open(
-    `<div class="battle-header"><span class="eyebrow">${esc(b.quest?.title ?? (b.mode === "daily" ? "DAILY EXPEDITION" : b.mode === "review" ? "LEARNING NOTES" : "PRACTICE ARENA"))}</span><button class="close-panel" aria-label="Pause challenge">Ⅱ</button></div><div class="battle-stage ${boss ? "boss-stage" : ""}"><div class="battle-land"><img class="battle-hero" src="${art.person1Face.src}" alt="Your adventurer"><div class="battle-beam"></div><img class="battle-monster" src="${art[boss ? "boss" : b.skill === "percent" ? "owl" : b.skill === "fraction" ? "beetle" : "slime"].src}" alt="${boss ? "The Fungus King" : "Practice creature"}"></div><div class="battle-status"><span id="hearts">${"♥".repeat(b.hearts)}${"♡".repeat(3 - b.hearts)}</span><span id="clock">${b.mode === "sprint" ? "60s" : "0s"}</span><span id="score">${b.score} points</span></div></div><div class="battle-body"><div class="question-top"><span>${SKILLS[q.skill] ?? "Revision"}</span><span id="step">${b.mode === "sprint" ? "60 SECOND SPRINT" : `${b.index + 1} / ${b.count}`}</span></div><h2 id="equation">${esc(q.text)}</h2><p class="answer-prompt">${isQuest ? "One bright idea at a time." : "Type your answer, then press Enter."}</p><form id="answer-form" novalidate><label class="sr-only" for="answer">Your answer</label><input id="answer" inputmode="decimal" autocomplete="off" placeholder="?" maxlength="16"><button class="primary" type="submit">${isQuest ? "Send a spark" : "Answer"} ↗</button></form><div id="answer-feedback" role="status" aria-live="polite"></div><div class="keypad" aria-label="Answer keypad">${["7", "8", "9", "4", "5", "6", "1", "2", "3", "−", "0", "."].map((k) => `<button type="button" data-key="${k === "−" ? "-" : k}">${k}</button>`).join("")}<button type="button" id="erase">⌫</button><button type="button" id="clear-answer">Clear</button></div><div class="battle-footer"><button id="hint">Show a method</button><span id="streak">${b.streak ? `${b.streak} in a row` : "Accuracy first."}</span></div><div id="method" hidden></div><button id="next-question" class="primary full" hidden>Next bright idea →</button></div>`,
+    `<div class="battle-header"><span class="eyebrow">${esc(b.quest?.title ?? (b.mode === "daily" ? "DAILY EXPEDITION" : b.mode === "review" ? "LEARNING NOTES" : "PRACTICE ARENA"))}</span><button class="close-panel" aria-label="Pause challenge">Ⅱ</button></div><div class="battle-stage ${boss ? "boss-stage" : ""}"><div class="battle-land"><span class="battle-hero hero-face" role="img" aria-label="Your adventurer" style="${portraitStyle(art, state.appearance.id, 3)}"></span><div class="battle-beam"></div><img class="battle-monster" src="${art[boss ? "boss" : b.skill === "percent" ? "owl" : b.skill === "fraction" ? "beetle" : "slime"].src}" alt="${boss ? "The Fungus King" : "Practice creature"}"></div><div class="battle-status"><span id="hearts">${"♥".repeat(b.hearts)}${"♡".repeat(3 - b.hearts)}</span><span id="clock">${b.mode === "sprint" ? "60s" : "0s"}</span><span id="score">${b.score} points</span></div></div><div class="battle-body"><div class="question-top"><span>${SKILLS[q.skill] ?? "Revision"}</span><span id="step">${b.mode === "sprint" ? "60 SECOND SPRINT" : `${b.index + 1} / ${b.count}`}</span></div><h2 id="equation">${esc(q.text)}</h2><p class="answer-prompt">${isQuest ? "One bright idea at a time." : "Type your answer, then press Enter."}</p><form id="answer-form" novalidate><label class="sr-only" for="answer">Your answer</label><input id="answer" inputmode="decimal" autocomplete="off" placeholder="?" maxlength="16"><button class="primary" type="submit">${isQuest ? "Send a spark" : "Answer"} ↗</button></form><div id="answer-feedback" role="status" aria-live="polite"></div><div class="keypad" aria-label="Answer keypad">${["7", "8", "9", "4", "5", "6", "1", "2", "3", "−", "0", "."].map((k) => `<button type="button" data-key="${k === "−" ? "-" : k}">${k}</button>`).join("")}<button type="button" id="erase">⌫</button><button type="button" id="clear-answer">Clear</button></div><div class="battle-footer"><button id="hint">Show a method</button><span id="streak">${b.streak ? `${b.streak} in a row` : "Accuracy first."}</span></div><div id="method" hidden></div><button id="next-question" class="primary full" hidden>Next bright idea →</button></div>`,
   );
   bindClose();
   $("answer-form").onsubmit = (e) => {
@@ -599,6 +607,9 @@ function settings() {
     toast("A new adventure begins. Mira is waiting.");
   };
 }
+function wardrobe() {
+  openWardrobe({ art, state, open, close, refresh, toast });
+}
 function about() {
   open(
     modalHead("MATH-WAREFARE", "Small answers. Big adventures.") +
@@ -676,6 +687,10 @@ $("daily").onclick = daily;
 $("mistakes").onclick = notes;
 $("collection").onclick = collection;
 $("settings").onclick = settings;
+$("wardrobe").onclick =
+  $("character-open").onclick =
+  $("intro-wardrobe").onclick =
+    wardrobe;
 $("about").onclick = about;
 $("sound").onclick = () => {
   state.muted = !state.muted;

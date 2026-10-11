@@ -8,6 +8,7 @@ import {
   createResidents,
   advanceResident,
   facing,
+  MEETINGS,
 } from "../src/adventure/village-life.js";
 
 test("left/right/up/down choose distinct normalized strips, and idle stops the walk cycle", () => {
@@ -69,8 +70,8 @@ test("village routines produce meetings, reciprocal conversation and returns wit
     }
     if (w.meeting?.phase === "chat") pairs.add(w.meeting.spec.pair.join(","));
   }
-  assert.equal(pairs.size, 4);
-  assert.ok(voices.size >= 7);
+  assert.equal(pairs.size, MEETINGS.length);
+  assert.ok(voices.size >= 9);
   assert.ok(homes.has("bakery"));
   assert.ok(homes.has("market"));
   assert.ok(homes.has("library"));
@@ -106,8 +107,16 @@ test("following a moving neighbour pins them, and arrival opens that neighbour e
     globalThis.window = previous;
   }
   assert.equal(spoke, null);
-  w.keys=new Set();w.paused=false;w.follow={...state.player};let talks=0;
-  w.onInteract=n=>{spoke=n.id;talks++;};
-  for(let i=0;i<500;i++)World.prototype.step.call(w,.05);
-  assert.equal(spoke,'bakery');assert.equal(talks,1);assert.equal(w.path.length,0);
+  w.keys = new Set();
+  w.paused = false;
+  w.follow = { ...state.player };
+  let talks = 0;
+  w.onInteract = (n) => {
+    spoke = n.id;
+    talks++;
+  };
+  for (let i = 0; i < 500; i++) World.prototype.step.call(w, 0.05);
+  assert.equal(spoke, "bakery");
+  assert.equal(talks, 1);
+  assert.equal(w.path.length, 0);
 });

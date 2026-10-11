@@ -1,4 +1,5 @@
 import { QUESTS, SHOP } from "./content.js";
+import { normalizeAppearance } from "./wardrobe.js";
 export const SAVE_KEY = "math-warfare-adventure-v1";
 export const fresh = () => ({
   version: 1,
@@ -15,6 +16,7 @@ export const fresh = () => ({
   player: { x: 16.5, y: 14.5 },
   muted: false,
   reducedMotion: false,
+  appearance: normalizeAppearance(null),
 });
 const unique = (xs, allowed) => [
   ...new Set(Array.isArray(xs) ? xs.filter((x) => allowed.includes(x)) : []),
@@ -49,6 +51,7 @@ export function restore(raw) {
     s.companion = "none";
   s.muted = raw.muted === true;
   s.reducedMotion = raw.reducedMotion === true;
+  s.appearance = normalizeAppearance(raw.appearance);
   s.dailyDone =
     typeof raw.dailyDone === "string" &&
     /^\d{4}-\d{2}-\d{2}$/.test(raw.dailyDone)

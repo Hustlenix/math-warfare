@@ -8,7 +8,7 @@
       name="description"
       content="A pixel maths adventure. Help Numberglen’s villagers, befriend animals and restore a mysterious mushroom cave through mental maths."
     />
-    <title>MATH-Warefare · The Lanterns of Numberglen</title>
+    <title>MATH-Warefare · The Dustlight Frontier</title>
   </head>
   <body>
     <section id="intro" class="intro" aria-label="Welcome to Numberglen">
@@ -21,9 +21,9 @@
             aria-label="The adventurer and Numberglen’s villagers gathered in the countryside"
           ></canvas>
           <div class="intro-title">
-            <span class="eyebrow">A LITTLE MATHS. A LOT OF HEART.</span>
+            <span class="eyebrow">STAY SHARP. RIDE INTO THE SUNSET.</span>
             <h1>MATH-WAREFARE</h1>
-            <p>THE LANTERNS OF NUMBERGLEN</p>
+            <p>THE DUSTLIGHT FRONTIER</p>
           </div>
           <span class="intro-kicker"
             >MEET THE NEIGHBOURS · BRING BACK THE LIGHT</span
@@ -31,7 +31,7 @@
         </div>
         <div class="intro-bottom">
           <div>
-            <p class="intro-tagline">Every village needs a bright idea.</p>
+            <p class="intro-tagline">Every frontier needs a bright idea.</p>
             <div class="intro-loading" aria-label="Artwork loading">
               <div id="intro-progress"></div>
             </div>
@@ -40,9 +40,14 @@
             </p>
           </div>
           <div>
-            <button id="intro-start" class="primary" disabled>
-              Loading the adventure…</button
-            ><button id="intro-retry" hidden>Reload</button>
+            <div class="intro-choices">
+              <button id="intro-wardrobe" disabled>
+                Choose your character
+              </button>
+              <button id="intro-start" class="primary" disabled>
+                Loading the adventure…</button
+              ><button id="intro-retry" hidden>Reload</button>
+            </div>
             <p class="intro-controls">Explore · meet · solve · restore</p>
           </div>
         </div>
@@ -52,13 +57,14 @@
       <header class="topbar">
         <a class="brand" href="./" aria-label="MATH-Warefare home"
           ><span class="brand-mark">×</span
-          ><span
-            >MATH-WAREFARE<small>THE LANTERNS OF NUMBERGLEN</small></span
-          ></a
+          ><span>MATH-WAREFARE<small>THE DUSTLIGHT FRONTIER</small></span></a
         >
         <div class="wallet">
           <span id="coins">0 coins</span><span id="xp">0 XP</span>
         </div>
+        <button id="character-open" aria-label="Character wardrobe">
+          Your character
+        </button>
         <button id="settings" class="icon-button" aria-label="Settings">
           ⚙
         </button>
@@ -137,6 +143,9 @@
               <span id="mistake-count">Nothing to revise yet →</span></button
             ><button id="collection">
               Companions & upgrades <span>Your growing village →</span>
+            </button>
+            <button id="wardrobe">
+              Character wardrobe <span>324 looks · make it yours →</span>
             </button>
           </div>
           <p class="journal-note">

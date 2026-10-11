@@ -8,6 +8,8 @@ import {
   spriteFrame,
 } from "./village-life.js";
 import { drawCountryside, villagePath } from "./countryside.js";
+import { heroFrame } from "./wardrobe.js";
+import { drawFrontier } from "./frontier.js";
 export const W = 33,
   H = 25,
   T = 32;
@@ -31,6 +33,7 @@ export function blocked(zone, x, y, state) {
     }
     if (x >= 3 && x <= 5 && y >= 17 && y <= 21) return true;
     if (x >= 27 && x <= 29 && y >= 20 && y <= 22) return true;
+    if (x >= 19 && x <= 23 && y >= 21 && y <= 22) return true;
     if ((x === 16 && y === 12) || (y === 5 && [5, 6, 22, 23, 26].includes(x)))
       return true;
   } else {
@@ -334,7 +337,11 @@ export class World {
         continue;
       }
       advanceResident(a, dt);
-      if (AMBIENT.some((n) => n.id === a.id) && !a.path.length) {
+      if (
+        AMBIENT.some((n) => n.id === a.id) &&
+        !a.path.length &&
+        !this.meeting?.actors.includes(a)
+      ) {
         a.wait -= dt;
         if (a.wait <= 0) {
           a.wait = 9 + (this.residents.indexOf(a) % 3);
@@ -351,11 +358,23 @@ export class World {
                     [19, 14],
                     [23, 14],
                   ]
-                : [
-                    [28, 11],
-                    [29, 15],
-                    [26, 22],
-                  ];
+                : a.id === "chemist"
+                  ? [
+                      [20, 20],
+                      [18, 18],
+                      [20, 20],
+                    ]
+                  : a.id === "deputy"
+                    ? [
+                        [28, 16],
+                        [24, 14],
+                        [18, 19],
+                      ]
+                    : [
+                        [28, 11],
+                        [29, 15],
+                        [26, 22],
+                      ];
           a.stop = ((a.stop ?? -1) + 1) % stops.length;
           route(a, ...stops[a.stop]);
           a.activity = "Taking a village stroll";
@@ -473,6 +492,28 @@ export class World {
     c.fillText(text, x, y);
   }
   character(art, x, y, dir = 3, moving = false) {
+    if (art.startsWith("hero-")) {
+      const f = heroFrame(
+        art,
+        dir,
+        moving,
+        this.time,
+        this.state.reducedMotion,
+      );
+      this.rect(x - 10, y - 5, 20, 7, "#30282055");
+      this.ctx.drawImage(
+        this.art.heroAtlas,
+        f.sx,
+        f.sy,
+        16,
+        32,
+        Math.round(x - 16),
+        Math.round(y - 56),
+        32,
+        64,
+      );
+      return;
+    }
     const im = this.art[art];
     if (!im) return;
     const frame = this.state.reducedMotion
@@ -509,7 +550,8 @@ export class World {
     this.camera.y = Math.max(0, Math.min(H * T - ch, p.y * T - ch / 2));
     c.save();
     c.clearRect(0, 0, cw, ch);
-    c.fillStyle=this.state.zone==='village'?'#315844':'#292636';c.fillRect(0,0,cw,ch);
+    c.fillStyle = this.state.zone === "village" ? "#756b4b" : "#292636";
+    c.fillRect(0, 0, cw, ch);
     c.translate(-Math.round(this.camera.x), -Math.round(this.camera.y));
     const village = this.state.zone === "village";
     for (let y = 0; y < H; y++)
@@ -521,11 +563,11 @@ export class World {
             y * T,
             T,
             T,
-            road ? ((x + y) % 3 ? "#d6bd81" : "#cdb17b") : "#789b6b",
+            road ? ((x + y) % 3 ? "#cdaa73" : "#c4a06a") : "#b3a16e",
           );
           if (!road && (x * 19 + y * 11) % 7 === 0) {
-            this.rect(x * T + 7, y * T + 15, 2, 6, "#527e58");
-            this.rect(x * T + 18, y * T + 9, 4, 2, "#93b37c");
+            this.rect(x * T + 7, y * T + 15, 2, 6, "#8f9262");
+            this.rect(x * T + 18, y * T + 9, 4, 2, "#cbb77e");
           }
           if (!road)
             for (let i = 0; i < 5; i++) {
@@ -536,7 +578,7 @@ export class World {
                 y * T + py,
                 2 + (i % 2),
                 2,
-                i % 2 ? "#87a676" : "#6e9163",
+                i % 2 ? "#bfae78" : "#a79563",
               );
             }
         } else {
@@ -545,7 +587,7 @@ export class World {
             this.rect(x * T + 4, y * T + 12, 3, 2, "#756a7c");
         }
         if (x < 1 || y < 2 || x >= W - 1 || y >= H - 1)
-          this.rect(x * T, y * T, T, T, village ? "#3d6953" : "#292636");
+          this.rect(x * T, y * T, T, T, village ? "#7d7951" : "#292636");
       }
     if (village) this.village();
     else this.cave();
@@ -565,7 +607,13 @@ export class World {
     ].sort((a, b) => a.py - b.py);
     for (const n of entities) {
       if (n.id === "player") {
-        this.character("person1", n.px, n.py, this.dir, this.moving);
+        this.character(
+          this.state.appearance.id,
+          n.px,
+          n.py,
+          this.dir,
+          this.moving,
+        );
         continue;
       }
       if (n.art)
@@ -641,6 +689,7 @@ export class World {
   }
   village() {
     drawCountryside(this);
+    drawFrontier(this);
   }
   tree(x, y) {
     this.rect(x - 11, y + 40, 59, 13, "#34574044");

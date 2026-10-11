@@ -1,0 +1,139 @@
+{
+  "archetypes": [
+    {
+      "id": "rookie",
+      "name": "Trail Rookie",
+      "group": "Neighbours",
+      "hair": 1,
+      "description": "A short crop and a light travelling jacket."
+    },
+    {
+      "id": "curly-guy",
+      "name": "Curly-haired Man",
+      "group": "Neighbours",
+      "hair": 0,
+      "curls": "short",
+      "description": "A full crown of tight curls."
+    },
+    {
+      "id": "curly-gal",
+      "name": "Curly-haired Woman",
+      "group": "Neighbours",
+      "hair": 0,
+      "curls": "long",
+      "description": "Long, rounded curls framing the face."
+    },
+    {
+      "id": "waves",
+      "name": "Long-haired Wanderer",
+      "group": "Neighbours",
+      "hair": 18,
+      "description": "Long flowing hair and an easy-going look."
+    },
+    {
+      "id": "braids",
+      "name": "Braided Traveller",
+      "group": "Neighbours",
+      "hair": 24,
+      "description": "Braided hair, ready for a long road."
+    },
+    {
+      "id": "pixie",
+      "name": "Pixie Scout",
+      "group": "Neighbours",
+      "hair": 5,
+      "description": "A lively, cropped silhouette."
+    },
+    {
+      "id": "silver",
+      "name": "Silver Scholar",
+      "group": "Desert",
+      "hair": 22,
+      "silver": true,
+      "glasses": true,
+      "description": "Silver hair, spectacles and a sharp eye for numbers."
+    },
+    {
+      "id": "shaved",
+      "name": "Shaved-head Traveller",
+      "group": "Desert",
+      "hair": 0,
+      "beard": true,
+      "description": "A shaved head, beard and desert workwear."
+    },
+    {
+      "id": "chemist",
+      "name": "Midnight Chemist",
+      "group": "Desert",
+      "hair": 0,
+      "hat": "fedora",
+      "glasses": true,
+      "goatee": true,
+      "description": "Black pork-pie hat, dark glasses and a goatee. A desert antihero tribute."
+    },
+    {
+      "id": "detective",
+      "name": "Desert Detective",
+      "group": "Desert",
+      "hair": 4,
+      "hat": "fedora",
+      "glasses": true,
+      "description": "A black brim, bobbed hair and a quiet detective presence."
+    },
+    {
+      "id": "cowboy",
+      "name": "High Noon Cowboy",
+      "group": "Frontier",
+      "hair": 1,
+      "hat": "cowboy",
+      "beard": true,
+      "description": "Wide-brim hat, bandana, boots and a dust-worn coat."
+    },
+    {
+      "id": "cowgirl",
+      "name": "Sunset Cowgirl",
+      "group": "Frontier",
+      "hair": 0,
+      "curls": "long",
+      "hat": "cowboy",
+      "description": "Long curly hair beneath a wide brim, with a frontier bandana."
+    }
+  ],
+  "skins": [
+    { "name": "Porcelain", "color": "#f4d0b7", "body": 2 },
+    { "name": "Peach", "color": "#e8b69b", "body": 3 },
+    { "name": "Warm sand", "color": "#d5aa83", "body": 7 },
+    { "name": "Honey", "color": "#bd916d", "body": 1 },
+    { "name": "Chestnut", "color": "#996d4f", "body": 4 },
+    { "name": "Caramel", "color": "#aa7956", "body": 1, "tint": true },
+    { "name": "Deep brown", "color": "#674737", "body": 1, "tint": true },
+    { "name": "Bronze", "color": "#895b43", "body": 1, "tint": true },
+    { "name": "Olive", "color": "#b39b72", "body": 1, "tint": true }
+  ],
+  "looks": [
+    {
+      "name": "Dune",
+      "coat": "#a76b43",
+      "light": "#cf9a63",
+      "trousers": "#454852",
+      "hair": "#70503a",
+      "scarf": "#ae4b33"
+    },
+    {
+      "name": "Sage",
+      "coat": "#535d3e",
+      "light": "#7e8758",
+      "trousers": "#383f43",
+      "hair": "#362c29",
+      "scarf": "#d2ae64"
+    },
+    {
+      "name": "Midnight",
+      "coat": "#343b3f",
+      "light": "#596264",
+      "trousers": "#242b32",
+      "hair": "#b28a56",
+      "scarf": "#3d7779"
+    }
+  ]
+}
