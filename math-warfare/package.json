@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test scripts/check-adventure.mjs"
+    "test": "node --test scripts/check-adventure.mjs scripts/check-village.mjs"
   },
   "dependencies": {},
   "devDependencies": {

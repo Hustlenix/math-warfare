@@ -195,11 +195,11 @@ export const NPCS = {
     },
     {
       id: "shop",
-      name: "Supply bench",
+      name: "Tess",
       x: 21,
       y: 14,
       art: "person7",
-      label: "Village upgrades",
+      label: "Supply bench · village upgrades",
     },
     {
       id: "arena",

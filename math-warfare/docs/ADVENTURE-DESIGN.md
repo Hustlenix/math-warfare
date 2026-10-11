@@ -1,5 +1,17 @@
 # The Lanterns of Numberglen
 
+## Countryside and village-life revision
+
+Experience target: players should feel like a neighbour in a countryside community by seeing people go about their day, meeting them in the lanes, and helping with their problems.
+
+Four scripted pairs follow collision-aware routes, face each other and alternate conversation turns. They return home after meeting. Three additional neighbours follow small circuits and share local stories. These are authored routines, not an AI simulation or multiplayer chat. The village clock pauses during challenges and dialogues. Following a quest neighbour pins their position so players do not have to chase them; walking away releases them. Quest IDs and rewards stay independent of temporary actor positions. Deliveries, gardening, reading and lights give the conversations a village purpose.
+
+Cottages, vegetable beds, an orchard, pond landing, farm stall, fences, chickens and birds replace exposed furniture and large checkerboard lawns. Roofs have a cutaway front so indoor quest characters stay visible. The southern cottage has collision; decorations preserve required routes. A status line repeats the current neighbour exchange outside the Canvas.
+
+The intro composes the actual licensed game cast in a rural pixel scene. Its loading bar reports decoded artwork count, and Start becomes available after successful loading. Returning players can continue their save. There is no artificial minimum loading delay. Reduced motion freezes decorative animation.
+
+Animation normalizes Modern Interiors’ right/up/left/down order and Fungus Cave’s down/left/right/up order to consistent runtime directions. Idle uses a dedicated idle frame; movement uses walking frames. Added verification compares actual pixels to original crops, and simulates several minutes of meetings, conversation, returns, collision and low-frame-rate movement.
+
 The intended experience is a friendly adventure about becoming confident at mental arithmetic. Players walk, meet neighbours, choose a method, answer a short challenge, and see their help change the settlement. Maths is the action that moves the story forward.
 
 ## Core and longer loops

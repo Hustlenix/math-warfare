@@ -11,6 +11,43 @@
     <title>MATH-Warefare · The Lanterns of Numberglen</title>
   </head>
   <body>
+    <section id="intro" class="intro" aria-label="Welcome to Numberglen">
+      <div class="intro-card">
+        <div class="intro-art">
+          <canvas
+            id="intro-scene"
+            width="960"
+            height="540"
+            aria-label="The adventurer and Numberglen’s villagers gathered in the countryside"
+          ></canvas>
+          <div class="intro-title">
+            <span class="eyebrow">A LITTLE MATHS. A LOT OF HEART.</span>
+            <h1>MATH-WAREFARE</h1>
+            <p>THE LANTERNS OF NUMBERGLEN</p>
+          </div>
+          <span class="intro-kicker"
+            >MEET THE NEIGHBOURS · BRING BACK THE LIGHT</span
+          >
+        </div>
+        <div class="intro-bottom">
+          <div>
+            <p class="intro-tagline">Every village needs a bright idea.</p>
+            <div class="intro-loading" aria-label="Artwork loading">
+              <div id="intro-progress"></div>
+            </div>
+            <p class="intro-status" id="intro-status" role="status">
+              Gathering the villagers…
+            </p>
+          </div>
+          <div>
+            <button id="intro-start" class="primary" disabled>
+              Loading the adventure…</button
+            ><button id="intro-retry" hidden>Reload</button>
+            <p class="intro-controls">Explore · meet · solve · restore</p>
+          </div>
+        </div>
+      </div>
+    </section>
     <div id="app">
       <header class="topbar">
         <a class="brand" href="./" aria-label="MATH-Warefare home"
@@ -53,6 +90,11 @@
                 Talk / interact <kbd>E</kbd></button
               ><button id="help-route">Find next quest ↗</button>
             </div>
+          </div>
+          <div class="village-life-line">
+            <span id="village-life"
+              >A quiet morning · neighbours are out and about</span
+            >
           </div>
           <div class="controls-line">
             <span

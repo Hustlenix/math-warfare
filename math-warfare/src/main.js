@@ -1,5 +1,7 @@
 import "./styles.css";
 import "./adventure/polish.css";
+import "./adventure/intro.css";
+import { setupIntro } from "./adventure/intro.js";
 import artUrls from "virtual:licensed-art";
 import { QUESTS, SKILLS, SHOP, NPCS } from "./adventure/content.js";
 import {
@@ -18,6 +20,7 @@ import {
   seeded,
 } from "./adventure/questions.js";
 import { World, blocked } from "./adventure/world.js";
+import { AMBIENT } from "./adventure/village-life.js";
 const $ = (id) => document.getElementById(id),
   esc = (s) =>
     String(s).replace(
@@ -128,6 +131,7 @@ function refresh() {
     state.zone === "village"
       ? "CHAPTER 01 · THE VILLAGE"
       : "CHAPTER 02 · LANTERN HOLLOW";
+  $("village-life").parentElement.hidden = state.zone !== "village";
   $("zone-title").textContent =
     state.zone === "village"
       ? "Welcome to Numberglen."
@@ -139,7 +143,10 @@ function refresh() {
       : "Even the strangest neighbours have ordinary problems.";
   $("neighbour-count").textContent =
     state.zone === "village" ? "NUMBERGLEN" : "HOLLOW";
-  $("neighbours").innerHTML = NPCS[state.zone]
+  $("neighbours").innerHTML = [
+    ...NPCS[state.zone],
+    ...(state.zone === "village" ? AMBIENT : []),
+  ]
     .map((n) => {
       const q = QUESTS.find((q) => q.id === n.id),
         done = state.completed.includes(n.id),
@@ -173,6 +180,15 @@ function route() {
   world.go(q.id);
 }
 function interact(n) {
+  if (AMBIENT.some((a) => a.id === n.id)) {
+    open(
+      modalHead("A NUMBERGLEN NEIGHBOUR", esc(n.name)) +
+        `<div class="dialogue-art"><img class="speaker" alt="${esc(n.name)}" src="${art[n.art + "Face"].src}"><p>${esc(n.lines[Math.floor(world.lifeTime / 40) % n.lines.length])}</p></div><p class="muted">${esc(n.activity ?? "Taking a village stroll")}</p><button id="back" class="primary">See you around →</button>`,
+    );
+    bindClose();
+    $("back").onclick = close;
+    return;
+  }
   if (n.id === "portal") {
     if (state.zone === "village" && !state.completed.includes("library")) {
       open(
@@ -595,6 +611,7 @@ panel.addEventListener("cancel", (e) => {
   battle ? pause() : close();
 });
 document.addEventListener("keydown", (e) => {
+  if (!$("intro").hidden) return;
   if (panel.open) {
     if (battle?.feedback && e.key === "Enter" && !battle.pausedAt) {
       e.preventDefault();
@@ -602,7 +619,12 @@ document.addEventListener("keydown", (e) => {
     }
     return;
   }
-  if (e.key === ' ' && e.target instanceof Element && e.target.closest('button,a,input,select,textarea')) return;
+  if (
+    e.key === " " &&
+    e.target instanceof Element &&
+    e.target.closest("button,a,input,select,textarea")
+  )
+    return;
   if (
     [
       "ArrowLeft",
@@ -661,57 +683,24 @@ $("sound").onclick = () => {
   chime();
 };
 async function boot() {
+  const intro = setupIntro(art, state, () => {
+    document.getElementById("app").inert = false;
+    world.paused = false;
+    if (!state.completed.length) {
+      open(
+        '<span class="eyebrow">YOUR FIRST BRIGHT IDEA</span><h2>Meet Mira in the square.</h2><p>Use WASD / arrows, click a place, or choose a neighbour in the field journal. Press E nearby to talk.</p><p>Help the village through short maths quests. Mistakes give you a method and another try. Your progress stays saved here.</p><button id="begin" class="primary full">Let’s explore →</button>',
+      );
+      $("begin").onclick = () => {
+        close();
+        $("world").focus();
+      };
+    } else $("world").focus();
+  });
+  document.getElementById("app").inert = true;
   try {
-    const names = [
-      "person1",
-      "person2",
-      "person3",
-      "person4",
-      "person5",
-      "person6",
-      "person7",
-      "person8",
-      "cat",
-      "frog",
-      "butterfly",
-      "desk",
-      "books",
-      "sofa",
-      "plant",
-      "rug",
-      "chair",
-      "cabinet",
-      "fungus",
-      "king",
-      "cleric",
-      "scout",
-      "stone",
-      "caveWall",
-      "mushrooms",
-      "throne",
-      "chest",
-      "crates",
-      "bed",
-      "caveSteps",
-      "owl",
-      "slime",
-      "boss",
-      "beetle",
-      ...[
-        "person1",
-        "person2",
-        "person3",
-        "person4",
-        "person5",
-        "person6",
-        "person7",
-        "person8",
-        "fungus",
-        "king",
-        "cleric",
-        "scout",
-      ].map((n) => n + "Face"),
-    ];
+    const names = Object.keys(artUrls);
+    let loaded = 0;
+    /* The importer supplies only the artwork used by this game. */
     await Promise.all(
       names.map(
         (name) =>
@@ -719,6 +708,7 @@ async function boot() {
             const im = new Image();
             im.onload = () => {
               art[name] = im;
+              intro.progress(++loaded, names.length);
               resolve();
             };
             im.onerror = () => reject(new Error("Missing artwork: " + name));
@@ -735,16 +725,10 @@ async function boot() {
     refresh();
     if (matchMedia("(pointer: coarse)").matches)
       $("touch-controls").hidden = false;
-    if (!state.completed.length) {
-      open(
-        '<div class="welcome-stamp">✦</div><span class="eyebrow">A MATHS ADVENTURE</span><h2>A little maths.<br>A lot of heart.</h2><p>Numberglen has lost its light. Walk around, meet your neighbours and use bright ideas to bring it back.</p><div class="welcome-controls"><span>01 · Meet Mira in the square</span><span>02 · Help villagers through maths</span><span>03 · Explore the mushroom cave</span></div><button id="begin" class="primary full">Step into Numberglen →</button><p class="muted">WASD / arrows or click to walk. E to talk.<br>On mobile, tap a neighbour or use touch controls.</p>',
-      );
-      $("begin").onclick = () => {
-        close();
-        $("world").focus();
-      };
-    }
+    world.paused = true;
+    intro.ready();
   } catch (err) {
+    intro.error();
     $("zone-title").textContent = "The artwork could not load.";
     $("scene-caption").textContent =
       "Run the local asset importer, then reload. See the README.";

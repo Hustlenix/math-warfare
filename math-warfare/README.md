@@ -7,6 +7,8 @@ A small maths adventure by Lalith. Numberglen’s lantern has gone dark. Walk ar
 - Two explorable maps with collision, click-to-walk routes, keyboard movement and a minimap.
 - Nine connected quests, requiring 49 correct answers to finish the story. Neighbours have dialogue and each quest teaches a different skill.
 - Animated characters, cats, frogs and butterflies; furniture and cave scenery from paid LimeZu packs.
+- A countryside settlement with tiled cottages, orchard, vegetable beds, pond landing, market awning and chickens. Villagers walk to deliveries and meetups, face one another, exchange dialogue and return home. Hazel, Jun and Sage wander the lanes and can be spoken to.
+- An ensemble pixel-art intro featuring the playable character and villagers, with real artwork-loading progress and a Continue button for saved adventures.
 - Eight skills: addition/subtraction, multiplication, division, decimals, percentages, order of operations, fractions of amounts, and short everyday word problems. Mixed practice draws from all eight.
 - Three number-size settings; untimed ten-question training and a 60 second sprint with a local personal best.
 - A daily seeded expedition, one coin reward per UTC date.
@@ -52,7 +54,7 @@ node scripts/verify-release.mjs
 npm run preview
 ```
 
-Ten tests cover 24,000 equations across all skills and sizes, input validation, daily determinism, quest prerequisites and duplicate rewards, shop overdrafts, save reloads, NPC reachability, cave gates, scaled canvas pointer coordinates and reliable auto-walking at 20 FPS. The deployment workflow verifies source and compiled-release hashes before uploading `math-warfare/release` to GitHub Pages. This allows CI to publish a playable game without possessing the private artwork packs. Rebuild and package again after changing any recorded source file.
+Fourteen tests cover 24,000 equations, validation, daily determinism, quest and purchase transactions, saves, routes, cave gates, scaled pointer coordinates, walking at 20 FPS, direction selection, conversation/return cycles and following a moving quest neighbour. `python scripts/check-art.py` also compares actual normalized sprite pixels against the owned sheets for eleven villagers and four cave characters. Run it after importing artwork. The deployment workflow checks source and release hashes before publishing the compiled game, so CI does not need the private artwork packs. Rebuild and package after changing recorded source files.
 
 ## Structure
 
@@ -61,6 +63,9 @@ Ten tests cover 24,000 equations across all skills and sizes, input validation, 
 - `src/adventure/questions.js`: exact questions, seeded daily trail and strict answer parsing.
 - `src/adventure/progress.js`: versioned saves and one-time reward/purchase transactions.
 - `src/adventure/world.js`: Canvas renderer, character animation, movement, collision, BFS routes and camera.
+- `src/adventure/village-life.js`: walking routines, neighbour meetings and normalized sprite frame selection.
+- `src/adventure/countryside.js`: cottages, farm plots, orchard, market and pond scenery.
+- `src/adventure/intro.js`: ensemble opening scene and real artwork-load progress.
 - `scripts/import-art.py`: local licensed artwork preparation.
 - `docs/ADVENTURE-DESIGN.md`: loops, state ownership, decisions and verification boundaries.
 

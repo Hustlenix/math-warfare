@@ -1,4 +1,13 @@
 import { NPCS, QUESTS } from "./content.js";
+import {
+  MEETINGS,
+  AMBIENT,
+  createResidents,
+  advanceResident,
+  facing,
+  spriteFrame,
+} from "./village-life.js";
+import { drawCountryside, villagePath } from "./countryside.js";
 export const W = 33,
   H = 25,
   T = 32;
@@ -21,6 +30,7 @@ export function blocked(zone, x, y, state) {
       if (y === 10 && x >= bx && x <= bx + 8 && x !== bx + 4) return true;
     }
     if (x >= 3 && x <= 5 && y >= 17 && y <= 21) return true;
+    if (x >= 27 && x <= 29 && y >= 20 && y <= 22) return true;
     if ((x === 16 && y === 12) || (y === 5 && [5, 6, 22, 23, 26].includes(x)))
       return true;
   } else {
@@ -98,6 +108,13 @@ export class World {
     this.last = 0;
     this.particles = [];
     this.follow = { ...state.player };
+    this.residents = createResidents(NPCS.village);
+    this.lifeTime = 0;
+    this.nextMeeting = 6;
+    this.meetingIndex = 0;
+    this.meeting = null;
+    this.pinnedId = null;
+    this.lifeLabel = document.getElementById("village-life");
     this.resize();
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(canvas);
@@ -112,7 +129,16 @@ export class World {
     this.ctx.imageSmoothingEnabled = false;
   }
   get npcs() {
-    return NPCS[this.state.zone];
+    if (this.state.zone !== "village") return NPCS[this.state.zone];
+    return [
+      ...this.residents.map((a) => ({
+        ...a,
+        x: a.x - 0.5,
+        y: a.y - 0.5,
+        actor: a,
+      })),
+      ...NPCS.village.filter((n) => !n.art),
+    ];
   }
   nearest() {
     return this.npcs
@@ -136,6 +162,10 @@ export class World {
   go(id) {
     const n = this.npcs.find((n) => n.id === id);
     if (!n) return;
+    if (n.actor) {
+      this.pinnedId = n.id;
+      n.actor.bubble = null;
+    }
     if (
       Math.hypot(
         n.x + 0.5 - this.state.player.x,
@@ -259,6 +289,7 @@ export class World {
     this.last = t;
     this.time = t / 1000;
     this.step(dt);
+    if (!this.paused && this.state.zone === "village") this.updateLife(dt);
     this.draw();
     requestAnimationFrame(this.frame);
   }
@@ -269,6 +300,151 @@ export class World {
       Math.round(y),
       Math.round(w),
       Math.round(h),
+    );
+  }
+  updateLife(dt) {
+    this.lifeTime += dt;
+    const now = this.lifeTime,
+      p = this.state.player;
+    const pinned = this.residents.find((a) => a.id === this.pinnedId);
+    if (
+      pinned &&
+      !this.path.length &&
+      Math.hypot(p.x - pinned.x, p.y - pinned.y) > 3
+    )
+      this.pinnedId = null;
+    const route = (a, x, y) => {
+      a.path = pathfind("village", a, { x, y }, this.state);
+      a.bubble = null;
+    };
+    if (!this.meeting && now >= this.nextMeeting) {
+      const spec = MEETINGS[this.meetingIndex++ % MEETINGS.length];
+      const actors = spec.pair.map((id) =>
+        this.residents.find((a) => a.id === id),
+      );
+      this.meeting = { spec, actors, phase: "walk", since: now };
+      actors.forEach((a, i) => {
+        a.activity = spec.activity;
+        route(a, ...spec.places[i]);
+      });
+    }
+    for (const a of this.residents) {
+      if (a.id === this.pinnedId) {
+        a.moving = false;
+        continue;
+      }
+      advanceResident(a, dt);
+      if (AMBIENT.some((n) => n.id === a.id) && !a.path.length) {
+        a.wait -= dt;
+        if (a.wait <= 0) {
+          a.wait = 9 + (this.residents.indexOf(a) % 3);
+          const stops =
+            a.id === "hazel"
+              ? [
+                  [10, 17],
+                  [12, 14],
+                  [11, 11],
+                ]
+              : a.id === "jun"
+                ? [
+                    [18, 18],
+                    [19, 14],
+                    [23, 14],
+                  ]
+                : [
+                    [28, 11],
+                    [29, 15],
+                    [26, 22],
+                  ];
+          a.stop = ((a.stop ?? -1) + 1) % stops.length;
+          route(a, ...stops[a.stop]);
+          a.activity = "Taking a village stroll";
+        }
+      }
+    }
+    const event = this.meeting;
+    if (event) {
+      const actors = event.actors;
+      if (
+        event.phase === "walk" &&
+        actors.every((a) => !a.path.length) &&
+        !actors.some((a) => a.id === this.pinnedId)
+      ) {
+        event.phase = "chat";
+        event.since = now;
+        actors[0].dir = facing(
+          actors[1].x - actors[0].x,
+          actors[1].y - actors[0].y,
+        );
+        actors[1].dir = facing(
+          actors[0].x - actors[1].x,
+          actors[0].y - actors[1].y,
+        );
+      }
+      if (event.phase === "chat") {
+        const turn = Math.floor((now - event.since) / 3) % 2;
+        actors.forEach(
+          (a, i) =>
+            (a.bubble =
+              i === turn && a.id !== this.pinnedId
+                ? event.spec.lines[i][1]
+                : null),
+        );
+        if (now - event.since > 12) {
+          event.phase = "return";
+          actors.forEach((a) => {
+            route(a, a.home.x, a.home.y);
+            a.activity = "Walking home";
+          });
+        }
+      }
+      if (event.phase === "return" && actors.every((a) => !a.path.length)) {
+        actors.forEach((a) => {
+          a.dir = 3;
+          a.activity = "Back at work";
+          a.bubble = null;
+        });
+        this.meeting = null;
+        this.nextMeeting = now + 5;
+      }
+      // A player can stop a neighbour. Do not let that stall village life indefinitely.
+      if (event.phase === "walk" && now - event.since > 35) {
+        event.phase = "return";
+        actors.forEach((a) => route(a, a.home.x, a.home.y));
+      }
+    }
+    const caption = this.lifeLabel;
+    const speaker = event?.actors.find((a) => a.bubble);
+    const summary = event
+      ? `${event.actors.map((a) => (a.id === "shop" ? "Tess" : a.name)).join(" & ")} · ${speaker ? speaker.bubble : event.spec.activity.toLowerCase()}`
+      : "A quiet morning · neighbours are out and about";
+    if (caption && caption.textContent !== summary)
+      caption.textContent = summary;
+  }
+  speech(text, x, y) {
+    const c = this.ctx;
+    c.font = "11px monospace";
+    const words = text.split(" "),
+      lines = [""];
+    for (const word of words) {
+      const i = lines.length - 1;
+      if (c.measureText(lines[i] + word).width > 176 && lines[i])
+        lines.push(word + " ");
+      else lines[i] += word + " ";
+    }
+    const w = Math.max(...lines.map((l) => c.measureText(l.trim()).width)) + 20,
+      h = lines.length * 15 + 12;
+    x = Math.max(
+      this.camera.x + w / 2 + 7,
+      Math.min(x, this.camera.x + this.canvas.width - w / 2 - 7),
+    );
+    this.rect(x - w / 2 + 3, y - h + 3, w, h, "#1c383b66");
+    this.rect(x - w / 2, y - h, w, h, "#fff3d6");
+    this.rect(x - 3, y, 6, 5, "#fff3d6");
+    c.fillStyle = "#29453c";
+    c.textAlign = "center";
+    lines.forEach((l, i) =>
+      c.fillText(l.trim(), Math.round(x), Math.round(y - h + 15 + i * 15)),
     );
   }
   sprite(name, x, y, scale = 2) {
@@ -305,7 +481,7 @@ export class World {
         ? Math.floor(this.time * 9) % 6
         : 1;
     const sx = art.startsWith("person")
-        ? (dir * 6 + frame) * 16
+        ? spriteFrame(dir, moving, this.time, this.state.reducedMotion) * 16
         : Math.min(frame % 3, 2) * 16,
       sy = art.startsWith("person") ? 0 : dir * 32;
     this.rect(x - 10, y - 5, 20, 7, "#152a2b55");
@@ -326,37 +502,43 @@ export class World {
       p = this.state.player,
       cw = this.canvas.width,
       ch = this.canvas.height;
-    this.camera.x = Math.max(0, Math.min(W * T - cw, p.x * T - cw / 2));
+    this.camera.x =
+      cw > W * T
+        ? (W * T - cw) / 2
+        : Math.max(0, Math.min(W * T - cw, p.x * T - cw / 2));
     this.camera.y = Math.max(0, Math.min(H * T - ch, p.y * T - ch / 2));
     c.save();
     c.clearRect(0, 0, cw, ch);
+    c.fillStyle=this.state.zone==='village'?'#315844':'#292636';c.fillRect(0,0,cw,ch);
     c.translate(-Math.round(this.camera.x), -Math.round(this.camera.y));
     const village = this.state.zone === "village";
     for (let y = 0; y < H; y++)
       for (let x = 0; x < W; x++) {
         if (village) {
-          const road =
-            (x >= 13 && x <= 18) ||
-            (y >= 11 && y <= 15) ||
-            (y === 8 && x >= 6 && x <= 26) ||
-            (y === 19 && x >= 6 && x <= 26);
+          const road = villagePath(x, y);
           this.rect(
             x * T,
             y * T,
             T,
             T,
-            road
-              ? (x + y) % 3
-                ? "#d6bd81"
-                : "#cdb17b"
-              : (x * 7 + y * 3) % 4
-                ? "#739b69"
-                : "#7ba570",
+            road ? ((x + y) % 3 ? "#d6bd81" : "#cdb17b") : "#789b6b",
           );
           if (!road && (x * 19 + y * 11) % 7 === 0) {
             this.rect(x * T + 7, y * T + 15, 2, 6, "#527e58");
             this.rect(x * T + 18, y * T + 9, 4, 2, "#93b37c");
           }
+          if (!road)
+            for (let i = 0; i < 5; i++) {
+              const px = (x * 17 + y * 11 + i * 7) % 29,
+                py = (x * 13 + y * 23 + i * 11) % 28;
+              this.rect(
+                x * T + px,
+                y * T + py,
+                2 + (i % 2),
+                2,
+                i % 2 ? "#87a676" : "#6e9163",
+              );
+            }
         } else {
           c.drawImage(this.art.stone, x * T, y * T, T, T);
           if ((x * 7 + y * 3) % 9 === 0)
@@ -386,7 +568,8 @@ export class World {
         this.character("person1", n.px, n.py, this.dir, this.moving);
         continue;
       }
-      if (n.art) this.character(n.art, n.px, n.py, 3, false);
+      if (n.art)
+        this.character(n.art, n.px, n.py, n.dir ?? 3, n.moving ?? false);
       else {
         this.rect(n.px - 6, n.py - 35, 12, 35, "#705b42");
         this.rect(n.px - 22, n.py - 40, 44, 18, "#b09b62");
@@ -411,6 +594,9 @@ export class World {
       const near = Math.hypot(n.px / T - p.x, n.py / T - p.y) < 2.8;
       if (near) this.label(n.name, n.px, n.py + 20);
     }
+    if (village)
+      for (const a of this.residents)
+        if (a.bubble) this.speech(a.bubble, a.x * T, a.y * T - 76);
     const animal = this.state.companion;
     if (animal !== "none") {
       const im = this.art[animal],
@@ -454,104 +640,23 @@ export class World {
     this.minimap();
   }
   village() {
-    for (const [bx, title] of [
-      [3, "BRAM’S BAKERY"],
-      [20, "ADA’S LIBRARY"],
-    ]) {
-      this.rect(bx * T, 3 * T, 9 * T, 8 * T, "#4f6c68");
-      this.rect((bx + 1) * T, 4 * T, 7 * T, 6 * T, "#c4aa82");
-      for (let x = bx + 1; x < bx + 8; x++)
-        for (let y = 4; y < 10; y++) {
-          if ((x + y) % 2 === 0) this.rect(x * T, y * T, T, T, "#baa27d");
-        }
-      this.rect(bx * T, 3 * T, 9 * T, T, "#4b726c");
-      this.rect(bx * T, 3 * T, 9 * T, 5, "#d1b06b");
-      this.rect((bx + 4) * T, 10 * T, T, T, "#d6bd81");
-      this.label(title, (bx + 4.5) * T, 3 * T + 22, "#fff3cb", 12);
-      this.sprite("books", (bx + 2) * T, 4.6 * T);
-      this.sprite("desk", (bx + 4) * T, 4.5 * T);
-      this.sprite("plant", (bx + 6.2) * T, 7 * T);
-    }
-    this.rect(3 * T, 17 * T, 3 * T, 5 * T, "#426d77");
-    for (let i = 0; i < 6; i++) {
-      this.rect(
-        (3 + (i % 3)) * T + 8,
-        (17 + Math.floor(i / 3) * 2) * T + 13,
-        15,
-        8,
-        "#9bba74",
-      );
-    }
-    const frogFrame = this.state.reducedMotion
-      ? 0
-      : Math.floor(this.time * 5) % 6;
-    this.ctx.drawImage(
-      this.art.frog,
-      frogFrame * 16,
-      0,
-      16,
-      16,
-      6 * T,
-      18 * T,
-      32,
-      32,
-    );
-    this.sprite("sofa", 22 * T, 17 * T);
-    this.sprite("desk", 24 * T, 17 * T);
-    this.sprite("rug", 21 * T, 19.3 * T);
-    this.label("FERN’S POND", 7 * T, 17 * T, "#fff1c8", 11);
-    this.label("MARKET", 24 * T, 17 * T - 8, "#fff1c8", 11);
-    this.rect(16 * T, 12 * T, 32, 32, "#687a6d");
-    this.rect(16 * T + 10, 12 * T - 24, 12, 30, "#887c56");
-    this.rect(
-      16 * T + 6,
-      12 * T - 31,
-      20,
-      12,
-      this.state.completed.includes("welcome") ? "#ffe38a" : "#7c8b87",
-    );
-    if (this.state.completed.includes("welcome")) {
-      const grad = this.ctx.createRadialGradient(
-        16 * T + 16,
-        12 * T - 20,
-        5,
-        16 * T + 16,
-        12 * T - 20,
-        50,
-      );
-      grad.addColorStop(0, "#ffd67545");
-      grad.addColorStop(1, "#ffd67500");
-      this.ctx.fillStyle = grad;
-      this.ctx.fillRect(16 * T - 34, 12 * T - 70, 100, 100);
-    }
-    this.label("NUMBERGLEN", 16 * T, 5 * T, "#fff3cc", 17);
-    for (let i = 0; i < 8; i++) {
-      const x = (i % 2 ? 30 : 2) * T,
-        y = (3 + Math.floor(i / 2) * 6) * T;
-      this.tree(x, y);
-    }
-    if (this.state.upgrades.includes("garden"))
-      for (let i = 0; i < 36; i++) {
-        const x = (12 + (i % 9)) * T + 8,
-          y = (6 + Math.floor(i / 9)) * T + 10;
-        this.rect(x, y, 4, 8, "#47734c");
-        this.rect(x - 3, y - 3, 10, 5, i % 2 ? "#e4ad77" : "#b3a4d1");
-      }
-    if (this.state.upgrades.includes("picnic")) {
-      this.sprite("rug", 13 * T, 19 * T);
-      this.sprite("sofa", 15 * T, 20 * T);
-      this.sprite("books", 17 * T, 19 * T);
-    }
-    if (this.state.upgrades.includes("lanterns"))
-      for (const x of [12, 19])
-        for (const y of [8, 18]) this.lantern(x * T, y * T);
+    drawCountryside(this);
   }
   tree(x, y) {
-    this.rect(x + 10, y + 22, 12, 32, "#6f6445");
-    this.rect(x - 6, y - 15, 44, 42, "#416b51");
-    this.rect(x - 12, y - 4, 56, 26, "#4d7d59");
-    this.rect(x + 1, y - 20, 30, 20, "#5b8962");
-    this.rect(x - 3, y - 9, 20, 6, "#709b6b");
+    this.rect(x - 11, y + 40, 59, 13, "#34574044");
+    this.rect(x + 10, y + 15, 12, 39, "#736247");
+    this.rect(x + 11, y + 24, 3, 27, "#a28a59");
+    this.rect(x - 4, y - 20, 40, 52, "#315b46");
+    this.rect(x - 14, y - 8, 61, 27, "#315b46");
+    this.rect(x - 8, y - 12, 49, 36, "#4b7853");
+    this.rect(x - 13, y - 4, 59, 17, "#4b7853");
+    this.rect(x + 1, y - 24, 28, 30, "#67905d");
+    this.rect(x - 4, y - 18, 34, 17, "#67905d");
+    for (let i = 0; i < 11; i++) {
+      const dx = ((i * 13) % 44) - 8,
+        dy = ((i * 7) % 27) - 13;
+      this.rect(x + dx, y + dy, 5 + (i % 3), 3, i % 3 ? "#7ca06a" : "#3f6d4c");
+    }
   }
   lantern(x, y) {
     this.rect(x + 10, y - 20, 6, 48, "#786541");

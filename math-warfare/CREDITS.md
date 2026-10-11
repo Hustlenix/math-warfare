@@ -6,7 +6,7 @@ Pixel artwork: **LimeZu**, https://limezu.itch.io/
 
 Used locally supplied paid packs:
 
-- Modern Interiors full version: https://limezu.itch.io/moderninteriors — eight premade characters, animated cat/frog/butterflies and furniture crops.
+- Modern Interiors full version: https://limezu.itch.io/moderninteriors — eleven premade characters, animated cat/frog/butterflies and furniture crops. Direction frames are reordered to consistent left/up/right/down strips. Side-facing art is used directly, without mirroring a back frame.
 - Fungus Cave: https://limezu.itch.io/fungus-cave — animated cave characters, stone/wall tiles, mushrooms, throne, camp furnishings and chest.
 - RPG Fantasy Battlers complete version: https://limezu.itch.io/fantasy-battlers — four static battlers, animated in the game through code.
 
