@@ -2,151 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MATH WARFARE: OMEGA ULTRA</title>
-  <meta name="description" content="A colorful MS Paint-style mental-math battle game with combos, boss equations, shields and time attacks.">
-  <meta name="theme-color" content="#87CEEB">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#272338">
+  <meta name="description" content="A pocket arcade for your brain. Train mental maths with pixel battles, quick rounds and helpful mistake reviews. No login needed.">
+  <title>MATH WARFARE · Stay calculated</title>
+  <link rel="icon" href="./calculator.svg" type="image/svg+xml">
 </head>
 <body>
-  <header class="app-header">
-    <div class="paint-title-box">
-      <p class="logo">MATH WARFARE</p>
-      <p class="logo-sub">OMEGA ULTRA</p>
-    </div>
-    <div class="paint-palette" aria-hidden="true">
-      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <p class="header-note">MENTAL MATH BATTLE GAME</p>
+  <a class="skip-link" href="#main">Skip to game</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Math Warfare home"><img src="./calculator.svg" alt="" width="36" height="40"><span>MATH<span class="brand-bottom">WARFARE<span class="brand-dot">.</span></span></span></a>
+    <div class="header-actions"><span class="edition">POCKET ARCADE / 01</span><button id="sound" class="icon-button" aria-pressed="false" aria-label="Mute sound">Sound on</button></div>
   </header>
-
-  <main class="app-main" id="app">
-    <section id="screen-start" class="screen active" aria-label="Start screen">
-      <article class="card start-card">
-        <h1 class="title" id="start-title">ENTER YOUR CALLSIGN</h1>
-        <p class="tagline">Solve fast. Build combos. Beat the boss.</p>
-
-        <figure class="paint-hero">
-          <img src="./paint-battle.svg" alt="Simple MS Paint style scene of a calculator fighter battling a math boss">
-          <figcaption>Made to look like a simple MS Paint school drawing: shapes + fill + black outlines.</figcaption>
-        </figure>
-
-        <form id="start-form">
-          <label class="field-label" for="player-name">CALLSIGN</label>
-          <input class="text-field" id="player-name" name="player-name" type="text" autocomplete="nickname" placeholder="PLAYER NAME" required>
-
-          <label class="field-label" for="difficulty">DIFFICULTY</label>
-          <select class="field" id="difficulty" name="difficulty">
-            <option value="basic">BASIC</option>
-            <option value="pro">PRO</option>
-            <option value="god">GOD (CHAOS)</option>
-          </select>
-
-          <label class="field-label" for="battle-type">BATTLE TYPE</label>
-          <select class="field" id="battle-type" name="battle-type">
-            <option value="classic">CLASSIC — N QUESTIONS</option>
-            <option value="60">TIME ATTACK 60s</option>
-            <option value="90">TIME ATTACK 90s</option>
-            <option value="120">TIME ATTACK 120s</option>
-          </select>
-
-          <fieldset class="ops-fieldset">
-            <legend class="field-label">PICK YOUR WEAPONS</legend>
-            <div class="chip-grid">
-              <label class="chip chip-red"><input type="checkbox" name="ops" value="+" checked><span>+ ADD</span></label>
-              <label class="chip chip-blue"><input type="checkbox" name="ops" value="-"><span>− SUB</span></label>
-              <label class="chip chip-yellow"><input type="checkbox" name="ops" value="*"><span>× MUL</span></label>
-              <label class="chip chip-green"><input type="checkbox" name="ops" value="/"><span>÷ DIV</span></label>
-            </div>
-          </fieldset>
-
-          <label class="field-label" for="total-qs">QUESTIONS (1–100)</label>
-          <input class="text-field" id="total-qs" name="total-qs" type="number" min="1" max="100" value="10" inputmode="numeric">
-
-          <button class="btn" type="submit">ENTER BATTLE!</button>
+  <main id="main" tabindex="-1">
+    <section id="home" class="home-view" aria-labelledby="home-title">
+      <div class="intro">
+        <p class="eyebrow"><span class="status-dot"></span> SMALL GAME. BIG BRAIN ENERGY.</p>
+        <h1 id="home-title">Less overthinking.<br>More <span class="title-highlight">calculating.</span></h1>
+        <p class="intro-copy">Your brain deserves an arcade, too. Turn everyday maths into quick battles. Find your rhythm. Beat your last run.</p>
+        <div class="world" aria-label="Pixel landscape with a calculator hero and a number monster">
+          <div class="world-top"><span>THE NUMBER FRONTIER</span><span>LVL 01</span></div>
+          <img class="world-art" src="./frontier.svg" alt="A small pixel calculator faces a purple number monster across a grassy valley under a peach moon">
+          <div class="world-bottom"><span class="pixel">YOU VS. YOUR LAST RUN</span><span class="world-coordinates">+ − × ÷</span></div>
+        </div>
+        <div class="how-strip"><span><b>01</b> Pick a challenge</span><span><b>02</b> Solve & build a streak</span><span><b>03</b> Learn from your misses</span></div>
+      </div>
+      <aside class="setup-panel" aria-labelledby="setup-title">
+        <div class="panel-heading"><span class="eyebrow">READY, PLAYER?</span><span class="tiny-star" aria-hidden="true">✦</span></div>
+        <h2 id="setup-title">Make it your game.</h2>
+        <form id="setup">
+          <label class="label" for="callsign">YOUR CALLSIGN <span>optional</span></label>
+          <input id="callsign" maxlength="24" autocomplete="nickname" placeholder="Player one" type="text">
+          <fieldset><legend class="label">01 / CHOOSE YOUR MODE</legend><div class="mode-options">
+            <label class="mode-choice"><input type="radio" name="format" value="run" checked><span><b>Adventure</b><small>A short run. A boss at the finish.</small></span><span class="mode-tag">10 Q</span></label>
+            <label class="mode-choice"><input type="radio" name="format" value="sprint"><span><b>Speed sprint</b><small>How far can you go in 60 seconds?</small></span><span class="mode-tag">60 S</span></label>
+            <label class="mode-choice"><input type="radio" name="format" value="focus"><span><b>Practice room</b><small>No clock. Just you and the numbers.</small></span><span class="mode-tag">ZEN</span></label>
+          </div></fieldset>
+          <fieldset><legend class="label">02 / SET THE CHALLENGE</legend><div class="difficulty-options">
+            <label><input type="radio" name="difficulty" value="basic" checked><span>Rookie</span></label>
+            <label><input type="radio" name="difficulty" value="pro"><span>Tactician</span></label>
+            <label><input type="radio" name="difficulty" value="god"><span>Boss level</span></label>
+          </div><p id="difficulty-note" class="field-note">Whole numbers · tables up to 12 · 15s per question</p></fieldset>
+          <fieldset><legend class="label">03 / PICK YOUR OPERATIONS</legend><div class="operations">
+            <label><input type="checkbox" name="operation" value="+" checked><span><b>+</b>Add</span></label>
+            <label><input type="checkbox" name="operation" value="-" checked><span><b>−</b>Subtract</span></label>
+            <label><input type="checkbox" name="operation" value="*" checked><span><b>×</b>Multiply</span></label>
+            <label><input type="checkbox" name="operation" value="/" checked><span><b>÷</b>Divide</span></label>
+          </div></fieldset>
+          <div class="run-length"><label class="label" for="length">RUN LENGTH</label><select id="length"><option value="10">10 questions</option><option value="20">20 questions</option><option value="30">30 questions</option></select></div>
+          <p id="setup-error" class="form-error" role="alert"></p>
+          <button type="submit" class="button primary start-button">LET’S PLAY <span aria-hidden="true">↗</span></button>
+          <p class="setup-footnote">No login. Progress stays on this device.</p>
         </form>
-      </article>
-
-      <section class="card lb-card" aria-label="Hall of fame">
-        <h2 class="lb-heading">HALL OF FAME</h2>
-        <div class="lb-grid">
-          <article class="lb-panel">
-            <h3 class="lb-title">LOCAL</h3>
-            <ol class="lb-list" id="lb-local"></ol>
-          </article>
-          <article class="lb-panel">
-            <h3 class="lb-title">GLOBAL (SIM)</h3>
-            <ol class="lb-list" id="lb-global"></ol>
-          </article>
-        </div>
-        <p class="player-status" id="player-status" aria-live="polite">ENTER YOUR CALLSIGN TO SEE YOUR RANK</p>
-      </section>
+      </aside>
+      <section class="records" aria-labelledby="records-title"><div><p class="eyebrow">YOUR LITTLE HALL OF FAME</p><h2 id="records-title">Every run counts.</h2><p>Compete with yourself. Keep showing up.</p></div><div id="recent-runs" class="recent-runs"></div></section>
     </section>
-
-    <section id="screen-quiz" class="screen hidden" aria-label="Quiz screen">
-      <article class="card quiz-card" id="quiz-card">
-        <div class="quiz-top">
-          <h1 class="q-count" id="q-count">1/10</h1>
-          <span class="combo" id="combo-text">x1 COMBO</span>
-          <span class="shield-chip" id="shield-chip" title="STREAK SHIELDS">🛡×0</span>
-          <button class="mute-btn" id="mute-btn" type="button" aria-label="Mute sound" aria-pressed="false">🔊</button>
-        </div>
-
-        <div class="timer-bar" id="timer-bar" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="10" aria-valuenow="10">
-          <div class="timer-fill" id="timer-fill"></div>
-        </div>
-
-        <p class="boss-banner hidden" id="boss-banner" aria-live="polite">BOSS EQUATION!</p>
-
-        <div class="equation-sheet">
-          <p class="equation" id="equation" aria-live="polite">0 + 0</p>
-        </div>
-
-        <label class="sr-only" for="answer">Your answer</label>
-        <input class="answer-input" id="answer" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="?" aria-label="Your answer">
-
-        <div id="reveal-flash" class="reveal-flash hidden" aria-live="polite"></div>
-
-        <div id="revenge-box" class="revenge-box hidden">
-          <p class="tagline revenge-tagline">WRONG! REDEEM YOUR PRIDE!</p>
-          <button class="btn revenge-btn" id="revenge-btn" type="button">
-            REDEEM YOUR PRIDE! <span class="revenge-count" id="revenge-count">5</span>
-          </button>
-        </div>
-
-        <p class="streak-text" id="streak-text" aria-live="polite"></p>
-        <p class="hints">ENTER = FIRE · ESC = PAUSE</p>
-      </article>
+    <section id="battle" class="battle-view hidden" aria-labelledby="battle-title">
+      <div class="battle-heading"><div><p class="eyebrow" id="battle-mode">ADVENTURE / ROOKIE</p><h1 id="battle-title">Stay calculated.</h1></div><button id="pause" class="button small secondary">Pause <kbd>Esc</kbd></button></div>
+      <div class="battle-grid">
+        <aside class="arena"><div class="arena-heading"><span id="stage">THE NUMBER FRONTIER</span><span id="stage-number">01 / 10</span></div><img src="./frontier.svg" alt="" class="arena-landscape"><div class="fighters" aria-hidden="true"><img id="hero" src="./calculator.svg" alt=""><span id="impact">✦</span><span class="enemy" id="enemy">?</span></div><div class="arena-bottom"><span id="arena-message">ONE ANSWER AT A TIME.</span><div id="route" class="route" aria-hidden="true"></div></div></aside>
+        <article class="question-panel" id="question-panel">
+          <div class="battle-hud"><div><span class="hud-label">SCORE</span><strong id="score">0</strong></div><div><span class="hud-label">STREAK</span><strong id="streak">0</strong></div><div class="clock"><span class="hud-label" id="clock-label">TIME LEFT</span><strong id="clock">15s</strong></div></div>
+          <div id="timer" class="timer" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="15" aria-valuenow="15"><div id="timer-fill"></div></div>
+          <p class="question-kicker" id="question-kicker">QUESTION 01</p><h2 id="equation" class="equation" aria-live="polite">12 + 8</h2>
+          <form id="answer-form"><label class="sr-only" for="answer">Your answer</label><div class="answer-row"><input id="answer" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer" aria-describedby="answer-note"><button id="submit" class="button primary" type="submit">Check <span aria-hidden="true">↵</span></button></div></form>
+          <p id="answer-note" class="answer-note">Type your answer, then press Enter.</p>
+          <div id="feedback" class="feedback hidden" role="status"><strong id="feedback-title"></strong><p id="feedback-detail"></p><button id="next" class="button secondary">Next question →</button></div>
+          <div class="keypad" aria-label="Answer keypad"><button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button><button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button><button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button><button data-key="-" aria-label="Toggle negative sign">±</button><button data-key="0">0</button><button data-key="." aria-label="Decimal point">.</button><button data-key="clear" class="key-wide">Clear</button><button data-key="backspace" aria-label="Delete last digit">⌫</button></div>
+          <button id="skip" class="text-button">Skip this question</button>
+        </article>
+      </div><p class="battle-footnote">Make mistakes here. Save the confidence for your exams.</p>
     </section>
-
-    <section id="screen-results" class="screen hidden" aria-labelledby="results-title">
-      <article class="card results-card">
-        <h1 class="title" id="results-title">BATTLE ENDED!</h1>
-        <p class="score-big" id="final-score">0/0</p>
-        <p class="final-xp" id="final-xp">XP EARNED: 0</p>
-        <p class="pb-stamp hidden" id="pb-stamp" aria-live="polite">NEW PERSONAL BEST!</p>
-        <p class="rank-text" id="rank-text"></p>
-        <p class="pb-delta" id="pb-delta"></p>
-        <button class="btn" id="rematch-btn" type="button">REMATCH!</button>
-        <button class="btn btn-ghost" id="menu-btn" type="button">MAIN MENU</button>
-      </article>
+    <section id="results" class="results-view hidden" aria-labelledby="result-title">
+      <div class="result-banner"><p class="eyebrow">RUN COMPLETE</p><img src="./calculator.svg" alt="Your calculator hero"><h1 id="result-title">That’s a wrap, soldier.</h1><p id="result-subtitle"></p><div class="result-stats"><div><strong id="result-score">0</strong><span>POINTS</span></div><div><strong id="result-accuracy">0%</strong><span>ACCURACY</span></div><div><strong id="result-speed">—</strong><span>AVG / ANSWER</span></div><div><strong id="result-streak">0</strong><span>BEST STREAK</span></div></div><p id="result-record" class="record-message"></p><div class="result-actions"><button id="again" class="button primary">Play again ↗</button><button id="back-home" class="button secondary">Change setup</button></div></div>
+      <section class="review" aria-labelledby="review-title"><div class="review-heading"><div><p class="eyebrow">THE DEBRIEF</p><h2 id="review-title">Turn misses into muscle memory.</h2></div><button id="retry" class="button secondary hidden">Practise missed questions</button></div><div id="review-list"></div></section>
     </section>
-
-    <div id="pause-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pause-title" aria-hidden="true">
-      <article class="card pause-card">
-        <h2 class="title" id="pause-title">PAUSED</h2>
-        <p class="tagline">The battle is waiting.</p>
-        <button class="btn" id="resume-btn" type="button">RESUME</button>
-        <button class="btn btn-ghost" id="quit-btn" type="button">QUIT</button>
-      </article>
-    </div>
-
-    <div id="meme-overlay" class="overlay meme-overlay hidden" aria-hidden="true"></div>
   </main>
-
-  <footer class="app-footer">
-    <p>MS PAINT MODE • MENTAL MATH • NO CALCULATORS</p>
-  </footer>
-
+  <dialog id="pause-dialog" aria-labelledby="pause-title"><p class="eyebrow">TAKE A BREATHER</p><h2 id="pause-title">The numbers can wait.</h2><p>Your clock is paused. Come back when you’re ready.</p><button id="resume" class="button primary">Resume game ↗</button><button id="quit" class="button secondary">Leave this run</button><p class="field-note">An unfinished run won’t be saved.</p></dialog>
+  <footer class="site-footer"><span>STAY CALCULATED, GNG.</span><div><span>MATH WARFARE · BY LALITH</span><a href="https://github.com/Hustlenix/math-warfare" target="_blank" rel="noopener">Source ↗</a></div></footer>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

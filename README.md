@@ -1,144 +1,94 @@
-# MATH-Warefare: Omega Ultra
+# MATH WARFARE
 
-**A fast mental-math battle game where correct calculations become combos, shields, boosts, boss damage, and XP.**
+A small pixel arcade for mental arithmetic. Solve questions, build a streak and review the calculations that slowed you down.
 
-![MATH-Warefare hand-drawn battle art](./math-warfare/public/paint-battle.svg)
+**[Play the game](https://hustlenix.github.io/math-warfare/)** · [Stardance project](https://stardance.hackclub.com/projects/45075)
 
-## Play it
+## The idea
 
-**▶ [PLAY THE LIVE GAME](https://hustlenix.github.io/math-warfare/)**
+Lalith's original project description identifies slow basic calculations during exams as the motivation. This game offers repeatable arithmetic practice; it does not claim to improve exam scores or replace a maths curriculum.
 
-No account is required. Enter a callsign, choose a difficulty and battle type, pick your operations, and start calculating.
+## Play
 
-## What is this?
+1. Optionally enter a callsign. Choose a mode, difficulty and at least one operation.
+2. Start the run. Type an answer or use the on-screen number pad.
+3. Press **Enter** or **Check**. Build a streak with correct answers.
+4. At the end, review accuracy, average answer time and missed questions. **Practise missed questions** replays those exact equations without a timer.
 
-I started MATH-Warefare because I kept losing exam time on calculations that should have been automatic. I wanted practice to feel less like another worksheet, so I turned it into a small arcade battle.
-
-The game deliberately uses the visual language of simple student-made MS Paint drawings instead of a polished dashboard: basic rectangles/circles/triangles, black outlines, flat bucket-filled colors, bright scenery, crude proportions, and an intentionally simple calculator-vs-math battle scene.
-
-## Features
-
-- **Classic + Time Attack battles** — play a fixed number of questions or survive a 60/90/120 second blitz.
-- **Three difficulty modes** — BASIC, PRO, and GOD/CHAOS change number ranges, timing, and visual pressure.
-- **Four selectable operations** — addition, subtraction, multiplication, and exact division can be mixed in one run.
-- **Combo combat system** — streaks increase XP multipliers, award shields, and drop random 2× / reveal / bomb boosts.
-- **Boss equations + revenge rounds** — every 10th question becomes a boss; misses in Classic give one short redemption attempt.
-- **Progression + score history** — callsigns keep local XP, ranks, personal bests, last-battle deltas, and a local leaderboard.
-- **Game feel** — synthesized WebAudio effects, rising combo pitch, hit-stop, floating XP, confetti, screen shake, memes, pause, and low-time warnings.
-
-## Controls
-
-| Action | Control |
+| Mode | Behaviour |
 | --- | --- |
-| Submit answer | **Enter** |
-| Pause / resume | **Esc** |
-| Sound | Speaker button |
-| Mobile play | Tap the answer field and use the numeric keyboard |
+| Adventure | 10, 20 or 30 questions. Each question has a clock; every tenth is a boss worth triple points. |
+| Speed sprint | One 60-second clock for the whole run, including feedback. |
+| Practice room | A fixed number of questions with no time limit. |
 
-## Quick start
+| Difficulty | Numbers | Adventure clock |
+| --- | --- | --- |
+| Rookie | Whole numbers, non-negative subtraction, multiplication tables up to 12 (15 at bosses) | 15 seconds; 20 at bosses |
+| Tactician | Negative numbers, decimals, multiplication up to 20 | 12 seconds; 18 at bosses |
+| Boss level | Larger numbers and multiplication with decimals | 10 seconds; 15 at bosses |
 
-The easiest way to try the project is the live demo above.
+Answers are exact, with at most two decimal places. No rounding is required. Division is constructed from a known quotient and divisor.
 
-To run it locally, use **Node.js 20+**:
+## Controls and accessibility
 
-```bash
+- **Enter:** check the answer; continue after a miss.
+- **Esc / Pause:** pause. Esc closes the pause dialog and resumes.
+- **Sound on/off:** toggle synthesized sound effects; the setting is saved locally.
+- **Number pad:** digits, decimal point, negative sign, clear and backspace.
+- Switching to another tab automatically pauses the game. Return and choose Resume.
+- Keyboard focus, semantic form labels, a skip link, status messages and reduced-motion support are included.
+
+## Scoring and progress
+
+A correct answer starts at 10 points. Every third consecutive correct answer increases the multiplier, up to 5×. Boss questions add another 3×. A wrong answer, skipped question or timeout earns zero and resets the streak. Accuracy includes all completed attempts; average answer time includes submitted answers and excludes paused time and feedback.
+
+Run history, preferences and sound settings live in the browser's localStorage. Best scores compare the same callsign, mode, difficulty, operations and run length; missed-question practice is separate. The previous warfare_xp totals remain and receive new earned points. If storage is blocked, progress is kept for the current session only.
+
+There is no global leaderboard, account system or score server. The previous simulated global board and external meme requests were removed. Clearing browser data removes saved progress. Progress does not sync between devices.
+
+## Run locally
+
+Requires Node.js 22+ and npm. The inner math-warfare directory is the Vite app.
+
+```sh
 git clone https://github.com/Hustlenix/math-warfare.git
 cd math-warfare/math-warfare
 npm ci
 npm run dev
 ```
 
-Vite will print a local address (usually `http://localhost:5173/`). The inner
-`math-warfare/` folder is the actual app. Installing dependencies only in the
-outer repository folder does **not** install the Vite app.
+Vite prints the local URL. From that same directory:
 
-For a production build (from the same inner folder):
-
-```bash
+```sh
+npm test
 npm run build
+npm run preview
 ```
 
-Alternatively, once inner dependencies are installed, the outer repository
-folder has `npm run dev` and `npm run build` wrapper scripts.
+The outer repository has matching dev, test, build and preview wrapper scripts after the inner dependencies are installed. Production files are generated in math-warfare/dist. No API keys or .env file are required.
 
-## How it works
+## Source map
 
-The game is intentionally split into small modules instead of keeping everything in one HTML file.
+- math-warfare/index.html — screens and accessible controls.
+- math-warfare/src/styles.css — custom cream, plum and moss pixel-arcade theme.
+- math-warfare/src/main.js — screen flow, active-time clocks, pause, input, results and replay.
+- math-warfare/src/engine/questions.js — exact question generation and calculation tips.
+- math-warfare/src/engine/session.js — answer validation, scoring and run statistics.
+- math-warfare/src/engine/storage.js — local persistence and session fallback.
+- math-warfare/src/fx/audio.js — existing WebAudio sound synthesis.
+- math-warfare/public/frontier.svg and calculator.svg — original pixel scenery and sprites.
+- math-warfare/tests/engine.test.js — arithmetic, validation, score and storage regression tests.
+- .github/workflows/deploy.yml — test, build and publish to GitHub Pages on pushes to master.
 
-- `src/engine/questions.js` generates questions and boss variants.
-- `src/engine/state.js` owns battle state, timers, shields, boosts, and transitions.
-- `src/engine/scoring.js` calculates multipliers, XP, ranks, boss bonuses, and revenge rewards.
-- `src/fx/audio.js` synthesizes sound effects in the browser with WebAudio.
-- `src/fx/chaos.js` handles GOD-mode screen effects.
-- `src/api/leaderboard.js` stores local battle history and provides the leaderboard layer.
-- `src/api/memes.js` fetches/falls back to safe meme reactions.
-- `src/main.js` is the DOM/game-flow controller.
-- `src/styles.css` is the custom hand-drawn visual system.
+## Verification
 
-The battle flow is a small state machine: **question → feedback → next question**, with a **revenge** state for Classic misses. Time Attack uses one battle clock that keeps running between questions instead of resetting per question.
+The automated suite contains 18 tests, including 6,000 generated equations across all difficulties and operations. It covers exact decimal products, input validation, scoring, boss rewards and unavailable storage. Browser checks cover completed rounds, mistake review, targeted replay, keyboard/number-pad input, pause/resume and responsive layouts. These checks verify game behaviour, not educational effectiveness.
 
-## Visual design
+## Credits and AI disclosure
 
-The current visual system was rebuilt after Stardance ship feedback that the original neo-brutalist CSS looked too similar to common AI-generated sites.
+- Project owner and original concept: Lalith / [Hustlenix](https://github.com/Hustlenix).
+- Vite and vanilla JavaScript; no UI framework or CSS template.
+- Press Start 2P by CodeMan38, bundled locally under the SIL Open Font License; see public/FONT-LICENSE.txt.
+- The October 11, 2026 pixel-arcade revision was implemented with substantial Codex AI assistance, including the HTML/CSS, game-flow revision, artwork code, tests and this factual README. The earlier sound module was retained from the existing project.
 
-The replacement follows simple MS Paint school-project drawings more closely:
-
-- plain black outlines
-- basic geometric shapes
-- solid bucket-fill colors
-- bright sky/grass scenery
-- simple Arial-style text
-- square controls with no designer shadows or glass effects
-- an original calculator-vs-equation battle image built from simple Paint-like shapes
-- intentionally low-tech visual composition rather than a UI-kit aesthetic
-
-The layout remains responsive and includes `prefers-reduced-motion` handling.
-
-## Project structure
-
-```text
-.
-├── .github/workflows/deploy.yml   # GitHub Pages build/deploy
-├── package.json                   # root wrapper scripts
-└── math-warfare/
-    ├── public/
-    │   └── paint-battle.svg       # original hand-drawn hero artwork
-    ├── src/
-    │   ├── api/
-    │   ├── engine/
-    │   ├── fx/
-    │   ├── main.js
-    │   └── styles.css
-    ├── index.html
-    ├── package.json
-    └── vite.config.js
-```
-
-## Deployment
-
-Every push to `master` runs the GitHub Actions workflow in `.github/workflows/deploy.yml`:
-
-1. install dependencies with `npm ci`
-2. build the Vite project
-3. upload `math-warfare/dist`
-4. deploy it to GitHub Pages
-
-Live URL: **https://hustlenix.github.io/math-warfare/**
-
-## Known limitations
-
-- The “GLOBAL (SIM)” board is intentionally labeled as simulated; local progress is the real persistent score history in the browser.
-- Progress is local to the browser/device unless a future backend is added.
-- The game currently focuses on arithmetic speed rather than a full school syllabus.
-
-## Credits & build notes
-
-- Built with **Vite** and vanilla JavaScript modules.
-- Celebration particles use **canvas-confetti**.
-- Meme reactions use external meme data with fallbacks.
-- AI/LLM assistance was used for coding support, review, troubleshooting, and deployment. The project structure, game direction, iteration decisions, and Stardance submission are maintained in this repository.
-- The current visual system and `paint-battle.svg` were made specifically for MATH-Warefare, using simple Paint-like shapes and flat fills rather than a UI template.
-
-## Why I built it
-
-During exam practice I noticed that knowing the difficult method was not enough: slow basic calculations still cost time. MATH-Warefare is my attempt to make repetition fast, competitive, and weird enough that I actually want to do another round.
+**Stardance eligibility is not asserted.** The reviewer cited a maximum 30% AI-use rule. This revision has not been measured against that rule and must not be described as independently human-authored. Review the assistance with the organisers before requesting re-certification. No devlogs, personal work hours or recertification request were generated or submitted by this revision.
