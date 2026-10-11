@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "MATH WARFARE: OMEGA ULTRA — neo-brutalist math battle game",
+  "description": "MATH WARFARE: OMEGA ULTRA — MS Paint-style mental math battle game",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
