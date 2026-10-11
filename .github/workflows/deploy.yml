@@ -29,11 +29,12 @@ jobs:
           cache-dependency-path: math-warfare/package-lock.json
       - run: npm ci
       - run: npm test
-      - run: npm run build
+      # Paid artist packs stay local. Publish the verified compiled game.
+      - run: node scripts/verify-release.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: math-warfare/dist
+          path: math-warfare/release
 
   deploy:
     needs: build

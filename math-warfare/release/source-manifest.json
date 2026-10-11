@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "source": {
+    "src/adventure/content.js": "a77a359472a5bac29f920022c18c5f587cf95066b544c7ed1fb9488ea99466ee",
+    "src/adventure/polish.css": "9d60182483e6a3290e358ba0faede4c2d6ad37dffb614db43dc2b1e03b3883ea",
+    "src/adventure/progress.js": "4970253206e14c2c0b64972b83435ef73123059875a4c35fb4bacdc3e0408200",
+    "src/adventure/questions.js": "bb17371b78aaa613747fb551ed075a22642d82e8ab70e9e99df7bdf4d756cdac",
+    "src/adventure/world.js": "bfcfa4eaba8a2a507e638acacd03853222cad91f8f82c0860da39370728e21dd",
+    "src/main.js": "711f0f1eb707f522433047404440b524a5d37b48ec918eca594fee413bf6386d",
+    "src/styles.css": "217b0cde3bb106bec4562304d50cb6f08d454c47d689c1295db29d418329195b",
+    "scripts/check-adventure.mjs": "b5c0e25491b089a81d75225f28a7bc7b912a8b8936462333ac91e9090e93ed33",
+    "scripts/import-art.py": "97af0680ac23c71eecaf3df288748a2b69d5235a549f927e050b6f1d9819806b",
+    "scripts/package-release.mjs": "54cbca42e792ee550ecc021b28ae40b3ee23ddbccd732e86d1ea4c26685195a4",
+    "scripts/verify-release.mjs": "376fa375e61b6058dd15ee5999e94a1437ebd72c8fa0a062e41f89d7fe39c7a3",
+    "vite.config.js": "6a5d7caa608be0a02af7787fa44b392ec0d8451401dd31d93113c8c1548c4182",
+    "index.html": "0e79501491fd2d6a9564cbd9bb674dc2b95fdb3af9f67a29ae5b66153c4c7a89",
+    "package.json": "876d6fdccaf75b7ec57af6fce4f8dbb3fdfb5fc40399c3d865bde63fd2fbddd5",
+    "package-lock.json": "7ed9dbc1412274b1236e4af4a1b07ab20fabc1da7dede52eb2e473d252313bce",
+    "CREDITS.md": "f58b421ee6065ed406732bde1246411eecb8ec6e667392c46e362020f7c37eea",
+    "public/pixel.ttf": "034c77f1f05ec89421e4a63f0e3a4ca1ecf852cc6d2bf611f126f275728e017d",
+    "public/FONT-LICENSE.txt": "705960c3281a5765ecc0b59bd4ed7ca59eed165748076bc2fc3e8fdbfeb944b0"
+  },
+  "release": {
+    "assets/index-CSlQJVa6.js": "f6a396b8ff70a1c4b223257b62bc3ff8f233275adfd8f555d5eaf1f348c4f0e3",
+    "assets/index-DebUaBjG.css": "12df50e3b4888344c91a979d24f64ed88b551d08f278e04a9fd38fc912c7bca8",
+    "CREDITS.md": "f58b421ee6065ed406732bde1246411eecb8ec6e667392c46e362020f7c37eea",
+    "FONT-LICENSE.txt": "705960c3281a5765ecc0b59bd4ed7ca59eed165748076bc2fc3e8fdbfeb944b0",
+    "index.html": "c540556f7ef3958bf87e35269b511fa6026a9c8a07fd3570862e6fbb028529a2",
+    "pixel.ttf": "034c77f1f05ec89421e4a63f0e3a4ca1ecf852cc6d2bf611f126f275728e017d"
+  }
+}

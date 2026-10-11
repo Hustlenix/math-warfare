@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#183c3a" />
+    <meta
+      name="description"
+      content="A pixel maths adventure. Help Numberglen’s villagers, befriend animals and restore a mysterious mushroom cave through mental maths."
+    />
+    <title>MATH-Warefare · The Lanterns of Numberglen</title>
+    <script type="module" crossorigin src="./assets/index-CSlQJVa6.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DebUaBjG.css">
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="MATH-Warefare home"
+          ><span class="brand-mark">×</span
+          ><span
+            >MATH-WAREFARE<small>THE LANTERNS OF NUMBERGLEN</small></span
+          ></a
+        >
+        <div class="wallet">
+          <span id="coins">0 coins</span><span id="xp">0 XP</span>
+        </div>
+        <button id="settings" class="icon-button" aria-label="Settings">
+          ⚙
+        </button>
+      </header>
+      <main class="layout">
+        <section class="play-area" aria-label="Adventure world">
+          <div class="world-heading">
+            <div>
+              <span class="eyebrow" id="zone-label"
+                >CHAPTER 01 · THE VILLAGE</span
+              >
+              <h1 id="zone-title">Welcome to Numberglen.</h1>
+            </div>
+            <span class="save-status" id="save-status"
+              >Saved on this device</span
+            >
+          </div>
+          <div class="canvas-wrap">
+            <canvas
+              id="world"
+              tabindex="0"
+              aria-label="Numberglen world. Use arrows or WASD to walk. E to interact. Or select a neighbour from the journal."
+            ></canvas>
+            <div class="scene-caption" id="scene-caption">
+              A village of small problems. A world of bright ideas.
+            </div>
+            <div class="world-action">
+              <button id="interact" class="primary">
+                Talk / interact <kbd>E</kbd></button
+              ><button id="help-route">Find next quest ↗</button>
+            </div>
+          </div>
+          <div class="controls-line">
+            <span
+              >WASD / arrows to walk · click a place to move · E to talk</span
+            ><button id="touch-toggle">Touch controls</button
+            ><button id="sound">Sound: on</button>
+          </div>
+          <div id="touch-controls" class="touch-controls" hidden>
+            <button data-direction="ArrowLeft" aria-label="Walk left">←</button
+            ><button data-direction="ArrowUp" aria-label="Walk up">↑</button
+            ><button data-direction="ArrowDown" aria-label="Walk down">↓</button
+            ><button data-direction="ArrowRight" aria-label="Walk right">
+              →
+            </button>
+          </div>
+        </section>
+        <aside class="journal">
+          <div class="journal-top">
+            <span class="eyebrow">YOUR FIELD JOURNAL</span
+            ><span id="quest-count">0 / 9</span>
+          </div>
+          <h2 id="active-title">A little spark</h2>
+          <p id="active-copy">Start with Mira in the square.</p>
+          <div class="chapter-progress" aria-label="Quest progress">
+            <div id="quest-progress"></div>
+          </div>
+          <button id="next-quest" class="primary full">Meet Mira →</button>
+          <div class="section-title">
+            NEIGHBOURS <span id="neighbour-count"></span>
+          </div>
+          <div id="neighbours" class="neighbours"></div>
+          <div class="section-title">TAKE A BREATHER</div>
+          <div class="journal-tools">
+            <button id="practice">
+              Practice arena <span>Choose your skill →</span></button
+            ><button id="daily">
+              Daily expedition <span>Same trail for everyone →</span></button
+            ><button id="mistakes">
+              My learning notes
+              <span id="mistake-count">Nothing to revise yet →</span></button
+            ><button id="collection">
+              Companions & upgrades <span>Your growing village →</span>
+            </button>
+          </div>
+          <p class="journal-note">
+            Accuracy first. Speed comes with practice.<br /><strong
+              >Stay calculated, GNG.</strong
+            >
+          </p>
+        </aside>
+      </main>
+      <footer>
+        <span
+          >A maths adventure by Lalith · pixel art by
+          <a href="https://limezu.itch.io/" target="_blank" rel="noreferrer"
+            >LimeZu</a
+          ></span
+        ><button id="about">About & credits</button>
+      </footer>
+    </div>
+    <dialog id="panel"><div id="panel-content"></div></dialog>
+    <div id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

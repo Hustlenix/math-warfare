@@ -1,3 +1,7 @@
 node_modules
 dist
 *.local
+
+# Paid artist resources are imported locally; never distribute original packs.
+public/game-art/
+.licensed-art/

@@ -1,15 +1,16 @@
 {
-  "name": "math-warfare-omega-ultra",
+  "name": "math-warfare-numberglen",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
-  "description": "A pixel arcade for mental maths, quick rounds and useful mistake reviews",
+  "description": "MATH WARFARE: OMEGA ULTRA — neo-brutalist math battle game",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test scripts/check-adventure.mjs"
   },
+  "dependencies": {},
   "devDependencies": {
     "vite": "^6.3.5"
   }
