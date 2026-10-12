@@ -8,13 +8,18 @@
       name="description"
       content="A pixel maths adventure. Explore a living frontier, solve maths quests and race friends online without a login."
     />
-    <title>MATH-Warefare · The Dustlight Frontier</title>
-    <script type="module" crossorigin src="./assets/index-Hc23zgZD.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-mKw42WaL.css">
+    <title>Math Warfare · Numberglen</title>
+    <script type="module" crossorigin src="./assets/index-DcDQMef0.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Bay-cT5F.css">
   </head>
   <body>
     <section id="intro" class="intro" aria-label="Welcome to Numberglen">
       <div class="intro-card">
+        <header class="intro-heading">
+          <span class="eyebrow">A maths adventure by Lalith</span>
+          <h1>MATH WARFARE</h1>
+          <p>NUMBERGLEN &amp; LANTERN HOLLOW</p>
+        </header>
         <div class="intro-art">
           <canvas
             id="intro-scene"
@@ -22,18 +27,10 @@
             height="540"
             aria-label="The adventurer and Numberglen’s villagers gathered in the countryside"
           ></canvas>
-          <div class="intro-title">
-            <span class="eyebrow">STAY SHARP. RIDE INTO THE SUNSET.</span>
-            <h1>MATH-WAREFARE</h1>
-            <p>THE DUSTLIGHT FRONTIER</p>
-          </div>
-          <span class="intro-kicker"
-            >MEET THE NEIGHBOURS · BRING BACK THE LIGHT</span
-          >
         </div>
         <div class="intro-bottom">
           <div>
-            <p class="intro-tagline">Every frontier needs a bright idea.</p>
+            <p class="intro-tagline">Help Numberglen’s neighbours with maths and restore the village lanterns.</p>
             <div class="intro-loading" aria-label="Artwork loading">
               <div id="intro-progress"></div>
             </div>
@@ -43,12 +40,10 @@
           </div>
           <div>
             <div class="intro-choices">
-              <button id="intro-wardrobe" disabled>
-                Choose your character
-              </button>
               <button id="intro-start" class="primary" disabled>
-                Loading the adventure…</button
-              ><button id="intro-online" disabled>Play with friends</button
+                Loading…</button>
+              <button id="intro-wardrobe" disabled>Character</button>
+              <button id="intro-online" disabled>Play with friends</button
               ><button id="intro-retry" hidden>Reload</button>
             </div>
             <p class="intro-controls">Explore · meet · solve · restore</p>
@@ -68,9 +63,9 @@
           class="quest-hud"
           aria-label="Open field journal"
         >
-          <span class="hud-book">▤</span
+          <span class="hud-book" data-icon="journal"></span
           ><span
-            ><small id="hud-zone">DUSTLIGHT FRONTIER</small
+            ><small id="hud-zone">NUMBERGLEN</small
             ><strong id="hud-quest">A little spark</strong
             ><span class="hud-progress"><i id="hud-progress"></i></span></span
           ><kbd>J</kbd>
@@ -86,9 +81,9 @@
             aria-label="Enter fullscreen"
             title="Fullscreen (F)"
           >
-            ⛶</button
+            <span data-icon="fullscreen"></span></button
           ><button id="settings" aria-label="Settings" title="Settings">
-            ⚙
+            <span data-icon="settings"></span>
           </button>
         </div>
       </div>
@@ -97,7 +92,7 @@
         ><button id="help-route">Track quest ↗</button
         ><button id="train-open">Practice <kbd>P</kbd></button
         ><button id="online-open">Online</button
-        ><button id="menu-open" aria-label="Open game menu">☰</button>
+        ><button id="menu-open" aria-label="Open game menu"><span data-icon="menu"></span></button>
       </div>
       <div class="trail-tools"><button id="map-open" aria-label="Open country map">Map · M</button><button id="pet-open" aria-label="Open companion care">Companion · B</button></div>
       <button
@@ -130,7 +125,7 @@
         class="drawer-close"
         aria-label="Close journal"
       >
-        ×
+        <span data-icon="close"></span>
       </button>
       <div class="journal-top">
         <span class="eyebrow">YOUR FIELD JOURNAL</span
@@ -146,7 +141,7 @@
         NEIGHBOURS <span id="neighbour-count"></span>
       </div>
       <div id="neighbours" class="neighbours"></div>
-      <div class="section-title">TAKE A BREATHER</div>
+      <div class="section-title">PRACTICE &amp; EXTRAS</div>
       <div class="journal-tools">
         <button id="practice">
           Practice arena <span>Choose your skill →</span></button

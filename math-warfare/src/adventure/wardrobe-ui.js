@@ -1,3 +1,4 @@
+import { icon } from "./icons.js";
 import {
   ARCHETYPES,
   SKINS,
@@ -14,17 +15,17 @@ export function openWardrobe({ art, state, open, close, refresh, toast }) {
     page = 0;
   const options = (xs) =>
     xs.map((x, i) => `<option value="${i}">${x.name}</option>`).join("");
-  open(`<div class="modal-heading"><div><span class="eyebrow">THE FRONTIER WARDROBE · ${CATALOG.length} READY-MADE CHARACTERS</span><h2>Make the road your own.</h2></div><button class="close-panel" aria-label="Close">×</button></div>
-    <p class="wardrobe-intro">Pick a ready-made traveller, then choose their style, skin tone and outfit. Every look is ready to play.</p>
+  open(`<div class="modal-heading"><div><span class="eyebrow">${CATALOG.length} CHARACTERS</span><h2>Choose a character</h2></div><button class="close-panel" aria-label="Close">${icon("close")}</button></div>
+    <p class="wardrobe-intro">Choose a style, skin tone and outfit. Use the preview to check the walking directions.</p>
     <div class="wardrobe-layout"><section class="wardrobe-dressing" aria-label="Character customisation">
-    <div class="wardrobe-stage"><span id="hero-portrait" role="img" aria-label="Selected character"></span><div><h3 id="hero-title"></h3><p id="hero-description"></p><span class="wardrobe-free">All looks are free. Change any time.</span></div></div>
+    <div class="wardrobe-stage"><span id="hero-portrait" role="img" aria-label="Selected character"></span><div><h3 id="hero-title"></h3><p id="hero-description"></p><span class="wardrobe-free">Change character whenever you like.</span></div></div>
     <label for="hero-name">Your traveller’s name</label><input id="hero-name" maxlength="24" autocomplete="off" placeholder="Traveller">
     <label for="hero-style">Character style</label><select id="hero-style">${options(ARCHETYPES)}</select>
     <label for="hero-skin">Skin tone</label><select id="hero-skin">${options(SKINS)}</select>
     <label for="hero-look">Outfit colour</label><select id="hero-look">${options(LOOKS)}</select>
     <div class="wardrobe-angles" aria-label="Four-direction preview">${["Front", "Left", "Right", "Back"].map((label, i) => `<figure><canvas id="hero-angle-${i}" width="32" height="64" aria-label="${label} character view"></canvas><figcaption>${label}</figcaption></figure>`).join("")}</div>
     <label class="wardrobe-walk"><input id="hero-walk" type="checkbox" ${state.reducedMotion ? "" : "checked"}>Preview walking</label>
-    <div class="button-row"><button id="hero-apply" class="primary">Wear this look →</button><button id="hero-cancel">Keep current look</button></div><p class="wardrobe-save">Your quests, coins and companions stay with you.</p>
+    <div class="button-row"><button id="hero-apply" class="primary">Use character</button><button id="hero-cancel">Cancel</button></div><p class="wardrobe-save">Your quests, coins and companions stay with you.</p>
     </section><section class="wardrobe-catalogue" aria-label="Ready-made character catalogue">
     <div class="wardrobe-browse"><label for="hero-search">Find a look</label><input id="hero-search" type="search" placeholder="Try curly, cowboy, chemist…"><label class="sr-only" for="hero-group">Character collection</label><select id="hero-group"><option>All collections</option><option>Neighbours</option><option>Desert</option><option>Frontier</option></select></div>
     <p id="hero-catalogue-status" role="status" aria-live="polite"></p><div id="hero-grid" class="hero-grid"></div><div class="wardrobe-pages"><button id="hero-prev" aria-label="Previous character page">←</button><span id="hero-page"></span><button id="hero-next" aria-label="Next character page">→</button></div>
@@ -118,7 +119,7 @@ export function openWardrobe({ art, state, open, close, refresh, toast }) {
     });
     refresh();
     close();
-    toast("Your traveller is ready. The road is yours.");
+    toast("Character updated.");
   };
   $("hero-cancel").onclick = $("panel-content").querySelector(
     ".close-panel",
