@@ -122,28 +122,19 @@ export function setupIntro(art, state, onStart) {
       rect(x, 370, 30, 5, "#d6c299");
       rect(x, 390, 30, 5, "#c0a97e");
     }
-    image("mushrooms", 744, 391, 3);
-    image("fungusFace", 811, 385, 3);
-    image("kingFace", 856, 399, 3);
-    // Ensemble composition: the actual playable hero leads the actual villagers.
+    // Place neighbours at their homes and along the path, on one sprite scale.
+    // Cave residents stay in the cave instead of piling into the village portrait.
     for (const [n, x, y, s] of [
-      ["person3Face", 113, 358, 3],
-      ["person4Face", 190, 350, 3],
-      ["person9Face", 270, 355, 3],
-      ["person2Face", 333, 335, 3.5],
-      ["playerFace", 424, 289, 5],
-      ["person5Face", 530, 337, 3.5],
-      ["person6Face", 613, 350, 3],
-      ["person7Face", 678, 362, 3],
-      ["person8Face", 743, 361, 3],
-      ["person10Face", 52, 392, 2.8],
-      ["person11Face", 900, 400, 2.5],
+      ["person4Face", 220, 290, 3],
+      ["person2Face", 381, 320, 3],
+      ["person9Face", 99, 398, 3],
+      ["playerFace", 454, 369, 3],
+      ["person5Face", 737, 294, 3],
+      ["person6Face", 630, 398, 3],
     ]) {
       rect(x + 6, y + 32 * s - 5, 16 * s - 8, 7, "#1b393d55");
       image(n, x, y, s);
     }
-    image("hero-218", 795, 354, 3);
-    image("hero-309", 850, 359, 3);
     if (art.cat) {
       const f = reduced ? 0 : Math.floor(time * 5) % 12;
       c.drawImage(art.cat, f * 48 + 8, 0, 32, 16, 368, 450, 48, 24);
@@ -152,25 +143,11 @@ export function setupIntro(art, state, onStart) {
       const f = reduced ? 0 : Math.floor(time * 4) % 6;
       c.drawImage(art.frog, f * 16, 0, 16, 16, 543, 457, 40, 40);
     }
-    for (let i = 0; i < 12; i++) {
-      const x = 30 + i * 81,
-        y = 492 + (i % 3) * 11;
-      rect(x, y, 3, 13, "#a2b770");
-      rect(x - 3, y - 3, 10, 5, i % 2 ? "#eac694" : "#c7adc1");
-    }
-    const badges = [
-      ["+", 299, 272],
-      ["×", 581, 268],
-      ["÷", 628, 308],
-      ["−", 343, 307],
-    ];
-    c.textAlign = "center";
-    for (const [s, x, y] of badges) {
-      const yy = y + Math.sin(time * 1.3 + x) * 3;
-      rect(x - 14, yy - 17, 28, 27, "#203f3bdd");
-      c.fillStyle = "#f3d79a";
-      c.font = "bold 24px Georgia";
-      c.fillText(s, x, yy + 4);
+    for (const [x, y, color] of [[54, 484, "#c7adc1"], [73, 500, "#c7adc1"],
+      [95, 487, "#c7adc1"], [685, 505, "#eac694"], [711, 499, "#eac694"],
+      [735, 514, "#eac694"], [822, 480, "#c7adc1"]]) {
+      rect(x, y, 2, 10, "#a2b770");
+      rect(x - 2, y - 2, 6, 4, color);
     }
     frame = requestAnimationFrame(draw);
   }
@@ -193,13 +170,13 @@ export function setupIntro(art, state, onStart) {
       ready = true;
       fill.style.width = "100%";
       status.textContent =
-        "The village is ready. Your bright ideas are needed.";
+        "Ready to play.";
       title.disabled = false;
       document.getElementById("intro-wardrobe").disabled = false;
       document.getElementById("intro-online").disabled = false;
       title.textContent = state.completed.length
-        ? "Continue your adventure →"
-        : "Step into Numberglen →";
+        ? "Continue"
+        : "Start adventure";
     },
     error() {
       status.textContent = "Something could not load. Reload to try again.";

@@ -14,6 +14,7 @@ import { dimensions, landscapeBlocked, LANDMARKS } from "./map-layout.js";
 import { drawExpansion } from "./expansion.js";
 import { Companion, drawCompanion, petName } from "./companion.js";
 import { MovementKeys } from "./movement-input.js";
+import { drawSceneryDetails } from "./scenery-details.js";
 export const W = 60,
   H = 44,
   T = 32;
@@ -612,24 +613,14 @@ export class World {
             y * T,
             T,
             T,
-            road ? ((x + y) % 3 ? "#cdaa73" : "#c4a06a") : green ? "#899867" : "#b3a16e",
+            road ? "#c5af85" : green ? "#809664" : "#879669",
           );
-          if (!road && (x * 19 + y * 11) % 7 === 0) {
-            this.rect(x * T + 7, y * T + 15, 2, 6, "#8f9262");
-            this.rect(x * T + 18, y * T + 9, 4, 2, "#cbb77e");
+          if (road) {
+            if (!villagePath(x - 1, y)) this.rect(x * T, y * T + 2, 2, T - 4, "#a0a079");
+            if (!villagePath(x + 1, y)) this.rect((x + 1) * T - 2, y * T + 2, 2, T - 4, "#a0a079");
+            if (!villagePath(x, y - 1)) this.rect(x * T + 2, y * T, T - 4, 2, "#a0a079");
+            if (!villagePath(x, y + 1)) this.rect(x * T + 2, (y + 1) * T - 2, T - 4, 2, "#a0a079");
           }
-          if (!road)
-            for (let i = 0; i < 5; i++) {
-              const px = (x * 17 + y * 11 + i * 7) % 29,
-                py = (x * 13 + y * 23 + i * 11) % 28;
-              this.rect(
-                x * T + px,
-                y * T + py,
-                2 + (i % 2),
-                2,
-                green ? (i % 2 ? "#a1ae79" : "#788b5b") : i % 2 ? "#bfae78" : "#a79563",
-              );
-            }
         } else {
           c.drawImage(this.art.stone, x * T, y * T, T, T);
           if ((x * 7 + y * 3) % 9 === 0)
@@ -734,24 +725,25 @@ export class World {
   }
   village() {
     drawCountryside(this);
+    drawSceneryDetails(this);
     drawFrontier(this);
     drawExpansion(this);
   }
   tree(x, y) {
+    const variant = (Math.floor(x / T) + Math.floor(y / T) * 2) % 3;
+    const leaf = ["#52764d", "#456e4c", "#647e4e"][variant];
+    const light = ["#7c965e", "#708b5b", "#91a16a"][variant];
     this.rect(x - 11, y + 40, 59, 13, "#34574044");
     this.rect(x + 10, y + 15, 12, 39, "#736247");
     this.rect(x + 11, y + 24, 3, 27, "#a28a59");
     this.rect(x - 4, y - 20, 40, 52, "#315b46");
     this.rect(x - 14, y - 8, 61, 27, "#315b46");
-    this.rect(x - 8, y - 12, 49, 36, "#4b7853");
-    this.rect(x - 13, y - 4, 59, 17, "#4b7853");
-    this.rect(x + 1, y - 24, 28, 30, "#67905d");
-    this.rect(x - 4, y - 18, 34, 17, "#67905d");
-    for (let i = 0; i < 11; i++) {
-      const dx = ((i * 13) % 44) - 8,
-        dy = ((i * 7) % 27) - 13;
-      this.rect(x + dx, y + dy, 5 + (i % 3), 3, i % 3 ? "#7ca06a" : "#3f6d4c");
-    }
+    this.rect(x - 8, y - 12, 49, 36, leaf);
+    this.rect(x - 13, y - 4, 59, 17, leaf);
+    this.rect(x + 1 - variant * 2, y - 24 + variant * 2, 28 + variant * 4, 30, light);
+    this.rect(x - 4, y - 18, 34, 17, light);
+    for (const [dx, dy, width] of [[0, -12, 8], [-6, 2, 6], [22, 8, 8], [10, 16, 6]])
+      this.rect(x + dx, y + dy, width, 2, "#a0b075");
   }
   lantern(x, y) {
     this.rect(x + 10, y - 20, 6, 48, "#786541");

@@ -1,6 +1,7 @@
 import { OnlineRoom } from "./online-room.js";
 import { SKILLS } from "./content.js";
 import { portraitStyle } from "./wardrobe.js";
+import { icon } from "./icons.js";
 
 export function setupOnline({
   state,
@@ -27,7 +28,7 @@ export function setupOnline({
     moving: getWorld()?.moving ?? false,
   });
   const head = (title) =>
-    `<div class="modal-heading"><div><span class="eyebrow">PLAY WITH FRIENDS · NO LOGIN</span><h2>${title}</h2></div><button class="online-close" aria-label="Back to village">×</button></div>`;
+    `<div class="modal-heading"><div><span class="eyebrow">ONLINE PLAY</span><h2>${title}</h2></div><button class="online-close" aria-label="Back to village">${icon("close")}</button></div>`;
   const bind = () => {
     content.querySelector(".online-close").onclick = () => {
       screen = null;

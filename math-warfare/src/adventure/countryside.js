@@ -1,4 +1,5 @@
 import { dimensions, villagePath } from "./map-layout.js";
+import { drawSquareApron } from "./scenery-details.js";
 export { villagePath } from "./map-layout.js";
 export function drawCountryside(w) {
   const T = 32,
@@ -9,12 +10,13 @@ export function drawCountryside(w) {
   for (let x = Math.max(1, Math.floor(w.camera.x / T) - 1); x < Math.min(dimensions("village").width - 1, Math.ceil((w.camera.x + w.canvas.width) / T) + 1); x++)
     for (let y = Math.max(2, Math.floor(w.camera.y / T) - 1); y < Math.min(dimensions("village").height - 1, Math.ceil((w.camera.y + w.canvas.height) / T) + 1); y++)
       if (villagePath(x, y)) {
-        r(x * T, y * T, T, T, (x + y) % 3 ? "#d2b580" : "#caae78");
-        if ((x * 7 + y) % 5 === 0) {
+        r(x * T + 2, y * T + 2, T - 4, T - 4, "#c5af85");
+        if ((x * 7 + y) % 13 === 0) {
           r(x * T + 5, y * T + 7, 5, 2, "#b89e70");
           r(x * T + 21, y * T + 23, 3, 2, "#efe0ad");
         }
       }
+  drawSquareApron(w);
   const fence = (x, y, count) => {
     for (let i = 0; i < count; i++) {
       r((x + i) * T, y * T + 9, T, 4, "#b29668");

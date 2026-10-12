@@ -3,6 +3,8 @@ import "./adventure/polish.css";
 import "./adventure/intro.css";
 import "./adventure/frontier.css";
 import "./adventure/fullscreen.css";
+import "./adventure/game-theme.css";
+import { icon, mountIcons } from "./adventure/icons.js";
 import { setupOnline } from "./adventure/online-ui.js";
 import { setupIntro } from "./adventure/intro.js";
 import { openWardrobe } from "./adventure/wardrobe-ui.js";
@@ -42,6 +44,7 @@ const $ = (id) => document.getElementById(id),
           "'": "&#39;",
         })[c],
     );
+mountIcons();
 let storage;
 try {
   storage = localStorage;
@@ -136,7 +139,7 @@ function close() {
   previousFocus?.focus?.();
 }
 function modalHead(eyebrow, title) {
-  return `<div class="modal-heading"><div><span class="eyebrow">${eyebrow}</span><h2>${title}</h2></div><button class="close-panel" aria-label="Close">×</button></div>`;
+  return `<div class="modal-heading"><div>${eyebrow ? `<span class="eyebrow">${eyebrow}</span>` : ""}<h2>${title}</h2></div><button class="close-panel" aria-label="Close">${icon("close")}</button></div>`;
 }
 function bindClose() {
   content.querySelector(".close-panel")?.addEventListener("click", () => {
@@ -159,12 +162,13 @@ function refresh() {
   $("quest-progress").style.width =
     `${(state.completed.length / QUESTS.length) * 100}%`;
   const next = nextQuest(state);
+  $("help-route").textContent = next ? `Find ${next.person === "The Fungus King" ? "the King" : next.person}` : "Quests";
   $("hud-quest").textContent = next?.title ?? "All lanterns restored";
   $("hud-zone").textContent =
-    state.zone === "village" ? "DUSTLIGHT FRONTIER" : "LANTERN HOLLOW";
+    state.zone === "village" ? "NUMBERGLEN" : "LANTERN HOLLOW";
   $("active-title").textContent = next?.title ?? "The light lives on.";
   $("active-copy").textContent = next
-    ? `${next.person} needs your help. ${SKILLS[next.skill]} · ${next.count} bright ideas.`
+    ? `${next.person} needs your help. ${SKILLS[next.skill]} · ${next.count} questions.`
     : "Every lantern is restored. Revisit your neighbours or chase a new arena record.";
   $("next-quest").textContent = next
     ? `Meet ${next.person} →`
@@ -251,7 +255,7 @@ function interact(n) {
   if (n.id === "portal") {
     if (state.zone === "village" && !state.completed.includes("library")) {
       open(
-        modalHead("THE TRAIL IS CLOSED", "One page is still missing.") +
+        modalHead("THE TRAIL IS CLOSED", "Cave trail closed") +
           '<p>Help Bram and Fern, then recover Ada’s map in the library. The cave trail will open.</p><button id="back" class="primary">Back to the village</button>',
       );
       bindClose();
@@ -357,10 +361,10 @@ function tick() {
 function renderBattle() {
   const b = battle,
     q = b.q,
-    isQuest = b.mode === "quest",
     boss = b.quest?.boss;
+  b.keypadOpen ??= matchMedia("(pointer: coarse)").matches || innerWidth <= 700;
   open(
-    `<div class="battle-header"><span class="eyebrow">${esc(b.quest?.title ?? (b.mode === "daily" ? "DAILY EXPEDITION" : b.mode === "review" ? "LEARNING NOTES" : "PRACTICE ARENA"))}</span><button class="close-panel" aria-label="Pause challenge">Ⅱ</button></div><div class="battle-stage ${boss ? "boss-stage" : ""}"><div class="battle-land"><span class="battle-hero hero-face" role="img" aria-label="Your adventurer" style="${portraitStyle(art, state.appearance.id, 3)}"></span><div class="battle-beam"></div><img class="battle-monster" src="${art[boss ? "boss" : b.skill === "percent" ? "owl" : b.skill === "fraction" ? "beetle" : "slime"].src}" alt="${boss ? "The Fungus King" : "Practice creature"}"></div><div class="battle-status"><span id="hearts">${"♥".repeat(b.hearts)}${"♡".repeat(3 - b.hearts)}</span><span id="clock">${b.mode === "sprint" ? "60s" : "0s"}</span><span id="score">${b.score} points</span></div></div><div class="battle-body"><div class="question-top"><span>${SKILLS[q.skill] ?? "Revision"}</span><span id="step">${b.mode === "sprint" ? "60 SECOND SPRINT" : `${b.index + 1} / ${b.count}`}</span></div><h2 id="equation">${esc(q.text)}</h2><p class="answer-prompt">${isQuest ? "One bright idea at a time." : "Type your answer, then press Enter."}</p><form id="answer-form" novalidate><label class="sr-only" for="answer">Your answer</label><input id="answer" inputmode="decimal" autocomplete="off" placeholder="?" maxlength="16"><button class="primary" type="submit">${isQuest ? "Send a spark" : "Answer"} ↗</button></form><div id="answer-feedback" role="status" aria-live="polite"></div><div class="keypad" aria-label="Answer keypad">${["7", "8", "9", "4", "5", "6", "1", "2", "3", "−", "0", "."].map((k) => `<button type="button" data-key="${k === "−" ? "-" : k}">${k}</button>`).join("")}<button type="button" id="erase">⌫</button><button type="button" id="clear-answer">Clear</button></div><div class="battle-footer"><button id="hint">Show a method</button><span id="streak">${b.streak ? `${b.streak} in a row` : "Accuracy first."}</span></div><div id="method" hidden></div><button id="next-question" class="primary full" hidden>Next bright idea →</button></div>`,
+    `<div class="battle-header"><span class="eyebrow">${esc(b.quest?.title ?? (b.mode === "daily" ? "DAILY EXPEDITION" : b.mode === "review" ? "LEARNING NOTES" : "PRACTICE ARENA"))}</span><button class="close-panel" aria-label="Pause challenge">${icon("pause")}</button></div><div class="battle-stage ${boss ? "boss-stage" : ""}"><div class="battle-land"><span class="battle-hero hero-face" role="img" aria-label="Your adventurer" style="${portraitStyle(art, state.appearance.id, 3)}"></span><div class="battle-beam"></div><img class="battle-monster" src="${art[boss ? "boss" : b.skill === "percent" ? "owl" : b.skill === "fraction" ? "beetle" : "slime"].src}" alt="${boss ? "The Fungus King" : "Practice creature"}"></div><div class="battle-status"><span id="hearts">${"♥".repeat(b.hearts)}${"♡".repeat(3 - b.hearts)}</span><span id="clock">${b.mode === "sprint" ? "60s" : "0s"}</span><span id="score">${b.score} points</span></div></div><div class="battle-body"><div class="question-top"><span>${SKILLS[q.skill] ?? "Revision"}</span><span id="step">${b.mode === "sprint" ? "60 SECOND SPRINT" : `${b.index + 1} / ${b.count}`}</span></div><h2 id="equation">${esc(q.text)}</h2><p class="answer-prompt">Type your answer, then press Enter.</p><form id="answer-form" novalidate><label class="sr-only" for="answer">Your answer</label><input id="answer" inputmode="decimal" autocomplete="off" placeholder="?" maxlength="16"><button class="primary" type="submit">Answer</button></form><div id="answer-feedback" role="status" aria-live="polite"></div><div id="answer-keypad" class="keypad" aria-label="Answer keypad" ${b.keypadOpen ? "" : "hidden"}>${["7", "8", "9", "4", "5", "6", "1", "2", "3", "−", "0", "."].map((k) => `<button type="button" data-key="${k === "−" ? "-" : k}">${k}</button>`).join("")}<button type="button" id="erase">⌫</button><button type="button" id="clear-answer">Clear</button></div><div class="battle-footer"><button id="hint">Show a method</button><button id="keypad-toggle" aria-controls="answer-keypad" aria-expanded="${b.keypadOpen}">Keypad</button><span id="streak">${b.streak ? `${b.streak} in a row` : "Streak: 0"}</span></div><div id="method" hidden></div><button id="next-question" class="primary full" hidden>Next question</button></div>`,
   );
   bindClose();
   $("answer-form").onsubmit = (e) => {
@@ -392,6 +396,11 @@ function renderBattle() {
     }
   };
   $("next-question").onclick = advance;
+  $("keypad-toggle").onclick = () => {
+    b.keypadOpen = !b.keypadOpen;
+    $("answer-keypad").hidden = !b.keypadOpen;
+    $("keypad-toggle").setAttribute("aria-expanded", String(b.keypadOpen));
+  };
   $("answer").focus();
   tick();
 }
@@ -418,8 +427,8 @@ function submit() {
     chime();
     $("answer-feedback").textContent =
       b.streak >= 3
-        ? `${b.streak} bright ideas in a row!`
-        : "That’s it! A spark of progress.";
+        ? `${b.streak} correct in a row.`
+        : "Correct.";
     $("answer-feedback").className = "correct";
     content.querySelector(".battle-stage").classList.add("hit");
   } else {
@@ -427,7 +436,7 @@ function submit() {
     b.hearts = Math.max(0, b.hearts - 1);
     chime(false);
     $("answer-feedback").textContent =
-      `A useful mistake. ${b.q.text} = ${b.q.answer}.`;
+      `Not quite. ${b.q.text} = ${b.q.answer}.`;
     $("answer-feedback").className = "incorrect";
     $("method").hidden = false;
     $("method").textContent = b.q.hint;
@@ -445,7 +454,7 @@ function submit() {
   $("streak").textContent = `Best streak: ${b.bestStreak}`;
   $("next-question").hidden = false;
   $("next-question").textContent = correct
-    ? "Next bright idea →"
+    ? "Next question"
     : b.mode === "quest"
       ? "Try a new question →"
       : "Keep going →";
@@ -516,9 +525,9 @@ function finish() {
         ? "You brought the light home."
         : win
           ? b.quest.title
-          : "Every answer is practice.",
+          : "Practice complete",
     ) +
-      `<div class="result-stamp">${final ? "✦" : win ? "✓" : "×"}</div><p>${esc(win ? b.quest.done : accuracy >= 80 ? "Steady thinking. Keep practising and the speed will follow." : "Keep the methods you learned. Your learning notes are ready for another try.")}</p><div class="result-grid"><div><strong>${accuracy}%</strong><span>accuracy</span></div><div><strong>${Math.round(b.seconds)}s</strong><span>active time</span></div><div><strong>${b.bestStreak}</strong><span>best streak</span></div></div><p class="reward-line">+ ${reward}</p>${b.assists ? `<p class="muted">You used ${b.assists} method hints. Good tools are part of learning.</p>` : ""}<div class="button-row"><button id="return-world" class="primary">${final ? "Keep exploring" : "Back to the adventure"} →</button><button id="review-result">Learning notes</button></div>`,
+      `<div class="result-stamp">${final ? "✦" : win ? "✓" : "×"}</div><p>${esc(win ? b.quest.done : accuracy >= 80 ? "Session saved. Try another skill or return to the village." : "The questions you missed are in your revision notes.")}</p><div class="result-grid"><div><strong>${accuracy}%</strong><span>accuracy</span></div><div><strong>${Math.round(b.seconds)}s</strong><span>active time</span></div><div><strong>${b.bestStreak}</strong><span>best streak</span></div></div><p class="reward-line">+ ${reward}</p>${b.assists ? `<p class="muted">You used ${b.assists} method hints. </p>` : ""}<div class="button-row"><button id="return-world" class="primary">${final ? "Keep exploring" : "Back to the adventure"} →</button><button id="review-result">Learning notes</button></div>`,
   );
   bindClose();
   $("return-world").onclick = close;
@@ -530,7 +539,7 @@ function pause() {
   battle.savedDOM = document.createDocumentFragment();
   while (content.firstChild) battle.savedDOM.append(content.firstChild);
   open(
-    modalHead("TAKE YOUR TIME", "A little breather.") +
+    modalHead("", "Paused") +
       '<p>The clock is paused. Your current answer and feedback will be kept.</p><div class="button-row"><button id="resume" class="primary">Resume</button><button id="quit">Return to the adventure</button></div>',
   );
   content.querySelector(".close-panel").onclick = resume;
@@ -556,8 +565,8 @@ function arena() {
     .filter((r) => r.mode === "sprint")
     .reduce((n, r) => Math.max(n, r.score ?? 0), 0);
   open(
-    modalHead("ROOK’S PRACTICE ARENA", "Train your bright ideas.") +
-      `<p>Choose a skill and a pace. Training gives you room to think. Sprint gives you one minute to chase your best score.</p><label class="field-label" for="skill">Your skill</label><select id="skill">${Object.entries(
+    modalHead("ROOK’S ARENA", "Practice") +
+      `<p>Choose a skill. Training has 10 questions; sprint lasts 60 seconds.</p><label class="field-label" for="skill">Your skill</label><select id="skill">${Object.entries(
         SKILLS,
       )
         .map(
@@ -566,7 +575,7 @@ function arena() {
         )
         .join(
           "",
-        )}</select><label class="field-label" for="level">Number size</label><select id="level"><option value="1">Gentle · build confidence</option><option value="2">Steady · stretch your skills</option><option value="3">Spicy · bigger numbers</option></select><div class="arena-options"><button id="train" class="primary">Training trail <small>10 questions · no timer</small></button><button id="sprint">60 second sprint <small>Personal best: ${best} points</small></button></div><p class="muted">Arena practice earns XP. Quest coins come from helping the village.</p>`,
+        )}</select><label class="field-label" for="level">Number size</label><select id="level"><option value="1">Small numbers</option><option value="2">Medium numbers</option><option value="3">Large numbers</option></select><div class="arena-options"><button id="train" class="primary">Training trail <small>10 questions · no timer</small></button><button id="sprint">60 second sprint <small>Personal best: ${best} points</small></button></div><p class="muted">Arena practice earns XP. Quest coins come from helping the village.</p>`,
   );
   bindClose();
   $("level").value = state.level;
@@ -584,8 +593,8 @@ function arena() {
 function daily() {
   const date = new Date().toISOString().slice(0, 10);
   open(
-    modalHead("ONE LITTLE RITUAL", `Daily expedition · ${date}`) +
-      `<p>Ten mixed questions. Everyone using the same difficulty gets the same sequence today. The date changes at midnight UTC.</p><p class="reward-line">${state.dailyDone === date ? "Today’s 20 coins are already collected. Replay for practice XP." : "Complete the trail for 20 coins + practice XP."}</p><p class="muted">Current number size: ${["Gentle", "Steady", "Spicy"][state.level - 1]}. Change it in the arena.</p><button id="daily-start" class="primary full">Start today’s trail →</button>`,
+    modalHead("DAILY PRACTICE", date) +
+      `<p>Ten mixed questions. Everyone using the same difficulty gets the same sequence today. The date changes at midnight UTC.</p><p class="reward-line">${state.dailyDone === date ? "Today’s 20 coins are already collected. Replay for practice XP." : "Complete the trail for 20 coins + practice XP."}</p><p class="muted">Current number size: ${["Small", "Medium", "Large"][state.level - 1]}. Change it in the arena.</p><button id="daily-start" class="primary full">Start today’s trail →</button>`,
   );
   bindClose();
   $("daily-start").onclick = () =>
@@ -593,7 +602,7 @@ function daily() {
 }
 function notes() {
   open(
-    modalHead("YOUR LEARNING NOTES", "Mistakes become methods.") +
+    modalHead("", "Revision notes") +
       `<p>These questions tripped you up. A correct revision answer clears its note.</p>${state.mistakes.length ? `<button id="review-notes" class="primary full">Practise ${state.mistakes.length} notes →</button><div class="notes-list">${state.mistakes.map((q) => `<article><strong>${esc(q.text)} = ${q.answer}</strong><p>${esc(q.hint)}</p></article>`).join("")}</div>` : '<div class="empty-note">No notes yet. Try a quest or the arena.</div>'}`,
   );
   bindClose();
@@ -611,7 +620,7 @@ function companions() {
   const kind = state.companion, hasPet = kind !== "none";
   const name = petName(state.petNames[kind], kind);
   const distance = hasPet ? Math.hypot(world.pet.x - state.player.x, world.pet.y - state.player.y) : 0;
-  open(modalHead("SMALL PAWS · BIG TRAILS", hasPet ? esc(name) + ", your trail companion." : "A friend for the road.") +
+  open(modalHead("COMPANIONS", hasPet ? esc(name) : "Cat & frog") +
     `<div class="pet-card"><canvas id="pet-preview" width="128" height="96" aria-label="${hasPet ? esc(name) : "Companion"} pixel art preview"></canvas><div><strong>${hasPet ? (kind === "cat" ? "Bram’s bakery cat" : "Fern’s pond frog") : "Earn a companion"}</strong><p>${hasPet ? `${world.pet.mode === "stay" ? "Waiting where you asked." : "Following your footsteps."} ${distance > 3 ? "A little way back on the trail." : "Close by and ready to explore."}` : "Help Bram to befriend Pixel the cat. Help Fern to unlock Pebble the frog."}</p></div></div><label class="field-label" for="pet-kind">Travelling companion</label><select id="pet-kind"><option value="none">A quiet solo walk</option>${unlocked.map((k) => `<option value="${k}">${esc(petName(state.petNames[k], k))} · ${k}</option>`).join("")}</select>` +
     (hasPet ? `<form id="pet-name-form"><label class="field-label" for="pet-name">Give your friend a name</label><div class="pet-name-row"><input id="pet-name" maxlength="18" value="${esc(name)}" autocomplete="off"><button type="submit">Save name</button></div></form><div class="pet-commands"><button id="pet-scratch" ${distance > 2.2 ? "disabled" : ""}>Give a scratch ♥</button><button id="pet-stay">Stay here</button><button id="pet-recall" class="primary">Recall / follow</button></div><p class="muted">Click your pet when nearby to give it a scratch. It uses paths around water, beds and buildings. After seven quiet seconds, it rests. Stay lasts until you recall it, change maps or reload.</p>` : `<button id="pet-unlock" class="primary">${unlocked.length ? "Choose a friend above" : "Meet " + (available(state, "bakery") ? "Bram" : "Mira") + " →"}</button>`));
   bindClose();
@@ -650,7 +659,7 @@ function companions() {
 }
 function countryMap() {
   const places = state.zone === "village" ? LANDMARKS : NPCS.cave;
-  open(modalHead("YOUR COUNTRY MAP", state.zone === "village" ? "Room to roam." : "Lantern Hollow.") +
+  open(modalHead("COUNTRY MAP", state.zone === "village" ? "Numberglen" : "Lantern Hollow") +
     `<canvas id="country-map" width="560" height="410" aria-label="World map. White marks your position; gold marks destinations."></canvas><p class="muted">White: you · pink: companion · gold: destinations. Choose a trail below to walk there.</p><div class="map-destinations">${places.map((p) => `<button data-place="${p.id}">${esc(p.name)} <span>Walk there ↗</span></button>`).join("")}</div>`);
   bindClose();
   const c = $("country-map").getContext("2d"), bounds = dimensions(state.zone), sx = 560 / bounds.width, sy = 410 / bounds.height;
@@ -666,7 +675,7 @@ function countryMap() {
 }
 function collection() {
   open(
-    modalHead("THE SUPPLY BENCH", "Make the village your own.") +
+    modalHead("SUPPLY BENCH", "Village supplies") +
       `<p>You have <strong>${state.coins} coins</strong>. Upgrades are decorations, and maths rewards are the same for everyone.</p><div class="shop-list">${SHOP.map((s) => `<article><div><strong>${s.name}</strong><p>${s.description}</p></div><button data-buy="${s.id}" ${state.upgrades.includes(s.id) || state.coins < s.price ? "disabled" : ""}>${state.upgrades.includes(s.id) ? "Added ✓" : s.price + " coins"}</button></article>`).join("")}</div><label class="field-label" for="companion">Travelling companion</label><select id="companion"><option value="none">A quiet solo walk</option>${state.completed.includes("bakery") ? '<option value="cat">Pixel · the apologetic cat</option>' : ""}${state.completed.includes("garden") ? '<option value="frog">Pebble · the picky frog</option>' : ""}</select><p class="muted">Earn companions through Bram’s and Fern’s quests.</p>`,
   );
   bindClose();
@@ -695,7 +704,7 @@ function collection() {
 }
 function settings() {
   open(
-    modalHead("A COMFORTABLE ADVENTURE", "Your settings.") +
+    modalHead("", "Settings") +
       `<label class="setting-row"><input id="mute-setting" type="checkbox" ${state.muted ? "checked" : ""}>Mute game sounds</label><label class="setting-row"><input id="motion-setting" type="checkbox" ${state.reducedMotion ? "checked" : ""}>Reduce motion</label><p class="muted">Solo progress stays in this browser. Online room scores disappear when the host leaves. No account is required.</p><button id="settings-fullscreen">Toggle fullscreen</button> <button id="settings-about">About & credits</button><hr><button id="reset-save">Start a new adventure</button><div id="reset-confirm" hidden><p>This clears adventure progress, coins and learning notes on this device. Your old MATH-Warefare scores are untouched.</p><button id="reset-yes">Clear this adventure</button> <button id="reset-no">Keep my save</button></div>`,
   );
   bindClose();
@@ -729,7 +738,7 @@ function wardrobe() {
 }
 function about() {
   open(
-    modalHead("MATH-WAREFARE", "Small answers. Big adventures.") +
+    modalHead("MATH WARFARE", "About & credits") +
       '<p>Lalith’s mental maths project, expanded into a village adventure. Built with JavaScript, Canvas and Vite. The adventure works without a maths API.</p><p>Characters, animals, furniture, cave tiles and fantasy battlers by <a href="https://limezu.itch.io/" target="_blank" rel="noreferrer">LimeZu</a>, used from Lalith’s locally supplied paid packs. Artwork remains the artist’s property.</p><p>This expansion was substantially implemented with Codex AI assistance. It should not be represented as human-only work or as verified compliance with a 30% AI limit. Stardance review and rewards are decided by its organisers.</p><p class="muted">Questions are practice aids. Number size changes difficulty, not curriculum certification.</p><a href="https://github.com/Hustlenix/math-warfare" target="_blank" rel="noreferrer">Project source ↗</a>',
   );
   bindClose();
@@ -742,10 +751,7 @@ document.addEventListener("keydown", (e) => {
   if (!$("intro").hidden) return;
   if (journal.open) return;
   if (panel.open) {
-    if (battle?.feedback && e.key === "Enter" && !battle.pausedAt) {
-      e.preventDefault();
-      advance();
-    }
+    // Native dialog controls own Enter; feedback already focuses Next question.
     return;
   }
   if (
@@ -859,7 +865,7 @@ async function boot() {
     }
     if (!state.completed.length) {
       open(
-        '<span class="eyebrow">YOUR FIRST BRIGHT IDEA</span><h2>Meet Mira in the square.</h2><p>Use WASD / arrows, click a place, or choose a neighbour in the field journal. Press E nearby to talk.</p><p>Help the village through short maths quests. Mistakes give you a method and another try. Your progress stays saved here.</p><button id="begin" class="primary full">Let’s explore →</button>',
+        '<span class="eyebrow">START HERE</span><h2>Mira needs a hand</h2><p>Walk with WASD or the arrow keys, or click a destination. Press E near a neighbour to talk. Find Mira takes you to the first quest.</p><p>Quests have no timer. If you miss an answer, you get a method and another try. Progress is saved in this browser.</p><button id="begin" class="primary full">Start exploring</button>',
       );
       $("begin").onclick = () => {
         close();
