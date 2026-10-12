@@ -42,6 +42,7 @@
     "scripts/check-wardrobe-art.py": "ec78a5279abdc5757496b44306bf20a1ea0d39e470a4d45be3da7a509bb1f70e",
     "scripts/check-wardrobe.mjs": "b9299cc2dc1de448570ebd0fa5791d7bbecc7b6d48c5e82c9b90aa4077cc7c14",
     "scripts/import-art.py": "999a87674dc9cd15e8d93c531b7526ca62913a6b555d4c61ad2e9c8beeca5822",
+    "scripts/local-npc-server.mjs": "2b04b74c466c72cf23a88f78c88c9b103b6d15bab42ccec32f343469526836b3",
     "scripts/package-release.mjs": "fadcc174a8c5c41246bb54dfb494087ed43791d188c117e595310acdfce9bf35",
     "scripts/stress-test.mjs": "5a22ee0ad0786879acc5b7f06e59c2f720ecf85d238b6234036b3cd305f08227",
     "scripts/verify-release.mjs": "376fa375e61b6058dd15ee5999e94a1437ebd72c8fa0a062e41f89d7fe39c7a3",

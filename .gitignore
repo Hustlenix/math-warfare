@@ -5,3 +5,5 @@ dist/
 !.env.example
 *.log
 .vercel/
+!\.env.local.example
+!.env.development.local.example

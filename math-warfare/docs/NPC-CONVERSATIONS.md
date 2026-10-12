@@ -10,7 +10,9 @@ The implementation and local fixture tests are ready. No real inference has been
 
 The selected model is fixed to `apodex/apodex-1.1-mini:free`. It has a free listing on [OpenRouter](https://openrouter.ai/apodex/apodex-1.1-mini:free). There is no paid model fallback. Free-model availability and account/provider quotas still apply.
 
-The supplied credential belongs to Hack Club, not OpenRouter. [Hack Club rules](https://docs.ai.hackclub.com/guide/rules.html) require eligible teen users and prohibit shared tools that allow others API access without meeting the rules. An unrestricted public game is therefore not enabled with that key. The backend rejects Hack Club in public/serverless deployment, including a mistakenly set local-private flag. No supplied secret was written or committed.
+The supplied credential belongs to Hack Club, not OpenRouter. The “no coding agents” rule applies when using the API for coding-agent tasks; game dialogue is a project feature, not code generation. A separate [Hack Club rule](https://docs.ai.hackclub.com/guide/rules.html) requires eligible teen users and prohibits shared tools that let others access the API without meeting those rules. The unrestricted public game therefore cannot expose this credential as a shared service. The backend rejects Hack Club in public/serverless deployment, including a mistakenly set local-private flag.
+
+For a private local preview, copy `.env.local.example` to ignored `.env.local`, replace the exposed key with a fresh key, and save it there. Copy `.env.development.local.example` to ignored `.env.development.local` to point only the development frontend at the local service. Start the service in one terminal from the game project directory with `rtk proxy node --env-file=.env.local scripts/local-npc-server.mjs`, then run `rtk proxy npm run dev -- --host 127.0.0.1` in a second terminal. The game sends only to a loopback listener bound on `127.0.0.1`. Do not expose that listener with a tunnel or public port forward. Live inference must still be verified with the eligible account and selected free model.
 
 ## Deployment configuration
 
