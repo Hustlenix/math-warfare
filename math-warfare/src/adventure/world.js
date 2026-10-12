@@ -13,6 +13,7 @@ import { drawFrontier } from "./frontier.js";
 import { dimensions, landscapeBlocked, LANDMARKS } from "./map-layout.js";
 import { drawExpansion } from "./expansion.js";
 import { Companion, drawCompanion, petName } from "./companion.js";
+import { MovementKeys } from "./movement-input.js";
 export const W = 60,
   H = 44,
   T = 32;
@@ -105,7 +106,7 @@ export class World {
     this.art = art;
     this.onInteract = onInteract;
     this.onNotice = onNotice;
-    this.keys = new Set();
+    this.keys = new MovementKeys();
     this.path = [];
     this.target = null;
     this.camera = { x: 0, y: 0 };
@@ -139,6 +140,7 @@ export class World {
     this.canvas.width = Math.max(320, Math.round(b.width / scale));
     this.canvas.height = Math.max(240, Math.round(b.height / scale));
     this.ctx.imageSmoothingEnabled = false;
+    this.needsRedraw = true;
   }
   get npcs() {
     if (this.state.zone !== "village") return NPCS[this.state.zone];
@@ -316,12 +318,20 @@ export class World {
     const dt = Math.min(0.05, (t - this.last) / 1000 || 0);
     this.last = t;
     this.time = t / 1000;
-    this.step(dt);
-    if (!this.paused && this.state.zone === "village") this.updateLife(dt);
-    this.draw();
+    // Keep the last frame behind dialogs; resize/settings can invalidate it.
+    // Hidden tabs never advance auto-walk or village routines.
+    if (!document.hidden) {
+      this.step(dt);
+      if (!this.paused && this.state.zone === "village") this.updateLife(dt);
+      if (!this.paused || this.needsRedraw) {
+        this.draw();
+        this.needsRedraw = false;
+      }
+    }
     requestAnimationFrame(this.frame);
   }
   rect(x, y, w, h, color) {
+    if (this.worldDrawing && !this.visible(x, y, w, h)) return;
     this.ctx.fillStyle = color;
     this.ctx.fillRect(
       Math.round(x),
@@ -329,6 +339,12 @@ export class World {
       Math.round(w),
       Math.round(h),
     );
+  }
+  visible(x, y, w, h) {
+    // One pixel of margin protects rounded coordinates at the camera edge.
+    return x + w >= this.camera.x - 1 && y + h >= this.camera.y - 1 &&
+      x <= this.camera.x + this.canvas.width + 1 &&
+      y <= this.camera.y + this.canvas.height + 1;
   }
   updateLife(dt) {
     this.lifeTime += dt;
@@ -493,7 +509,7 @@ export class World {
   }
   sprite(name, x, y, scale = 2) {
     const im = this.art[name];
-    if (im)
+    if (im && (!this.worldDrawing || this.visible(x, y, im.width * scale, im.height * scale)))
       this.ctx.drawImage(
         im,
         Math.round(x),
@@ -505,18 +521,21 @@ export class World {
   label(text, x, y, color = "#fff1c8", size = 12) {
     const c = this.ctx;
     c.font = `${size}px monospace`;
+    const width = c.measureText(text).width + 10;
+    if (this.worldDrawing && !this.visible(x - width / 2, y - size - 3, width, size + 8)) return;
     c.textAlign = "center";
     c.fillStyle = "#152a2b";
     c.fillRect(
-      x - c.measureText(text).width / 2 - 5,
+      x - width / 2,
       y - size - 3,
-      c.measureText(text).width + 10,
+      width,
       size + 8,
     );
     c.fillStyle = color;
     c.fillText(text, x, y);
   }
   character(art, x, y, dir = 3, moving = false) {
+    if (this.worldDrawing && !this.visible(x - 16, y - 56, 32, 64)) return;
     if (art.startsWith("hero-")) {
       const f = heroFrame(
         art,
@@ -574,6 +593,7 @@ export class World {
         ? (W * T - cw) / 2
         : Math.max(0, Math.min(W * T - cw, p.x * T - cw / 2));
     this.camera.y = Math.max(0, Math.min(H * T - ch, p.y * T - ch / 2));
+    this.worldDrawing = true;
     c.save();
     c.clearRect(0, 0, cw, ch);
     c.fillStyle = this.state.zone === "village" ? "#756b4b" : "#292636";
@@ -709,6 +729,7 @@ export class World {
       }
     }
     c.restore();
+    this.worldDrawing = false;
     this.minimap();
   }
   village() {
@@ -780,17 +801,23 @@ export class World {
       );
     const { width: W, height: H } = dimensions(this.state.zone), sx = w / W, sy = h / H;
     this.rect(x - 5, y - 5, w + 10, h + 10, "#152a2bdd");
-    this.rect(
-      x,
-      y,
-      w,
-      h,
-      this.state.zone === "village" ? "#739b69" : "#645e6e",
-    );
-    for (let ty = 0; ty < H; ty++)
-      for (let tx = 0; tx < W; tx++)
-        if (blocked(this.state.zone, tx, ty, this.state))
-          this.rect(x + tx * sx, y + ty * sy, Math.ceil(sx), Math.ceil(sy), "#233e3b");
+    // Terrain changes only when maps or quest-controlled gates change.
+    const terrainKey = `${this.state.zone}:${this.state.completed.join(",")}`;
+    if (this.minimapTerrain?.key !== terrainKey) {
+      const layer = document.createElement("canvas");
+      layer.width = w;
+      layer.height = h;
+      const ctx = layer.getContext("2d");
+      ctx.fillStyle = this.state.zone === "village" ? "#739b69" : "#645e6e";
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "#233e3b";
+      for (let ty = 0; ty < H; ty++)
+        for (let tx = 0; tx < W; tx++)
+          if (blocked(this.state.zone, tx, ty, this.state))
+            ctx.fillRect(Math.round(tx * sx), Math.round(ty * sy), Math.ceil(sx), Math.ceil(sy));
+      this.minimapTerrain = { key: terrainKey, layer };
+    }
+    c.drawImage(this.minimapTerrain.layer, x, y);
     for (const n of this.npcs)
       this.rect(x + n.x * sx, y + n.y * sy, 2, 2, "#ffd275");
     for (const r of this.remotePlayers ?? [])
