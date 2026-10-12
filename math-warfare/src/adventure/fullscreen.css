@@ -517,7 +517,7 @@ body {
 }
 @media (max-height: 500px) {
   .game-actions {
-    bottom: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
   }
   .game-dpad {
     bottom: 65px;
@@ -525,4 +525,63 @@ body {
   .intro {
     overflow: auto;
   }
+}
+
+/* Keep compact controls usable with fingers and protect display cutouts. */
+.trail-tools {
+  left: max(14px, env(safe-area-inset-left));
+  top: calc(max(14px, env(safe-area-inset-top)) + 82px);
+}
+.trail-tools button {
+  min-height: 44px;
+  min-width: 44px;
+}
+.player-hud button { min-width: 44px; }
+.online-hud {
+  left: max(14px, env(safe-area-inset-left));
+  top: calc(max(14px, env(safe-area-inset-top)) + 132px) !important;
+}
+.game-dpad {
+  left: max(18px, env(safe-area-inset-left));
+  bottom: calc(max(18px, env(safe-area-inset-bottom)) + 67px);
+}
+.journal-drawer {
+  padding-top: max(30px, env(safe-area-inset-top));
+  padding-right: max(24px, env(safe-area-inset-right));
+  padding-bottom: max(30px, env(safe-area-inset-bottom));
+}
+@media (max-width: 700px) {
+  .game-hud {
+    top: max(8px, env(safe-area-inset-top));
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+  }
+  .quest-hud { flex: 1; min-width: 0; }
+  .player-hud { flex-shrink: 0; }
+  .player-hud button,
+  .player-hud #character-open {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+  }
+  .trail-tools {
+    left: max(8px, env(safe-area-inset-left));
+    top: calc(max(8px, env(safe-area-inset-top)) + 67px);
+  }
+  .online-hud {
+    left: max(8px, env(safe-area-inset-left));
+    top: calc(max(8px, env(safe-area-inset-top)) + 117px) !important;
+  }
+  .game-actions {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 44px;
+    width: calc(100% - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right)));
+    max-width: none;
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+    transform: none;
+  }
+  .game-actions button { min-width: 44px; padding: 8px 4px; }
+  .game-dpad { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 70px); }
+  #panel-content { padding: 20px 16px; }
 }

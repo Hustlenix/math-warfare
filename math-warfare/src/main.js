@@ -25,6 +25,7 @@ import {
   seeded,
 } from "./adventure/questions.js";
 import { World, blocked } from "./adventure/world.js";
+import { movementKey } from "./adventure/movement-input.js";
 import { AMBIENT } from "./adventure/village-life.js";
 import { LANDMARKS, dimensions, villagePath } from "./adventure/map-layout.js";
 import { petName, drawCompanion } from "./adventure/companion.js";
@@ -144,6 +145,7 @@ function bindClose() {
   });
 }
 function refresh() {
+  if (world) world.needsRedraw = true;
   $("pet-open").textContent = state.companion === "none" ? "Companion · B" : `${petName(state.petNames[state.companion], state.companion)} · B`;
   $("coins").textContent = `${state.coins} coins`;
   $("xp").textContent = `${state.xp} XP`;
@@ -769,27 +771,22 @@ document.addEventListener("keydown", (e) => {
     shortcut();
     return;
   }
-  if (
-    [
-      "ArrowLeft",
-      "ArrowRight",
-      "ArrowUp",
-      "ArrowDown",
-      "w",
-      "a",
-      "s",
-      "d",
-    ].includes(e.key)
-  ) {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  // Focused controls retain their native keyboard behavior.
+  if (e.target instanceof Element && e.target.closest("button,a")) return;
+  const key = movementKey(e);
+  if (key) {
     e.preventDefault();
-    world?.keys.add(e.key);
+    world?.keys.press(`keyboard:${e.code || key}`, key);
   }
-  if (e.key.toLowerCase() === "e" || e.key === " ") {
+  if (!e.repeat && (e.key.toLowerCase() === "e" || e.key === " ")) {
     e.preventDefault();
     world?.interact();
   }
 });
-document.addEventListener("keyup", (e) => world?.keys.delete(e.key));
+document.addEventListener("keyup", (e) =>
+  world?.keys.release(`keyboard:${e.code || (e.key.length === 1 ? e.key.toLowerCase() : e.key)}`),
+);
 window.addEventListener("blur", () => world?.keys.clear());
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
@@ -801,14 +798,15 @@ document.addEventListener("visibilitychange", () => {
 window.addEventListener("pagehide", persist);
 for (const el of document.querySelectorAll("[data-direction]")) {
   el.onpointerdown = (e) => {
+    if (!world || world.paused || document.hidden) return;
     e.preventDefault();
     el.setPointerCapture(e.pointerId);
-    world.keys.add(el.dataset.direction);
+    world.keys.press(`pointer:${e.pointerId}`, el.dataset.direction);
   };
   el.onpointerup =
     el.onpointercancel =
     el.onlostpointercapture =
-      () => world.keys.delete(el.dataset.direction);
+      (e) => world?.keys.release(`pointer:${e.pointerId}`);
 }
 $("touch-toggle").onclick = () => {
   $("touch-controls").hidden = !$("touch-controls").hidden;
