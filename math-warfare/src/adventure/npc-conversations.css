@@ -1,0 +1,15 @@
+.npc-speaker { display:flex; align-items:center; gap:16px; margin:8px 0 14px; }
+.npc-speaker .speaker { width:64px; height:64px; object-fit:contain; image-rendering:pixelated; }
+.npc-log { max-height: min(34dvh, 300px); overflow:auto; overscroll-behavior:contain; border:2px solid var(--line,#b1ac83); padding:12px; background:#f5eacb; }
+.npc-line { margin:0 0 12px; display:grid; gap:4px; overflow-wrap:anywhere; line-height:1.55; }
+.npc-line:last-child { margin-bottom:0; }
+.npc-line strong { color:#365648; font-size:12px; }
+.npc-user { margin-left:20px; padding-left:12px; border-left:3px solid #aa7637; }
+.npc-user strong { color:#885d2c; }
+.npc-prompts { display:flex; gap:6px; flex-wrap:wrap; margin:10px 0; }
+.npc-prompts button { font-size:12px; }
+.npc-compose { display:flex; gap:8px; margin-top:6px; }
+.npc-compose input { min-width:0; min-height:44px; box-sizing:border-box; flex:1; width:100%; font-size:16px; }
+.npc-disclosure { font-size:11px; line-height:1.5; margin:12px 0; }
+.npc-talk { margin-top:14px; width:100%; }
+@media(max-width:420px) { .npc-compose { flex-wrap:wrap; } .npc-compose button { width:100%; } .npc-log { max-height:28dvh; } }

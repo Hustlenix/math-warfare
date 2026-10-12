@@ -27,6 +27,8 @@ const source = [
   "src/main.js",
   "src/styles.css",
   ...walk("scripts"),
+  ...walk("api"),
+  "vercel.json",
   "vite.config.js",
   "index.html",
   "package.json",
