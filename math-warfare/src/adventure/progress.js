@@ -8,6 +8,8 @@ export const fresh = () => ({
   coins: 0,
   xp: 0,
   completed: [],
+  questWork: {},
+  questResults: {},
   upgrades: [],
   companion: "none",
   petNames: { cat: "Pixel", frog: "Pebble" },
@@ -31,6 +33,14 @@ export function restore(raw) {
     raw.completed,
     QUESTS.map((q) => q.id),
   );
+  for (const quest of QUESTS) {
+    const work = raw.questWork?.[quest.id];
+    if (Number.isInteger(work) && work >= 0 && work < quest.count)
+      s.questWork[quest.id] = work;
+    const result = raw.questResults?.[quest.id];
+    if (Number.isFinite(result) && result >= 0 && result <= 1e6)
+      s.questResults[quest.id] = result;
+  }
   s.upgrades = unique(
     raw.upgrades,
     SHOP.map((q) => q.id),
@@ -107,6 +117,7 @@ export function finishQuest(state, id) {
   const q = QUESTS.find((q) => q.id === id);
   if (!q || state.completed.includes(id) || !available(state, id)) return false;
   state.completed.push(id);
+  delete state.questWork[id];
   state.coins += q.reward;
   state.xp += q.count * 10;
   if (id === "bakery") state.companion = "cat";

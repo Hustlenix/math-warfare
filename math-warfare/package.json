@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test scripts/check-adventure.mjs scripts/check-battle.mjs scripts/check-village.mjs scripts/check-wardrobe.mjs scripts/check-online.mjs scripts/check-country.mjs scripts/check-runtime.mjs",
+    "test": "node --test scripts/check-adventure.mjs scripts/check-battle.mjs scripts/check-village.mjs scripts/check-wardrobe.mjs scripts/check-online.mjs scripts/check-country.mjs scripts/check-runtime.mjs scripts/check-quest-tasks.mjs",
     "stress": "node scripts/stress-test.mjs"
   },
   "dependencies": {

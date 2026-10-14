@@ -6,6 +6,8 @@ import "./adventure/fullscreen.css";
 import "./adventure/game-theme.css";
 import { icon, mountIcons } from "./adventure/icons.js";
 import { escapeHtml as esc } from "./adventure/html.js";
+import { QUEST_EFFECTS, questProgress } from "./adventure/quest-tasks.js";
+import { questCompletionMarkup, resolveQuestScene } from "./adventure/quest-ui.js";
 import { battleMarkup, bindBattleControls } from "./adventure/battle-ui.js";
 import {
   advanceBattle,
@@ -158,7 +160,7 @@ function refresh() {
     state.zone === "village" ? "NUMBERGLEN" : "LANTERN HOLLOW";
   $("active-title").textContent = next?.title ?? "The light lives on.";
   $("active-copy").textContent = next
-    ? `${next.person} needs your help. ${SKILLS[next.skill]} · ${next.count} questions.`
+    ? `${next.person}: ${state.questWork[next.id] ?? 0} / ${next.count} tasks checked. ${QUEST_EFFECTS[next.id].change}`
     : "Every lantern is restored. Revisit your neighbours or chase a new arena record.";
   $("next-quest").textContent = next
     ? `Meet ${next.person} →`
@@ -286,7 +288,7 @@ function interact(n) {
                 .map((id) => QUESTS.find((v) => v.id === id).title)
                 .join(", ") +
               ".",
-      )}</p></div><div class="quest-stamp"><span>${q.count} questions · no time limit</span><strong>${done ? "Already rewarded" : `${q.reward} coins + ${q.count * 10} XP`}</strong></div><div class="button-row">${ready ? `<button id="start-quest" class="primary">${done ? "Practise this skill" : "Let’s help →"}</button>` : ""}<button id="back">Keep exploring</button></div>`,
+      )}</p></div><p class="quest-objective"><strong>Your task:</strong> ${esc(QUEST_EFFECTS[q.id].change)}</p><div class="quest-stamp"><span>${state.questWork[q.id] ?? 0} / ${q.count} tasks checked · no time limit</span><strong>${done ? "Already rewarded" : `${q.reward} coins + ${q.count * 10} XP`}</strong></div><div class="button-row">${ready ? `<button id="start-quest" class="primary">${done ? "Practise this skill" : "Let’s help →"}</button>` : ""}<button id="back">Keep exploring</button></div>`,
   );
   bindClose();
   $("back").onclick = close;
@@ -301,7 +303,7 @@ function interact(n) {
 }
 function start(options) {
   clearInterval(interval);
-  battle = createBattle(options, state.level);
+  battle = createBattle({ ...options, progress: options.mode === "quest" ? questProgress(state, options.quest.id) : 0 }, state.level);
   renderBattle();
   interval = setInterval(tick, 100);
 }
@@ -316,8 +318,7 @@ function tick() {
     $("clock").textContent = `${Math.floor(battle.seconds)}s`;
 }
 function renderBattle() {
-  const b = battle,
-    q = b.q;
+  const b = battle;
   b.keypadOpen ??= matchMedia("(pointer: coarse)").matches || innerWidth <= 700;
   open(battleMarkup(b, art, state.appearance));
   bindClose();
@@ -338,6 +339,11 @@ function submit() {
   }
   if (result.correct) {
     chime();
+    if (b.mode === "quest") {
+      resolveQuestScene(content, b.q);
+      state.questResults[b.quest.id] = b.q.answer;
+      persist();
+    }
     $("answer-feedback").textContent = result.message;
     $("answer-feedback").className = "correct";
     content.querySelector(".battle-stage").classList.add("hit");
@@ -378,6 +384,10 @@ function advance() {
   if (transition.finished) {
     finish();
     return;
+  }
+  if (b.mode === "quest") {
+    state.questWork[b.quest.id] = b.index;
+    refresh();
   }
   renderBattle();
 }
@@ -430,7 +440,7 @@ function finish() {
           ? b.quest.title
           : "Practice complete",
     ) +
-      `<div class="result-stamp">${final ? "✦" : win ? "✓" : "×"}</div><p>${esc(win ? b.quest.done : accuracy >= 80 ? "Session saved. Try another skill or return to the village." : "The questions you missed are in your revision notes.")}</p><div class="result-grid"><div><strong>${accuracy}%</strong><span>accuracy</span></div><div><strong>${Math.round(b.seconds)}s</strong><span>active time</span></div><div><strong>${b.bestStreak}</strong><span>best streak</span></div></div><p class="reward-line">+ ${reward}</p>${b.assists ? `<p class="muted">You used ${b.assists} method hints. </p>` : ""}<div class="button-row"><button id="return-world" class="primary">${final ? "Keep exploring" : "Back to the adventure"} →</button><button id="review-result">Learning notes</button></div>`,
+      (win ? questCompletionMarkup(b.quest, reward, nextQuest(state)) : `<div class="result-stamp">${final ? "✦" : win ? "✓" : "×"}</div><p>${esc(win ? b.quest.done : accuracy >= 80 ? "Session saved. Try another skill or return to the village." : "The questions you missed are in your revision notes.")}</p><div class="result-grid"><div><strong>${accuracy}%</strong><span>accuracy</span></div><div><strong>${Math.round(b.seconds)}s</strong><span>active time</span></div><div><strong>${b.bestStreak}</strong><span>best streak</span></div></div><p class="reward-line">+ ${reward}</p>${b.assists ? `<p class="muted">You used ${b.assists} method hints. </p>` : ""}<div class="button-row"><button id="return-world" class="primary">${final ? "Keep exploring" : "Back to the adventure"} →</button><button id="review-result">Learning notes</button></div>`),
   );
   bindClose();
   $("return-world").onclick = close;

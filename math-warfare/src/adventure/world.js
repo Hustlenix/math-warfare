@@ -1,4 +1,5 @@
 import { NPCS, QUESTS } from "./content.js";
+import { drawQuestEffects } from "./quest-tasks.js";
 import {
   createResidents,
   facing,
@@ -498,6 +499,7 @@ export class World {
       }
     if (village) this.village();
     else this.cave();
+    drawQuestEffects(this);
     if (this.path.length) {
       for (let i = 0; i < this.path.length; i += 2) {
         const q = this.path[i];

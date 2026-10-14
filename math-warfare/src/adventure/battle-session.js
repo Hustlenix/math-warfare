@@ -1,4 +1,5 @@
 import { matches, parseAnswer, question, seeded } from "./questions.js";
+import { questQuestion } from "./quest-tasks.js";
 
 export function createBattle(options, level, started = Date.now(), random = Math.random) {
   const rng =
@@ -11,8 +12,8 @@ export function createBattle(options, level, started = Date.now(), random = Math
   return {
     ...options,
     rng,
-    index: 0,
-    correct: 0,
+    index: options.progress ?? 0,
+    correct: options.progress ?? 0,
     attempts: 0,
     streak: 0,
     bestStreak: 0,
@@ -24,7 +25,7 @@ export function createBattle(options, level, started = Date.now(), random = Math
     seconds: 0,
     assists: 0,
     results: [],
-    q: options.review?.[0] ?? question(options.skill, level, rng),
+    q: options.mode === "quest" ? questQuestion(options.quest.id, options.progress ?? 0, level, rng) : options.review?.[0] ?? question(options.skill, level, rng),
     feedback: false,
   };
 }
@@ -62,7 +63,7 @@ export function answerBattle(battle, input) {
   return {
     status: correct ? "correct" : "incorrect",
     correct,
-    message: correct
+    message: correct && battle.q.success ? battle.q.success : correct
       ? battle.streak >= 3
         ? `${battle.streak} correct in a row.`
         : "Correct."
@@ -86,7 +87,7 @@ export function advanceBattle(battle, level) {
   if (battle.mode !== "sprint" && battle.index >= battle.count)
     return { finished: true, resetHearts, removedMistake };
 
-  battle.q = battle.review?.[battle.index] ?? question(battle.skill, level, battle.rng);
+  battle.q = battle.mode === "quest" ? questQuestion(battle.quest.id, battle.index, level, battle.rng) : battle.review?.[battle.index] ?? question(battle.skill, level, battle.rng);
   battle.feedback = false;
   return { finished: false, resetHearts, removedMistake };
 }

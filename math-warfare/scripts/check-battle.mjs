@@ -42,7 +42,7 @@ test("answers validate before recording and preserve streak, points and hearts",
 });
 
 test("quest retries restore hearts without advancing, then correct answers progress", () => {
-  const battle = createBattle({ mode: "quest", skill: "add", count: 2 }, 1, 0, () => 0.2);
+  const battle = createBattle({ mode: "quest", quest: { id: "welcome" }, skill: "add", count: 2 }, 1, 0, () => 0.2);
   battle.q = { text: "1 + 1", answer: 2 };
   battle.lastCorrect = false;
   battle.hearts = 0;

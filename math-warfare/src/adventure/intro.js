@@ -176,7 +176,7 @@ export function setupIntro(art, state, onStart) {
       document.getElementById("intro-online").disabled = false;
       title.textContent = state.completed.length
         ? "Continue"
-        : "Start adventure";
+        : "Begin Adventure";
     },
     error() {
       status.textContent = "Something could not load. Reload to try again.";

@@ -2,6 +2,7 @@ import { icon } from "./icons.js";
 import { portraitStyle } from "./wardrobe.js";
 import { SKILLS } from "./content.js";
 import { escapeHtml } from "./html.js";
+import { questSceneMarkup } from "./quest-ui.js";
 
 const KEYPAD_KEYS = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "−", "0", "."];
 
@@ -28,13 +29,14 @@ export function battleMarkup(battle, art, appearance) {
   const hearts = "♥".repeat(battle.hearts) + "♡".repeat(3 - battle.hearts);
 
   return `<div class="battle-header"><span class="eyebrow">${escapeHtml(title)}</span><button class="close-panel" aria-label="Pause challenge">${icon("pause")}</button></div>
-  <div class="battle-stage ${battle.quest?.boss ? "boss-stage" : ""}">
+  <div class="battle-stage ${battle.quest ? "quest-task-stage" : ""} ${battle.quest?.boss ? "boss-stage" : ""}">
     <div class="battle-land"><span class="battle-hero hero-face" role="img" aria-label="Your adventurer" style="${portraitStyle(art, appearance.id, 3)}"></span><div class="battle-beam"></div><img class="battle-monster" src="${art[monster].src}" alt="${battle.quest?.boss ? "The Fungus King" : "Practice creature"}"></div>
     <div class="battle-status"><span id="hearts">${hearts}</span><span id="clock">${battle.mode === "sprint" ? "60s" : "0s"}</span><span id="score">${battle.score} points</span></div>
   </div>
   <div class="battle-body">
+    ${battle.mode === "quest" ? questSceneMarkup(battle.q) : ""}
     <div class="question-top"><span>${SKILLS[battle.q.skill] ?? "Revision"}</span><span id="step">${step}</span></div>
-    <h2 id="equation">${escapeHtml(battle.q.text)}</h2>
+    <h2 id="equation" class="${battle.q.scene ? "context-question" : ""}">${escapeHtml(battle.q.text)}</h2>
     <p class="answer-prompt">Type your answer, then press Enter.</p>
     <form id="answer-form" novalidate><label class="sr-only" for="answer">Your answer</label><input id="answer" inputmode="decimal" autocomplete="off" placeholder="?" maxlength="16"><button class="primary" type="submit">Answer</button></form>
     <div id="answer-feedback" role="status" aria-live="polite"></div>
