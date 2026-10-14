@@ -174,7 +174,7 @@ export function setupIntro(art, state, onStart) {
       title.disabled = false;
       document.getElementById("intro-wardrobe").disabled = false;
       document.getElementById("intro-online").disabled = false;
-      title.textContent = state.completed.length
+      title.textContent = state.completed.length || Object.values(state.questWork ?? {}).some(Boolean)
         ? "Continue"
         : "Begin Adventure";
     },

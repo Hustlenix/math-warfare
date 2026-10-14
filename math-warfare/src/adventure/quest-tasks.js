@@ -10,6 +10,19 @@ export const QUEST_EFFECTS = {
   camp: { change: "Ivo has counted the return journey's rations.", unlock: "The final lantern can be repaired once Noor is ready.", next: "Meet the Fungus King, or finish Noor's market task.", unit: "supplies", marker: "CAMP READY" },
   king: { change: "The last lantern beneath the village stays illuminated.", unlock: "The village's lantern trail is complete.", next: "Explore with your companion or revisit your learning notes.", unit: "lantern supplies", marker: "LAST LANTERN LIT" },
 };
+const OBJECTIVES = {
+  welcome: "Count the supplies needed to repair the square lantern.",
+  bakery: "Pack five bread orders from equal baskets.",
+  garden: "Share five water supplies fairly among pond beds.",
+  library: "Join the route measurements to recover Ada's cave map.",
+  market: "Check five discounted prices for Noor's neighbours.",
+  bridge: "Align Scout's gate by calculating the gear settings.",
+  fungi: "Set aside fair soup portions for the lost camp.",
+  camp: "Count the rations left for the journey home.",
+  king: "Check every neighbour's contribution to restore the last lantern.",
+};
+for (const [id, objective] of Object.entries(OBJECTIVES))
+  QUEST_EFFECTS[id].objective = objective;
 
 const pick = (rng, low, high) => low + Math.floor(rng() * (high - low + 1));
 function task(skill, text, answer, hint, scene, success) {

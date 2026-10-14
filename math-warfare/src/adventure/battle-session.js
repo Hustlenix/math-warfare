@@ -68,7 +68,7 @@ export function answerBattle(battle, input) {
       ? battle.streak >= 3
         ? `${battle.streak} correct in a row.`
         : "Correct."
-      : `Not quite. ${battle.q.text} = ${battle.q.answer}.`,
+      : battle.q.scene ? "Not quite. The checked answer is " + battle.q.answer + ". Follow the method below, then try this task again." : `Not quite. ${battle.q.text} = ${battle.q.answer}.`,
   };
 }
 

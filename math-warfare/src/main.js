@@ -150,7 +150,7 @@ function refresh() {
     state.zone === "village" ? "NUMBERGLEN" : "LANTERN HOLLOW";
   $("active-title").textContent = next?.title ?? "The light lives on.";
   $("active-copy").textContent = next
-    ? `${next.person}: ${state.questWork[next.id] ?? 0} / ${next.count} tasks checked. ${QUEST_EFFECTS[next.id].change}`
+    ? `${next.person}: ${state.questWork[next.id] ?? 0} / ${next.count} tasks checked. ${QUEST_EFFECTS[next.id].objective}`
     : "Every lantern is restored. Revisit your neighbours or chase a new arena record.";
   $("next-quest").textContent = next
     ? `Meet ${next.person} →`
@@ -278,7 +278,7 @@ function interact(n) {
                 .map((id) => QUESTS.find((v) => v.id === id).title)
                 .join(", ") +
               ".",
-      )}</p></div><p class="quest-objective"><strong>Your task:</strong> ${esc(QUEST_EFFECTS[q.id].change)}</p><div class="quest-stamp"><span>${state.questWork[q.id] ?? 0} / ${q.count} tasks checked · no time limit</span><strong>${done ? "Already rewarded" : `${q.reward} coins + ${q.count * 10} XP`}</strong></div><div class="button-row">${ready ? `<button id="start-quest" class="primary">${done ? "Practise this skill" : "Let’s help →"}</button>` : ""}<button id="back">Keep exploring</button></div>`,
+      )}</p></div><p class="quest-objective"><strong>Your task:</strong> ${esc(QUEST_EFFECTS[q.id].objective)}</p><div class="quest-stamp"><span>${state.questWork[q.id] ?? 0} / ${q.count} tasks checked · no time limit</span><strong>${done ? "Already rewarded" : `${q.reward} coins + ${q.count * 10} XP`}</strong></div><div class="button-row">${ready ? `<button id="start-quest" class="primary">${done ? "Practise this skill" : "Let’s help →"}</button>` : ""}<button id="back">Keep exploring</button></div>`,
   );
   bindClose();
   $("back").onclick = close;
@@ -494,7 +494,7 @@ async function boot() {
       online.open();
       return;
     }
-    if (!state.completed.length) {
+    if (!state.completed.length && !Object.values(state.questWork).some(Boolean)) {
       open(
         '<span class="eyebrow">START HERE</span><h2>Mira needs a hand</h2><p>Walk with WASD or the arrow keys, or click a destination. Press E near a neighbour to talk. Find Mira takes you to the first quest.</p><p>Quests have no timer. If you miss an answer, you get a method and another try. Progress is saved in this browser.</p><button id="begin" class="primary full">Start exploring</button>',
       );

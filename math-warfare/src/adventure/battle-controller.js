@@ -51,9 +51,9 @@ function submit() {
       state.questResults[b.quest.id] = b.q.answer;
       persist();
     }
-    $("answer-feedback").textContent = result.message;
+    $("answer-feedback").textContent = b.mode === "quest" ? "Task checked. Save it to continue." : result.message;
     $("answer-feedback").className = "correct";
-    content.querySelector(".battle-stage").classList.add("hit");
+    if (b.mode !== "quest") content.querySelector(".battle-stage").classList.add("hit");
   } else {
     chime(false);
     $("answer-feedback").textContent = result.message;
@@ -72,9 +72,9 @@ function submit() {
   $("streak").textContent = `Best streak: ${b.bestStreak}`;
   $("next-question").hidden = false;
   $("next-question").textContent = result.correct
-    ? "Next question"
+    ? b.mode === "quest" ? (b.index + 1 === b.count ? "Finish this repair" : "Save task & continue") : "Next question"
     : b.mode === "quest"
-      ? "Try a new question →"
+      ? "Try this task again"
       : "Keep going →";
   $("next-question").focus();
 }
