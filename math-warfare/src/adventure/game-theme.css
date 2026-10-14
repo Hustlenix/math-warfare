@@ -1,11 +1,11 @@
 /* One game UI: bitmap headings, readable fixed-width text, hard-edged frames. */
 :root {
-  --game-ink: #24352e;
-  --game-paper: #f0e8d2;
+  --game-ink: #182c29;
+  --game-paper: #e8d4a2;
   --game-paper-edge: #cec3a3;
-  --game-frame: #263c32;
-  --game-frame-edge: #899277;
-  --game-gold: #dfb66b;
+  --game-frame: #182c29;
+  --game-frame-edge: #b6c0a3;
+  --game-gold: #d7b76e;
   --game-type: "Courier New", Courier, monospace;
 }
 body { font-family: var(--game-type); color: var(--game-ink); }
@@ -176,4 +176,33 @@ dialog::backdrop { background: #152a229e; backdrop-filter: none; }
   .intro-bottom { padding: 12px 16px; }
   .intro-choices { margin-top: 10px; gap: 6px; }
   .intro-choices button { padding: 8px 10px; font-size: 12px; }
+}
+
+/* Quest components own their presentation here; practice retains arena styling. */
+.quest-task-stage .battle-land, .quest-task-stage #clock, .quest-task-stage #score { display: none; }
+.quest-task-stage .battle-status { justify-content: center; }
+.task-scene { border: 2px solid #a76f4a; background: #f3e3ba; padding: 12px; margin-bottom: 14px; }
+.task-scene h3 { font: bold 15px/1.4 var(--game-type); margin: 0; }
+#panel-content .task-scene p { font-size: 12px; margin: 6px 0 10px; }
+.task-groups { display: grid; grid-template-columns: repeat(auto-fit,minmax(72px,1fr)); gap: 6px; }
+.task-group { background: #e8d4a2; border: 2px solid #a76f4a; padding: 6px; text-align: center; }
+.task-group span { display: block; font: 10px/1.4 var(--game-type); }
+.task-group strong { font-size: 22px; }
+.task-pieces { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin: 7px 0; }
+.task-pieces i { width: 8px; height: 8px; background: #a76f4a; border-bottom: 2px solid #182c29; }
+.task-total { padding: 6px 0 12px; font-weight: bold; }
+.task-resolved { border-color: #415a36; background: #dce3c8; }
+.task-resolved .task-group { background: #b6c0a3; border-color: #415a36; }
+#panel-content .context-question { font: bold 20px/1.45 var(--game-type); }
+.quest-change, .next-objective { padding: 12px; border-left: 4px solid #a76f4a; background: #f3e3ba; margin-bottom: 14px; }
+.quest-change h3 { font: bold 17px var(--game-type); }
+.quest-objective { border-block: 1px solid #a76f4a; padding-block: 10px; }
+.dialogue-art { align-items: flex-start; }
+.game-actions #train-open, .game-actions #online-open { display: none; }
+.game-actions { grid-template-columns: 44px minmax(0,1fr) 44px; }
+.battle-land { background: #b6c0a3; border-bottom: 8px solid #a76f4a; }
+@media(max-width:700px) {
+  #panel-content .context-question { font-size: 17px; }
+  .task-scene { padding: 9px; }
+  .task-groups { grid-template-columns: repeat(auto-fit,minmax(64px,1fr)); }
 }

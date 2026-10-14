@@ -1,11 +1,10 @@
 import { NPCS, QUESTS } from "./content.js";
+import { drawQuestEffects } from "./quest-tasks.js";
 import {
-  MEETINGS,
-  AMBIENT,
   createResidents,
-  advanceResident,
   facing,
   spriteFrame,
+  updateVillageLife,
 } from "./village-life.js";
 import { drawCountryside, villagePath } from "./countryside.js";
 import { heroFrame } from "./wardrobe.js";
@@ -290,8 +289,7 @@ export class World {
     }
     this.moving = !!(dx || dy);
     if (this.moving) {
-      this.dir =
-        Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 2 : 0) : dy > 0 ? 3 : 1;
+      this.dir = facing(dx, dy);
       const len = Math.max(1, Math.hypot(dx, dy)),
         sx = (dx / len) * dt * 4.5,
         sy = (dy / len) * dt * 4.5;
@@ -305,6 +303,7 @@ export class World {
       }
       this.pet.update(dt, p, this.state.companion !== "none");
     }
+    if (this.onNearby) this.onNearby(this.nearest());
   }
   petAnimal() {
     if (this.state.companion === "none") return false;
@@ -348,139 +347,9 @@ export class World {
       y <= this.camera.y + this.canvas.height + 1;
   }
   updateLife(dt) {
-    this.lifeTime += dt;
-    const now = this.lifeTime,
-      p = this.state.player;
-    const pinned = this.residents.find((a) => a.id === this.pinnedId);
-    if (
-      pinned &&
-      !this.path.length &&
-      Math.hypot(p.x - pinned.x, p.y - pinned.y) > 3
-    )
-      this.pinnedId = null;
-    const route = (a, x, y) => {
-      a.path = pathfind("village", a, { x, y }, this.state);
-      a.bubble = null;
-    };
-    if (!this.meeting && now >= this.nextMeeting) {
-      const spec = MEETINGS[this.meetingIndex++ % MEETINGS.length];
-      const actors = spec.pair.map((id) =>
-        this.residents.find((a) => a.id === id),
-      );
-      this.meeting = { spec, actors, phase: "walk", since: now };
-      actors.forEach((a, i) => {
-        a.activity = spec.activity;
-        route(a, ...spec.places[i]);
-      });
-    }
-    for (const a of this.residents) {
-      if (a.id === this.pinnedId) {
-        a.moving = false;
-        continue;
-      }
-      advanceResident(a, dt);
-      if (
-        AMBIENT.some((n) => n.id === a.id) &&
-        !a.path.length &&
-        !this.meeting?.actors.includes(a)
-      ) {
-        a.wait -= dt;
-        if (a.wait <= 0) {
-          a.wait = 9 + (this.residents.indexOf(a) % 3);
-          const stops = a.stops ??
-            a.id === "hazel"
-              ? [
-                  [10, 17],
-                  [12, 14],
-                  [11, 11],
-                ]
-              : a.id === "jun"
-                ? [
-                    [18, 18],
-                    [19, 14],
-                    [23, 14],
-                  ]
-                : a.id === "chemist"
-                  ? [
-                      [20, 20],
-                      [18, 18],
-                      [20, 20],
-                    ]
-                  : a.id === "deputy"
-                    ? [
-                        [28, 16],
-                        [24, 14],
-                        [18, 19],
-                      ]
-                    : [
-                        [28, 11],
-                        [29, 15],
-                        [26, 22],
-                      ];
-          a.stop = ((a.stop ?? -1) + 1) % stops.length;
-          route(a, ...stops[a.stop]);
-          a.activity = "Taking a village stroll";
-        }
-      }
-    }
-    const event = this.meeting;
-    if (event) {
-      const actors = event.actors;
-      if (
-        event.phase === "walk" &&
-        actors.every((a) => !a.path.length) &&
-        !actors.some((a) => a.id === this.pinnedId)
-      ) {
-        event.phase = "chat";
-        event.since = now;
-        actors[0].dir = facing(
-          actors[1].x - actors[0].x,
-          actors[1].y - actors[0].y,
-        );
-        actors[1].dir = facing(
-          actors[0].x - actors[1].x,
-          actors[0].y - actors[1].y,
-        );
-      }
-      if (event.phase === "chat") {
-        const turn = Math.floor((now - event.since) / 3) % 2;
-        actors.forEach(
-          (a, i) =>
-            (a.bubble =
-              i === turn && a.id !== this.pinnedId
-                ? event.spec.lines[i][1]
-                : null),
-        );
-        if (now - event.since > 12) {
-          event.phase = "return";
-          actors.forEach((a) => {
-            route(a, a.home.x, a.home.y);
-            a.activity = "Walking home";
-          });
-        }
-      }
-      if (event.phase === "return" && actors.every((a) => !a.path.length)) {
-        actors.forEach((a) => {
-          a.dir = 3;
-          a.activity = "Back at work";
-          a.bubble = null;
-        });
-        this.meeting = null;
-        this.nextMeeting = now + 5;
-      }
-      // A player can stop a neighbour. Do not let that stall village life indefinitely.
-      if (event.phase === "walk" && now - event.since > 35) {
-        event.phase = "return";
-        actors.forEach((a) => route(a, a.home.x, a.home.y));
-      }
-    }
-    const caption = this.lifeLabel;
-    const speaker = event?.actors.find((a) => a.bubble);
-    const summary = event
-      ? `${event.actors.map((a) => (a.id === "shop" ? "Tess" : a.name)).join(" & ")} · ${speaker ? speaker.bubble : event.spec.activity.toLowerCase()}`
-      : "A quiet morning · neighbours are out and about";
-    if (caption && caption.textContent !== summary)
-      caption.textContent = summary;
+    updateVillageLife(this, dt, (actor, goal) =>
+      pathfind("village", actor, goal, this.state),
+    );
   }
   speech(text, x, y) {
     const c = this.ctx;
@@ -631,6 +500,7 @@ export class World {
       }
     if (village) this.village();
     else this.cave();
+    drawQuestEffects(this);
     if (this.path.length) {
       for (let i = 0; i < this.path.length; i += 2) {
         const q = this.path[i];
@@ -694,7 +564,7 @@ export class World {
           16,
         );
       }
-      const near = Math.hypot(n.px / T - p.x, n.py / T - p.y) < 2.8;
+      const near = Math.hypot(n.px / T - p.x, n.py / T - p.y) < 2.4;
       if (near) this.label(n.name, n.px, n.py + 20);
     }
     if (village)

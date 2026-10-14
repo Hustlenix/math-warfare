@@ -30,14 +30,14 @@ export const QUESTS = [
   {
     id: "garden",
     person: "Fern",
-    title: "Lily pads",
+    title: "Water for the pond beds",
     skill: "divide",
     count: 5,
     reward: 25,
     zone: "village",
     requires: ["welcome"],
     intro:
-      "Each pond needs the same number of lily pads. Fair sharing is division. Help me settle these extremely picky frogs.",
+      "The pond beds are dry. We have enough water, but every bed needs a fair share. Help me fill each watering cup.",
     done: "The pond is restored. Pebble the frog is now your travelling buddy.",
     tip: "Think backwards: 48 ÷ 6 asks what number times 6 is 48.",
   },
@@ -121,7 +121,7 @@ export const QUESTS = [
     zone: "cave",
     requires: ["camp", "market"],
     intro:
-      "My crown is cursed with unfinished homework. Prove your skills across the whole journey, and restore the light beneath the village.",
+      "The last lantern needs every neighbour’s contribution. Check the supplies, portions and route measurements, then we can bring the light home.",
     done: "The lantern is restored! You brought the whole village together. Keep exploring, practise your mistakes, or test yourself in the arena.",
     tip: "Pause and choose a method. Accuracy first; speed comes with practice.",
     boss: true,

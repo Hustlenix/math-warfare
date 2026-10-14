@@ -34,7 +34,7 @@ Across sessions: choose a companion, save for three cosmetic village upgrades, r
 
 `progress.js` owns the save schema and reward/purchase transactions. Quest IDs are unique, prerequisites are checked again at reward time, and completed quests never pay twice. Cosmetics cannot overdraw coins. Unknown save versions start fresh; corrupt numeric values are bounded. Storage failure leaves a playable in-memory session and a visible saving notice.
 
-`World` owns movement, collision, BFS navigation, camera, sprites and minimap. DOM controls offer another route to each NPC so canvas pointer precision is optional. The modal pauses movement. A separate challenge object owns the current question, score, attempts, streak and clock. Pausing retains the actual DOM nodes, including the typed answer and feedback. Tab hiding pauses challenges and clears held movement keys.
+`World` owns movement, collision, BFS navigation, camera, sprites and minimap. DOM controls offer another route to each NPC so canvas pointer precision is optional. `main.js` coordinates application startup, quest flow, input and challenge lifecycle. `battle-session.js` owns question progression, scoring, hearts, retries and elapsed time; `battle-ui.js` owns the challenge markup and its event bindings. `world-panels.js` groups companion care, the country map, supplies and settings without creating another save store. The modal pauses movement. Pausing retains the actual DOM nodes, including the typed answer and feedback. Tab hiding pauses challenges and clears held movement keys.
 
 ## Feedback map
 

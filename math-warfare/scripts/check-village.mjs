@@ -3,13 +3,64 @@ import assert from "node:assert/strict";
 import { World, blocked } from "../src/adventure/world.js";
 import { NPCS } from "../src/adventure/content.js";
 import { fresh } from "../src/adventure/progress.js";
+import { dimensions } from "../src/adventure/map-layout.js";
 import {
   spriteFrame,
   createResidents,
   advanceResident,
   facing,
   MEETINGS,
+  AMBIENT,
+  AMBIENT_ROUTES,
+  routeStops,
 } from "../src/adventure/village-life.js";
+
+test("farmers and ranchers keep their configured village routes", () => {
+  for (const id of ["farmer", "rancher"]) {
+    const actor = AMBIENT.find((resident) => resident.id === id);
+    assert.ok(actor?.stops?.length);
+    assert.strictEqual(routeStops(actor), actor.stops);
+  }
+});
+
+test("Hazel uses Hazel's fallback route, not a configured farmer route", () => {
+  const hazel = AMBIENT.find((resident) => resident.id === "hazel");
+  const farmer = AMBIENT.find((resident) => resident.id === "farmer");
+  assert.deepEqual(routeStops(hazel), AMBIENT_ROUTES.hazel);
+  assert.notDeepEqual(routeStops(farmer), AMBIENT_ROUTES.hazel);
+});
+
+test("farmer, rancher and Hazel walk their own scheduled route through open tiles", () => {
+  const state = fresh();
+  const residents = createResidents(NPCS.village);
+  const world = {
+    state,
+    residents,
+    lifeTime: 0,
+    nextMeeting: Infinity,
+    meetingIndex: 0,
+    meeting: null,
+    pinnedId: null,
+    path: [],
+    lifeLabel: null,
+  };
+  const { width, height } = dimensions("village");
+
+  for (const id of ["farmer", "rancher", "hazel"]) {
+    const actor = residents.find((resident) => resident.id === id);
+    actor.wait = 0;
+    actor.stop = 0;
+    World.prototype.updateLife.call(world, 0.01);
+
+    const [x, y] = routeStops(actor)[1];
+    assert.deepEqual(actor.path.at(-1), { x: x + 0.5, y: y + 0.5 }, id);
+    for (const point of actor.path) {
+      assert.ok(point.x >= 1 && point.x < width - 1, `${id} x=${point.x}`);
+      assert.ok(point.y >= 2 && point.y < height - 1, `${id} y=${point.y}`);
+      assert.equal(blocked("village", point.x, point.y, state), false, id);
+    }
+  }
+});
 
 test("left/right/up/down choose distinct normalized strips, and idle stops the walk cycle", () => {
   assert.equal(facing(-1, 0), 0);

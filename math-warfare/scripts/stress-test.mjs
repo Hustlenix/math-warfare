@@ -99,6 +99,6 @@ measure("malformed saves and multiplayer profiles remain bounded", 10000, () => 
     assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y));
   }
 });
-const report = { date: "2026-10-12", seed: 20261012, scope: "local deterministic simulation; no server flood or physical-device benchmark", results };
+const report = { date: new Date().toISOString().slice(0, 10), seed: 20261012, scope: "local deterministic simulation; no server flood or physical-device benchmark", results };
 if (process.argv[2]) fs.writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + "\n");
 console.log(JSON.stringify(report, null, 2));
