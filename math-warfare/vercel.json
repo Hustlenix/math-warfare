@@ -1,0 +1,5 @@
+{
+  "buildCommand": "",
+  "outputDirectory": "server-public",
+  "functions": { "api/npc.js": { "maxDuration": 25 } }
+}

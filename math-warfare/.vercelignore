@@ -1,0 +1,7 @@
+.licensed-art
+node_modules
+dist
+release
+.env*
+tests
+scripts

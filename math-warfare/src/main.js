@@ -4,6 +4,8 @@ import "./adventure/intro.css";
 import "./adventure/frontier.css";
 import "./adventure/fullscreen.css";
 import "./adventure/game-theme.css";
+import "./adventure/npc-conversations.css";
+import { createConversations } from "./adventure/npc-conversations.js";
 import { icon, mountIcons } from "./adventure/icons.js";
 import { setupOnline } from "./adventure/online-ui.js";
 import { setupIntro } from "./adventure/intro.js";
@@ -68,6 +70,11 @@ let art = {},
   audioCtx;
 let online;
 const journal = $("journal-panel");
+const conversations = createConversations({ state, open, close, content, esc, modalHead, bindClose,
+  portrait: (n) => n.art.startsWith("hero-")
+    ? `<span role="img" aria-label="${esc(n.name)}" class="hero-face" style="${portraitStyle(art, n.art, 3)}"></span>`
+    : `<img class="speaker" alt="${esc(n.name)}" src="${art[n.art + "Face"]?.src ?? art.person2Face.src}">`,
+});
 function closeJournal() {
   journal.close();
   if (world) world.paused = panel.open || !$("intro").hidden;
@@ -124,6 +131,7 @@ function chime(good = true) {
   } catch {}
 }
 function open(html) {
+  conversations.cancel();
   closeJournal();
   world.paused = true;
   world.keys.clear();
@@ -133,6 +141,7 @@ function open(html) {
   content.querySelector("input,button,select")?.focus();
 }
 function close() {
+  conversations.cancel();
   panel.close();
   world.paused = !$("intro").hidden;
   world.keys.clear();
@@ -250,6 +259,7 @@ function interact(n) {
     );
     bindClose();
     $("back").onclick = close;
+    conversations.add(n, () => interact(n));
     return;
   }
   if (n.id === "portal") {
@@ -300,6 +310,7 @@ function interact(n) {
   );
   bindClose();
   $("back").onclick = close;
+  conversations.add(n, () => interact(n));
   if (ready)
     $("start-quest").onclick = () =>
       start({
@@ -578,6 +589,7 @@ function arena() {
         )}</select><label class="field-label" for="level">Number size</label><select id="level"><option value="1">Small numbers</option><option value="2">Medium numbers</option><option value="3">Large numbers</option></select><div class="arena-options"><button id="train" class="primary">Training trail <small>10 questions · no timer</small></button><button id="sprint">60 second sprint <small>Personal best: ${best} points</small></button></div><p class="muted">Arena practice earns XP. Quest coins come from helping the village.</p>`,
   );
   bindClose();
+  conversations.add(NPCS.village.find((n) => n.id === "arena"), arena);
   $("level").value = state.level;
   for (const mode of ["train", "sprint"])
     $(mode).onclick = () => {
@@ -679,6 +691,7 @@ function collection() {
       `<p>You have <strong>${state.coins} coins</strong>. Upgrades are decorations, and maths rewards are the same for everyone.</p><div class="shop-list">${SHOP.map((s) => `<article><div><strong>${s.name}</strong><p>${s.description}</p></div><button data-buy="${s.id}" ${state.upgrades.includes(s.id) || state.coins < s.price ? "disabled" : ""}>${state.upgrades.includes(s.id) ? "Added ✓" : s.price + " coins"}</button></article>`).join("")}</div><label class="field-label" for="companion">Travelling companion</label><select id="companion"><option value="none">A quiet solo walk</option>${state.completed.includes("bakery") ? '<option value="cat">Pixel · the apologetic cat</option>' : ""}${state.completed.includes("garden") ? '<option value="frog">Pebble · the picky frog</option>' : ""}</select><p class="muted">Earn companions through Bram’s and Fern’s quests.</p>`,
   );
   bindClose();
+  conversations.add(NPCS.village.find((n) => n.id === "shop"), collection);
   $("companion").value = state.companion;
   $("companion").onchange = () => {
     state.companion = $("companion").value;
