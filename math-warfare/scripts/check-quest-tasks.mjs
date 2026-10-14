@@ -58,3 +58,26 @@ test("old saves derive quest world effects; invalid checkpoints cannot skip task
   const bad=restore({version:1,questWork:{welcome:999,bakery:-1,garden:"4"}});
   assert.deepEqual(bad.questWork,{});
 });
+
+test("all contextual quests finish with original rewards and reject repeated submissions", () => {
+  let state=fresh();
+  for (const quest of QUESTS) {
+    const b=createBattle({mode:"quest",quest,skill:quest.skill,count:quest.count},2,1000,seeded(50));
+    let ended=false;
+    for(let i=0;i<quest.count;i++){
+      assert.equal(answerBattle(b,String(b.q.answer)).status,"correct");
+      const score=b.score;
+      assert.equal(answerBattle(b,String(b.q.answer)).status,"already-answered");
+      assert.equal(b.score,score);
+      ended=advanceBattle(b,2).finished;
+      assert.equal(ended,i===quest.count-1);
+    }
+    assert.ok(ended);
+    assert.equal(finishQuest(state,quest.id),true);
+    assert.equal(finishQuest(state,quest.id),false);
+    state=restore(JSON.parse(JSON.stringify(state)));
+  }
+  assert.equal(state.completed.length,9);
+  assert.equal(state.coins,340);
+  assert.equal(state.xp,490);
+});

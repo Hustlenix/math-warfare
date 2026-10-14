@@ -13,7 +13,7 @@ export function createBattle(options, level, started = Date.now(), random = Math
     ...options,
     rng,
     index: options.progress ?? 0,
-    correct: options.progress ?? 0,
+    correct: 0,
     attempts: 0,
     streak: 0,
     bestStreak: 0,
@@ -36,6 +36,7 @@ export function elapsedBattle(battle, now = Date.now()) {
 }
 
 export function answerBattle(battle, input) {
+  if (battle.feedback) return { status: "already-answered" };
   if (parseAnswer(input) === null)
     return { status: "invalid", message: "Use a number, like 12 or 2.5." };
 

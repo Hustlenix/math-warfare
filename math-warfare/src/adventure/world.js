@@ -303,6 +303,7 @@ export class World {
       }
       this.pet.update(dt, p, this.state.companion !== "none");
     }
+    if (this.onNearby) this.onNearby(this.nearest());
   }
   petAnimal() {
     if (this.state.companion === "none") return false;
@@ -563,7 +564,7 @@ export class World {
           16,
         );
       }
-      const near = Math.hypot(n.px / T - p.x, n.py / T - p.y) < 2.8;
+      const near = Math.hypot(n.px / T - p.x, n.py / T - p.y) < 2.4;
       if (near) this.label(n.name, n.px, n.py + 20);
     }
     if (village)
