@@ -5,6 +5,14 @@ import "./adventure/frontier.css";
 import "./adventure/fullscreen.css";
 import "./adventure/game-theme.css";
 import { icon, mountIcons } from "./adventure/icons.js";
+import { escapeHtml as esc } from "./adventure/html.js";
+import { battleMarkup, bindBattleControls } from "./adventure/battle-ui.js";
+import {
+  advanceBattle,
+  answerBattle,
+  createBattle,
+  elapsedBattle,
+} from "./adventure/battle-session.js";
 import { setupOnline } from "./adventure/online-ui.js";
 import { setupIntro } from "./adventure/intro.js";
 import { openWardrobe } from "./adventure/wardrobe-ui.js";
@@ -20,30 +28,12 @@ import {
   purchase,
   nextQuest,
 } from "./adventure/progress.js";
-import {
-  question,
-  matches,
-  parseAnswer,
-  seeded,
-} from "./adventure/questions.js";
 import { World, blocked } from "./adventure/world.js";
 import { movementKey } from "./adventure/movement-input.js";
 import { AMBIENT } from "./adventure/village-life.js";
 import { LANDMARKS, dimensions, villagePath } from "./adventure/map-layout.js";
 import { petName, drawCompanion } from "./adventure/companion.js";
-const $ = (id) => document.getElementById(id),
-  esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
+const $ = (id) => document.getElementById(id);
 mountIcons();
 let storage;
 try {
@@ -311,46 +301,13 @@ function interact(n) {
 }
 function start(options) {
   clearInterval(interval);
-  const rng =
-    options.mode === "daily"
-      ? seeded(
-          Number(new Date().toISOString().slice(0, 10).replaceAll("-", "")),
-        )
-      : Math.random;
-  battle = {
-    ...options,
-    rng,
-    index: 0,
-    correct: 0,
-    attempts: 0,
-    streak: 0,
-    bestStreak: 0,
-    score: 0,
-    hearts: 3,
-    started: Date.now(),
-    pauseMs: 0,
-    pausedAt: 0,
-    seconds: 0,
-    assists: 0,
-    results: [],
-    q: options.review?.[0] ?? question(options.skill, state.level, rng),
-    feedback: false,
-  };
+  battle = createBattle(options, state.level);
   renderBattle();
   interval = setInterval(tick, 100);
 }
-function elapsed() {
-  return (
-    (Date.now() -
-      battle.started -
-      battle.pauseMs -
-      (battle.pausedAt ? Date.now() - battle.pausedAt : 0)) /
-    1000
-  );
-}
 function tick() {
   if (!battle || battle.pausedAt) return;
-  battle.seconds = elapsed();
+  battle.seconds = elapsedBattle(battle);
   if (battle.mode === "sprint") {
     const remaining = Math.max(0, 60 - battle.seconds);
     if ($("clock")) $("clock").textContent = `${Math.ceil(remaining)}s`;
@@ -360,83 +317,33 @@ function tick() {
 }
 function renderBattle() {
   const b = battle,
-    q = b.q,
-    boss = b.quest?.boss;
+    q = b.q;
   b.keypadOpen ??= matchMedia("(pointer: coarse)").matches || innerWidth <= 700;
-  open(
-    `<div class="battle-header"><span class="eyebrow">${esc(b.quest?.title ?? (b.mode === "daily" ? "DAILY EXPEDITION" : b.mode === "review" ? "LEARNING NOTES" : "PRACTICE ARENA"))}</span><button class="close-panel" aria-label="Pause challenge">${icon("pause")}</button></div><div class="battle-stage ${boss ? "boss-stage" : ""}"><div class="battle-land"><span class="battle-hero hero-face" role="img" aria-label="Your adventurer" style="${portraitStyle(art, state.appearance.id, 3)}"></span><div class="battle-beam"></div><img class="battle-monster" src="${art[boss ? "boss" : b.skill === "percent" ? "owl" : b.skill === "fraction" ? "beetle" : "slime"].src}" alt="${boss ? "The Fungus King" : "Practice creature"}"></div><div class="battle-status"><span id="hearts">${"♥".repeat(b.hearts)}${"♡".repeat(3 - b.hearts)}</span><span id="clock">${b.mode === "sprint" ? "60s" : "0s"}</span><span id="score">${b.score} points</span></div></div><div class="battle-body"><div class="question-top"><span>${SKILLS[q.skill] ?? "Revision"}</span><span id="step">${b.mode === "sprint" ? "60 SECOND SPRINT" : `${b.index + 1} / ${b.count}`}</span></div><h2 id="equation">${esc(q.text)}</h2><p class="answer-prompt">Type your answer, then press Enter.</p><form id="answer-form" novalidate><label class="sr-only" for="answer">Your answer</label><input id="answer" inputmode="decimal" autocomplete="off" placeholder="?" maxlength="16"><button class="primary" type="submit">Answer</button></form><div id="answer-feedback" role="status" aria-live="polite"></div><div id="answer-keypad" class="keypad" aria-label="Answer keypad" ${b.keypadOpen ? "" : "hidden"}>${["7", "8", "9", "4", "5", "6", "1", "2", "3", "−", "0", "."].map((k) => `<button type="button" data-key="${k === "−" ? "-" : k}">${k}</button>`).join("")}<button type="button" id="erase">⌫</button><button type="button" id="clear-answer">Clear</button></div><div class="battle-footer"><button id="hint">Show a method</button><button id="keypad-toggle" aria-controls="answer-keypad" aria-expanded="${b.keypadOpen}">Keypad</button><span id="streak">${b.streak ? `${b.streak} in a row` : "Streak: 0"}</span></div><div id="method" hidden></div><button id="next-question" class="primary full" hidden>Next question</button></div>`,
-  );
+  open(battleMarkup(b, art, state.appearance));
   bindClose();
-  $("answer-form").onsubmit = (e) => {
-    e.preventDefault();
-    submit();
-  };
-  document.querySelectorAll("[data-key]").forEach(
-    (el) =>
-      (el.onclick = () => {
-        if (b.feedback) return;
-        const a = $("answer");
-        if (a.value.length < 16) a.value += el.dataset.key;
-        a.focus();
-      }),
-  );
-  $("erase").onclick = () => {
-    $("answer").value = $("answer").value.slice(0, -1);
-    $("answer").focus();
-  };
-  $("clear-answer").onclick = () => {
-    $("answer").value = "";
-    $("answer").focus();
-  };
-  $("hint").onclick = () => {
-    if ($("method").hidden) {
-      $("method").hidden = false;
-      $("method").textContent = q.hint;
-      b.assists++;
-    }
-  };
-  $("next-question").onclick = advance;
-  $("keypad-toggle").onclick = () => {
-    b.keypadOpen = !b.keypadOpen;
-    $("answer-keypad").hidden = !b.keypadOpen;
-    $("keypad-toggle").setAttribute("aria-expanded", String(b.keypadOpen));
-  };
-  $("answer").focus();
+  bindBattleControls(content, b, { onSubmit: submit, onAdvance: advance });
   tick();
 }
 function submit() {
   const b = battle;
   if (!b || b.feedback || b.pausedAt) return;
-  if (b.mode === "sprint" && elapsed() >= 60) {
+  if (b.mode === "sprint" && elapsedBattle(b) >= 60) {
     finish();
     return;
   }
-  const input = $("answer").value;
-  if (parseAnswer(input) === null) {
-    $("answer-feedback").textContent = "Use a number, like 12 or 2.5.";
+  const result = answerBattle(b, $("answer").value);
+  if (result.status === "invalid") {
+    $("answer-feedback").textContent = result.message;
     return;
   }
-  b.attempts++;
-  const correct = matches(input, b.q.answer);
-  b.results.push({ text: b.q.text, answer: b.q.answer, input, correct });
-  if (correct) {
-    b.correct++;
-    b.streak++;
-    b.bestStreak = Math.max(b.bestStreak, b.streak);
-    b.score += 10 + Math.min(5, b.streak - 1) * 2;
+  if (result.correct) {
     chime();
-    $("answer-feedback").textContent =
-      b.streak >= 3
-        ? `${b.streak} correct in a row.`
-        : "Correct.";
+    $("answer-feedback").textContent = result.message;
     $("answer-feedback").className = "correct";
     content.querySelector(".battle-stage").classList.add("hit");
   } else {
-    b.streak = 0;
-    b.hearts = Math.max(0, b.hearts - 1);
     chime(false);
-    $("answer-feedback").textContent =
-      `Not quite. ${b.q.text} = ${b.q.answer}.`;
+    $("answer-feedback").textContent = result.message;
     $("answer-feedback").className = "incorrect";
     $("method").hidden = false;
     $("method").textContent = b.q.hint;
@@ -445,15 +352,13 @@ function submit() {
     state.mistakes = state.mistakes.slice(-24);
     persist();
   }
-  b.feedback = true;
-  b.lastCorrect = correct;
   $("answer").disabled = true;
   $("answer-form").querySelector("button").disabled = true;
   $("hearts").textContent = "♥".repeat(b.hearts) + "♡".repeat(3 - b.hearts);
   $("score").textContent = `${b.score} points`;
   $("streak").textContent = `Best streak: ${b.bestStreak}`;
   $("next-question").hidden = false;
-  $("next-question").textContent = correct
+  $("next-question").textContent = result.correct
     ? "Next question"
     : b.mode === "quest"
       ? "Try a new question →"
@@ -463,27 +368,25 @@ function submit() {
 function advance() {
   if (!battle) return;
   const b = battle;
-  if (b.mode === "quest" && !b.lastCorrect) {
-    if (!b.hearts) {
-      b.hearts = 3;
-      toast("Take a breath. Your progress is safe. Keep learning.");
-    }
-  } else b.index++;
-  if (b.mode === "review" && b.lastCorrect)
-    state.mistakes = state.mistakes.filter((q) => q.text !== b.q.text);
-  if (b.mode !== "sprint" && b.index >= b.count) {
+  const transition = advanceBattle(b, state.level);
+  if (transition.resetHearts)
+    toast("Take a breath. Your progress is safe. Keep learning.");
+  if (transition.removedMistake)
+    state.mistakes = state.mistakes.filter(
+      (question) => question.text !== transition.removedMistake,
+    );
+  if (transition.finished) {
     finish();
     return;
   }
-  b.q = b.review?.[b.index] ?? question(b.skill, state.level, b.rng);
-  b.feedback = false;
   renderBattle();
 }
 function finish() {
   const b = battle;
   if (!b) return;
   clearInterval(interval);
-  b.seconds = elapsed();
+  interval = null;
+  b.seconds = elapsedBattle(b);
   let reward = "";
   if (b.mode === "quest" && finishQuest(state, b.quest.id))
     reward = `${b.quest.reward} coins · ${b.quest.count * 10} XP`;
@@ -536,6 +439,8 @@ function finish() {
 function pause() {
   if (!battle || battle.pausedAt) return;
   battle.pausedAt = Date.now();
+  clearInterval(interval);
+  interval = null;
   battle.savedDOM = document.createDocumentFragment();
   while (content.firstChild) battle.savedDOM.append(content.firstChild);
   open(
@@ -546,6 +451,7 @@ function pause() {
   $("resume").onclick = resume;
   $("quit").onclick = () => {
     clearInterval(interval);
+    interval = null;
     battle = null;
     close();
     refresh();
@@ -557,6 +463,7 @@ function resume() {
   battle.pausedAt = 0;
   content.replaceChildren(battle.savedDOM);
   battle.savedDOM = null;
+  interval = setInterval(tick, 100);
   ($("next-question")?.hidden ? $("answer") : $("next-question"))?.focus();
   tick();
 }
