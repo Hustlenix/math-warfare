@@ -92,4 +92,4 @@ Equal bread baskets and resolved water allocation:
 
 Phone-width task layout:
 
-![Phone task](screenshots/last-lantern/after-mobile-bakery.jpg)
+![Phone task](screenshots/last-lantern/after-mobile-garden.jpg)
