@@ -1,36 +1,6 @@
 /* Dust, timber, sage and amber: the village keeps its legibility in a Western palette. */
 body {
   background: #ede0c6;
-  color: #342f29;
-}
-.topbar {
-  background: #252c29;
-  border-bottom-color: #b48345;
-}
-.brand-mark,
-button.primary {
-  background: #cfa76b;
-  color: #292d28;
-  border-color: #9d7441;
-  box-shadow: 0 3px 0 #705335;
-}
-button {
-  border-color: #b8a68b;
-  color: #3a3c30;
-  background: #f2e6cf;
-  box-shadow: 0 2px 0 #b3a087;
-}
-button:hover {
-  background: #e2cda8;
-}
-.canvas-wrap {
-  border-color: #665a40;
-  background: #776b4a;
-  box-shadow: 5px 5px 0 #c7ae7c;
-}
-.scene-caption {
-  background: #303b33e8;
-  color: #f6dfae;
 }
 .journal {
   border-color: #c1a678;
@@ -42,7 +12,6 @@ button:hover {
   background: #7c8550;
 }
 .eyebrow,
-.save-status,
 .section-title,
 .journal-note,
 .controls-line,
@@ -201,10 +170,6 @@ button:hover {
   flex-shrink: 0;
   background-repeat: no-repeat;
 }
-.wardrobe-stage h3 {
-  font-size: 18px;
-  font-family: Georgia, serif;
-}
 .wardrobe-stage p {
   font-size: 11px;
   line-height: 1.55;
@@ -315,17 +280,7 @@ button:hover {
 .wardrobe-pages button {
   min-width: 42px;
 }
-.wardrobe-panel .modal-heading h2 {
-  font-size: 27px;
-}
 @media (max-width: 780px) {
-  .topbar {
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .wallet {
-    margin-left: auto;
-  }
   #character-open {
     order: 4;
     min-height: 37px;
@@ -360,12 +315,6 @@ button:hover {
   .wardrobe-browse {
     grid-template-columns: 1fr;
   }
-  .wardrobe-panel .modal-heading h2 {
-    font-size: 23px;
-  }
-  .wardrobe-stage h3 {
-    font-size: 20px;
-  }
 }
 @media (max-width: 380px) {
   .hero-grid {
@@ -379,8 +328,5 @@ button:hover {
   }
   .wardrobe-stage {
     gap: 8px;
-  }
-  .wardrobe-stage h3 {
-    font-size: 17px;
   }
 }

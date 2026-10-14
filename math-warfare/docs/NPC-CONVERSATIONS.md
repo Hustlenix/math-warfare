@@ -6,7 +6,7 @@ The client sends text to a separately hosted NPC-only endpoint. Provider keys be
 
 ## Current status
 
-The implementation and local fixture tests are ready. No real inference has been verified and no AI backend has been deployed. The public Pages game still runs the previous release until this draft is connected and verified. Fixture screenshots are interface tests, not evidence of model output.
+Real provider inference has been verified in the local preview. No public AI backend has been deployed, and the public Pages game still runs the previous release. Fixture screenshots are interface tests, not evidence of model output.
 
 The selected model is fixed to `apodex/apodex-1.1-mini:free`. It has a free listing on [OpenRouter](https://openrouter.ai/apodex/apodex-1.1-mini:free). There is no paid model fallback. Free-model availability and account/provider quotas still apply.
 

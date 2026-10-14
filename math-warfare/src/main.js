@@ -166,10 +166,9 @@ function refresh() {
   $("sound").textContent = `Sound: ${state.muted ? "off" : "on"}`;
   document.body.classList.toggle("reduce-motion", state.reducedMotion);
   $("quest-count").textContent = `${state.completed.length} / ${QUESTS.length}`;
-  $("hud-progress").style.width =
-    `${(state.completed.length / QUESTS.length) * 100}%`;
-  $("quest-progress").style.width =
-    `${(state.completed.length / QUESTS.length) * 100}%`;
+  const completion = `${(state.completed.length / QUESTS.length) * 100}%`;
+  $("hud-progress").style.width = completion;
+  $("quest-progress").style.width = completion;
   const next = nextQuest(state);
   $("help-route").textContent = next ? `Find ${next.person === "The Fungus King" ? "the King" : next.person}` : "Quests";
   $("hud-quest").textContent = next?.title ?? "All lanterns restored";
@@ -369,14 +368,65 @@ function tick() {
   } else if ($("clock"))
     $("clock").textContent = `${Math.floor(battle.seconds)}s`;
 }
+function battleMarkup(b, q, boss) {
+  const title =
+    b.quest?.title ??
+    (b.mode === "daily"
+      ? "DAILY EXPEDITION"
+      : b.mode === "review"
+        ? "LEARNING NOTES"
+        : "PRACTICE ARENA");
+  const monster =
+    boss ? "boss" : b.skill === "percent" ? "owl" : b.skill === "fraction" ? "beetle" : "slime";
+  const step = b.mode === "sprint" ? "60 SECOND SPRINT" : `${b.index + 1} / ${b.count}`;
+  const keys = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "−", "0", "."];
+
+  return `<div class="battle-header">
+    <span class="eyebrow">${esc(title)}</span>
+    <button class="close-panel" aria-label="Pause challenge">${icon("pause")}</button>
+  </div>
+  <div class="battle-stage ${boss ? "boss-stage" : ""}">
+    <div class="battle-land">
+      <span class="battle-hero hero-face" role="img" aria-label="Your adventurer" style="${portraitStyle(art, state.appearance.id, 3)}"></span>
+      <div class="battle-beam"></div>
+      <img class="battle-monster" src="${art[monster].src}" alt="${boss ? "The Fungus King" : "Practice creature"}">
+    </div>
+    <div class="battle-status">
+      <span id="hearts">${"♥".repeat(b.hearts)}${"♡".repeat(3 - b.hearts)}</span>
+      <span id="clock">${b.mode === "sprint" ? "60s" : "0s"}</span>
+      <span id="score">${b.score} points</span>
+    </div>
+  </div>
+  <div class="battle-body">
+    <div class="question-top"><span>${SKILLS[q.skill] ?? "Revision"}</span><span id="step">${step}</span></div>
+    <h2 id="equation">${esc(q.text)}</h2>
+    <p class="answer-prompt">Type your answer, then press Enter.</p>
+    <form id="answer-form" novalidate>
+      <label class="sr-only" for="answer">Your answer</label>
+      <input id="answer" inputmode="decimal" autocomplete="off" placeholder="?" maxlength="16">
+      <button class="primary" type="submit">Answer</button>
+    </form>
+    <div id="answer-feedback" role="status" aria-live="polite"></div>
+    <div id="answer-keypad" class="keypad" aria-label="Answer keypad" ${b.keypadOpen ? "" : "hidden"}>
+      ${keys.map((key) => `<button type="button" data-key="${key === "−" ? "-" : key}">${key}</button>`).join("")}
+      <button type="button" id="erase">⌫</button>
+      <button type="button" id="clear-answer">Clear</button>
+    </div>
+    <div class="battle-footer">
+      <button id="hint">Show a method</button>
+      <button id="keypad-toggle" aria-controls="answer-keypad" aria-expanded="${b.keypadOpen}">Keypad</button>
+      <span id="streak">${b.streak ? `${b.streak} in a row` : "Streak: 0"}</span>
+    </div>
+    <div id="method" hidden></div>
+    <button id="next-question" class="primary full" hidden>Next question</button>
+  </div>`;
+}
 function renderBattle() {
   const b = battle,
     q = b.q,
     boss = b.quest?.boss;
   b.keypadOpen ??= matchMedia("(pointer: coarse)").matches || innerWidth <= 700;
-  open(
-    `<div class="battle-header"><span class="eyebrow">${esc(b.quest?.title ?? (b.mode === "daily" ? "DAILY EXPEDITION" : b.mode === "review" ? "LEARNING NOTES" : "PRACTICE ARENA"))}</span><button class="close-panel" aria-label="Pause challenge">${icon("pause")}</button></div><div class="battle-stage ${boss ? "boss-stage" : ""}"><div class="battle-land"><span class="battle-hero hero-face" role="img" aria-label="Your adventurer" style="${portraitStyle(art, state.appearance.id, 3)}"></span><div class="battle-beam"></div><img class="battle-monster" src="${art[boss ? "boss" : b.skill === "percent" ? "owl" : b.skill === "fraction" ? "beetle" : "slime"].src}" alt="${boss ? "The Fungus King" : "Practice creature"}"></div><div class="battle-status"><span id="hearts">${"♥".repeat(b.hearts)}${"♡".repeat(3 - b.hearts)}</span><span id="clock">${b.mode === "sprint" ? "60s" : "0s"}</span><span id="score">${b.score} points</span></div></div><div class="battle-body"><div class="question-top"><span>${SKILLS[q.skill] ?? "Revision"}</span><span id="step">${b.mode === "sprint" ? "60 SECOND SPRINT" : `${b.index + 1} / ${b.count}`}</span></div><h2 id="equation">${esc(q.text)}</h2><p class="answer-prompt">Type your answer, then press Enter.</p><form id="answer-form" novalidate><label class="sr-only" for="answer">Your answer</label><input id="answer" inputmode="decimal" autocomplete="off" placeholder="?" maxlength="16"><button class="primary" type="submit">Answer</button></form><div id="answer-feedback" role="status" aria-live="polite"></div><div id="answer-keypad" class="keypad" aria-label="Answer keypad" ${b.keypadOpen ? "" : "hidden"}>${["7", "8", "9", "4", "5", "6", "1", "2", "3", "−", "0", "."].map((k) => `<button type="button" data-key="${k === "−" ? "-" : k}">${k}</button>`).join("")}<button type="button" id="erase">⌫</button><button type="button" id="clear-answer">Clear</button></div><div class="battle-footer"><button id="hint">Show a method</button><button id="keypad-toggle" aria-controls="answer-keypad" aria-expanded="${b.keypadOpen}">Keypad</button><span id="streak">${b.streak ? `${b.streak} in a row` : "Streak: 0"}</span></div><div id="method" hidden></div><button id="next-question" class="primary full" hidden>Next question</button></div>`,
-  );
+  open(battleMarkup(b, q, boss));
   bindClose();
   $("answer-form").onsubmit = (e) => {
     e.preventDefault();

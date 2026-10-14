@@ -11,9 +11,6 @@ html {
 }
 body {
   margin: 0;
-  background: #eee8d9;
-  color: #1f3e3b;
-  font-family: Verdana, sans-serif;
   font-size: 14px;
   line-height: 1.55;
 }
@@ -30,16 +27,7 @@ select {
 }
 button {
   cursor: pointer;
-  border: 1px solid #bdc5ad;
-  background: #f4eedf;
-  color: #254843;
   padding: 10px 14px;
-  border-radius: 3px;
-  font-weight: bold;
-  box-shadow: 0 2px 0 #adb19b;
-}
-button:hover {
-  background: #e1e8cf;
 }
 button:active {
   transform: translateY(2px);
@@ -66,17 +54,6 @@ h3,
 p {
   margin: 0;
 }
-h1 {
-  font-family: Georgia, serif;
-  font-size: clamp(24px, 2.4vw, 36px);
-  line-height: 1.25;
-  letter-spacing: -1px;
-}
-h2 {
-  font-family: Georgia, serif;
-  font-size: 28px;
-  line-height: 1.2;
-}
 p {
   margin: 16px 0;
 }
@@ -87,101 +64,12 @@ p {
   letter-spacing: 1px;
   color: #617a6c;
 }
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 18px 4vw;
-  background: #193e3b;
-  color: #f2eccf;
-  border-bottom: 4px solid #e0ba72;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  text-decoration: none;
-  font:
-    11px/1.6 Pixel,
-    monospace;
-}
-.brand small {
-  display: block;
-  font: 8px/2.4 monospace;
-  letter-spacing: 2px;
-  color: #b6c8aa;
-}
-.brand-mark {
-  font: 32px/1 Georgia;
-  background: #d2b374;
-  color: #214943;
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  box-shadow: 4px 4px 0 #112e2b;
-}
-.wallet {
-  display: flex;
-  gap: 14px;
-  margin-left: auto;
-  font: 11px monospace;
-  color: #ead9a0;
-}
-.icon-button {
-  background: transparent;
-  border-color: #597967;
-  color: #ead9a0;
-  box-shadow: none;
-  font-size: 22px;
-  padding: 2px 11px;
-}
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 290px;
-  gap: 26px;
-  padding: 30px 4vw 16px;
-  max-width: 1700px;
-  margin: auto;
-}
-.world-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: end;
-  margin-bottom: 20px;
-}
-.save-status {
-  font: 10px monospace;
-  white-space: nowrap;
-  color: #70806b;
-  padding-bottom: 6px;
-}
-.canvas-wrap {
-  position: relative;
-  border: 6px solid #294c42;
-  box-shadow: 0 6px 0 #b2bda0;
-  background: #739b69;
-  height: min(68vh, 720px);
-  min-height: 450px;
-  overflow: hidden;
-}
 canvas {
   display: block;
   width: 100%;
   height: 100%;
   image-rendering: pixelated;
   outline-offset: -5px !important;
-}
-.scene-caption {
-  position: absolute;
-  left: 16px;
-  top: 14px;
-  background: #183a34e8;
-  padding: 6px 10px;
-  color: #f0e7c4;
-  font: 11px monospace;
-  max-width: calc(100% - 150px);
 }
 .world-action {
   position: absolute;
@@ -326,21 +214,6 @@ kbd {
 }
 .journal-note strong {
   color: #42654e;
-}
-footer {
-  display: flex;
-  justify-content: space-between;
-  padding: 18px 4vw 25px;
-  font: 10px monospace;
-  color: #6c7c66;
-  gap: 10px;
-}
-footer button {
-  font-size: 10px;
-  box-shadow: none;
-  background: transparent;
-  border: 0;
-  padding: 0;
 }
 dialog {
   border: 3px solid #2c5147;
@@ -787,63 +660,14 @@ select {
   .journal {
     padding-left: 18px;
   }
-  .scene-caption {
-    display: none;
-  }
-  .save-status {
-    display: none;
-  }
-  .canvas-wrap {
-    min-height: 460px;
-  }
   .controls-line {
     flex-wrap: wrap;
   }
   .controls-line span {
     flex-basis: 100%;
   }
-  .brand small {
-    font-size: 7px;
-  }
 }
 @media (max-width: 780px) {
-  .topbar {
-    padding: 14px 18px;
-    gap: 9px;
-  }
-  .brand {
-    font-size: 8px;
-    gap: 9px;
-  }
-  .brand small {
-    font-size: 6px;
-    letter-spacing: 1px;
-  }
-  .brand-mark {
-    width: 32px;
-    height: 32px;
-    font-size: 27px;
-  }
-  .wallet {
-    flex-direction: column;
-    gap: 2px;
-    font-size: 10px;
-  }
-  .icon-button {
-    font-size: 20px;
-    padding: 2px 7px;
-  }
-  .layout {
-    display: block;
-    padding: 23px 14px 10px;
-  }
-  .world-heading {
-    margin-bottom: 16px;
-  }
-  .canvas-wrap {
-    height: 60vh;
-    min-height: 390px;
-  }
   .world-action {
     left: 10px;
     right: 10px;
@@ -884,11 +708,6 @@ select {
   }
   .section-title {
     margin-top: 22px;
-  }
-  footer {
-    padding: 16px;
-    font-size: 9px;
-    flex-wrap: wrap;
   }
   #panel-content {
     padding: 20px;
