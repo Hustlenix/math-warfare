@@ -114,16 +114,19 @@ node scripts/verify-release.mjs
 npm run preview
 ```
 
-Thirty-three tests cover 24,000 equations, input validation, daily determinism, quest/purchase transactions, saved progress, routes, cave gates, scaled pointers, walking at 20 FPS, six conversation/return cycles, wardrobe coverage and caravan collision. Country tests check reachability, crop/path separation, both bridges, pet movement around the pond/farm/creek without crossing solids, Stay/Recall/scratches, four cat directions, small nap rendering, old saves, pet names and expanded multiplayer bounds. Online checks cover safe profiles, private answers, host-owned scores, duplicates, attempts, deadlines and five-round completion. `python scripts/check-art.py` compares normalized sprite pixels against the owned sheets for eleven villagers and four cave characters; `python scripts/check-wardrobe-art.py` checks all 324 characters and their 9,072 animation cells. Run the pixel checks after importing artwork. CI verifies source/release hashes and publishes the compiled game without needing private artwork packs. Rebuild and package after changing recorded source files.
+Forty tests cover 24,000 equations, input validation, daily determinism, battle scoring and pause handling, quest/purchase transactions, saved progress, NPC routes and schedules, cave gates, scaled pointers, movement, wardrobe coverage and caravan collision. Country tests check reachability, crop/path separation, both bridges, pet movement around the pond/farm/creek without crossing solids, Stay/Recall/scratches, four cat directions, small nap rendering, old saves, pet names and expanded multiplayer bounds. Online checks cover safe profiles, private answers, host-owned scores, duplicates, attempts, deadlines and five-round completion. `npm run stress` runs deterministic simulations for maths, story rewards, country paths, movement, multiplayer races and malformed data. `python scripts/check-art.py` compares normalized sprite pixels against the owned sheets for eleven villagers and four cave characters; `python scripts/check-wardrobe-art.py` checks all 324 characters and their 9,072 animation cells. Run the pixel checks after importing artwork. CI verifies source/release hashes and publishes the compiled game without needing private artwork packs. Rebuild and package after changing recorded source files.
 
 ## Structure
 
-- `src/main.js`: accessible DOM interface, dialogues, challenge lifecycle and audio.
+- `src/main.js`: application startup, save and quest coordination, player interaction, input, and challenge lifecycle.
+- `src/adventure/battle-session.js` and `battle-ui.js`: challenge state transitions and scoring, plus battle markup and event bindings.
+- `src/adventure/world-panels.js`: companion care, country map, supplies, and settings panels.
+- `src/adventure/html.js`: shared HTML escaping for player and NPC text.
 - `src/adventure/content.js`: neighbours, quest graph and cosmetic prices.
 - `src/adventure/questions.js`: exact questions, seeded daily trail and strict answer parsing.
 - `src/adventure/progress.js`: versioned saves and one-time reward/purchase transactions.
 - `src/adventure/world.js`: Canvas renderer, character animation, movement, collision, BFS routes and camera.
-- `src/adventure/village-life.js`: walking routines, neighbour meetings and normalized sprite frame selection.
+- `src/adventure/village-life.js`: NPC route definitions, walking routines, neighbour meetings and normalized sprite frame selection.
 - `src/adventure/countryside.js`: cottages, farm plots, orchard, market and pond scenery.
 - `src/adventure/map-layout.js`: per-map dimensions, roads, solid scenery, farm beds/gates and country landmarks.
 - `src/adventure/expansion.js`: farm, barn, chickens, creek bridges, camp and companion meadow artwork.
@@ -138,7 +141,7 @@ Thirty-three tests cover 24,000 equations, input validation, daily determinism, 
 - `scripts/build-wardrobe.py`: offline construction and palette packing of 324 distinct playable looks.
 - `docs/ADVENTURE-DESIGN.md`: loops, state ownership, decisions and verification boundaries.
 
-Older engine/fx/API modules remain as project history; the current entry point uses the adventure modules above. The separate mathsheet generator is preserved and is not part of the game runtime.
+The game uses `src/adventure/questions.js` for live question generation and answer validation. `src/engine/` has no game-runtime imports; it remains as a historical implementation covered by `tests/engine.test.js`. The separate mathsheet generator is preserved and is not part of the game runtime.
 
 ## Progress, privacy and limitations
 
