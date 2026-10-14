@@ -80,7 +80,7 @@ export function questQuestion(id, index, level = 1, rng = Math.random) {
   if (id === "bridge") return task("order",
     "Scout's gate needs " + groups + " + " + items + " × 2 turns. What setting opens the lock?",
     groups + items * 2, "Turn the paired gears first: " + items + " × 2 = " + items * 2 + ". Then add " + groups + ".",
-    scene("Set the tunnel lock", "Paired gears turn before the loose gear count.", groups, items, "gear turns", "lock"),
+    scene("Set the tunnel lock", "Paired gears turn before the loose gear count.", 2, [groups, items], "gear turns", "lock"),
     "The next lock tumbler is aligned.");
   if (id === "fungi") return task("fraction",
     "Pip cooked " + groups * items + " soup portions. One of " + groups + " equal groups is for the camp. How many portions go there?",

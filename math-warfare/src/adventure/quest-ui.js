@@ -8,7 +8,13 @@ export function questSceneMarkup(question) {
     const count = Array.isArray(s.items) ? s.items[i] : s.items;
     const pictorial = Number.isInteger(count) && (s.operation === "groups" || s.operation === "combine");
     const dots = pictorial ? Array(Math.min(count, 14)).fill('<i aria-hidden="true"></i>').join("") : "";
-    const label = s.operation === "share" ? "Bed / group " + (i + 1) : s.operation === "groups" ? "Basket / bag " + (i + 1) : i === 0 ? "Known supply" : s.operation === "missing" ? "Required total" : "Delivery / value";
+    let label;
+    if (s.operation === "share") label = (s.unit === "cups to share" ? "Pond bed " : "Soup group ") + (i + 1);
+    else if (s.operation === "groups") label = (s.unit === "buns" ? "Bread basket " : "Ration bag ") + (i + 1);
+    else if (s.operation === "price") label = i === 0 ? "Original price (coins)" : "Discount (%)";
+    else if (s.operation === "lock") label = i === 0 ? "Loose turns" : "Paired gears (× 2)";
+    else if (s.unit === "metres") label = "Trail section " + (i + 1) + " (m)";
+    else label = i === 0 ? "Stock on hand" : s.operation === "missing" ? "Required total" : "Delivered pieces";
     return '<div class="task-group"><span>' + esc(label) + '</span><div class="task-pieces">' + dots + '</div><strong>' + (s.operation === "share" ? "?" : count) + '</strong></div>';
   }).join("");
   return '<section class="task-scene" aria-label="' + esc(s.title) + '"><h3>' + esc(s.title) + '</h3><p>' + esc(s.instruction) + '</p>' +
