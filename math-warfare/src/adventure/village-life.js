@@ -151,6 +151,118 @@ const DEFAULT_AMBIENT_ROUTE = [[28, 11], [29, 15], [26, 22]];
 export function routeStops(actor) {
   return actor.stops ?? AMBIENT_ROUTES[actor.id] ?? DEFAULT_AMBIENT_ROUTE;
 }
+export function updateVillageLife(world, dt, findPath) {
+  world.lifeTime += dt;
+  const now = world.lifeTime;
+  const pinned = world.residents.find((actor) => actor.id === world.pinnedId);
+  if (
+    pinned &&
+    !world.path.length &&
+    Math.hypot(world.state.player.x - pinned.x, world.state.player.y - pinned.y) > 3
+  )
+    world.pinnedId = null;
+
+  const route = (actor, x, y) => {
+    actor.path = findPath(actor, { x, y });
+    actor.bubble = null;
+  };
+
+  if (!world.meeting && now >= world.nextMeeting) {
+    const spec = MEETINGS[world.meetingIndex++ % MEETINGS.length];
+    const actors = spec.pair.map((id) =>
+      world.residents.find((actor) => actor.id === id),
+    );
+    world.meeting = { spec, actors, phase: "walk", since: now };
+    actors.forEach((actor, index) => {
+      actor.activity = spec.activity;
+      route(actor, ...spec.places[index]);
+    });
+  }
+
+  for (const actor of world.residents) {
+    if (actor.id === world.pinnedId) {
+      actor.moving = false;
+      continue;
+    }
+    advanceResident(actor, dt);
+    if (
+      AMBIENT.some((resident) => resident.id === actor.id) &&
+      !actor.path.length &&
+      !world.meeting?.actors.includes(actor)
+    ) {
+      actor.wait -= dt;
+      if (actor.wait <= 0) {
+        actor.wait = 9 + (world.residents.indexOf(actor) % 3);
+        const stops = routeStops(actor);
+        actor.stop = ((actor.stop ?? -1) + 1) % stops.length;
+        route(actor, ...stops[actor.stop]);
+        actor.activity = "Taking a village stroll";
+      }
+    }
+  }
+
+  const meeting = world.meeting;
+  if (!meeting) {
+    updateVillageCaption(world, null);
+    return;
+  }
+
+  const actors = meeting.actors;
+  if (
+    meeting.phase === "walk" &&
+    actors.every((actor) => !actor.path.length) &&
+    !actors.some((actor) => actor.id === world.pinnedId)
+  ) {
+    meeting.phase = "chat";
+    meeting.since = now;
+    actors[0].dir = facing(actors[1].x - actors[0].x, actors[1].y - actors[0].y);
+    actors[1].dir = facing(actors[0].x - actors[1].x, actors[0].y - actors[1].y);
+  }
+
+  if (meeting.phase === "chat") {
+    const turn = Math.floor((now - meeting.since) / 3) % 2;
+    actors.forEach((actor, index) => {
+      actor.bubble =
+        index === turn && actor.id !== world.pinnedId
+          ? meeting.spec.lines[index][1]
+          : null;
+    });
+    if (now - meeting.since > 12) {
+      meeting.phase = "return";
+      actors.forEach((actor) => {
+        route(actor, actor.home.x, actor.home.y);
+        actor.activity = "Walking home";
+      });
+    }
+  }
+
+  if (meeting.phase === "return" && actors.every((actor) => !actor.path.length)) {
+    actors.forEach((actor) => {
+      actor.dir = 3;
+      actor.activity = "Back at work";
+      actor.bubble = null;
+    });
+    world.meeting = null;
+    world.nextMeeting = now + 5;
+  }
+
+  // If the player pins a meeting partner, send both residents home after a short wait.
+  if (meeting.phase === "walk" && now - meeting.since > 35) {
+    meeting.phase = "return";
+    actors.forEach((actor) => route(actor, actor.home.x, actor.home.y));
+  }
+  updateVillageCaption(world, meeting);
+}
+
+function updateVillageCaption(world, meeting) {
+  const caption = world.lifeLabel;
+  if (!caption) return;
+  const speaker = meeting?.actors.find((actor) => actor.bubble);
+  const summary = meeting
+    ? `${meeting.actors.map((actor) => (actor.id === "shop" ? "Tess" : actor.name)).join(" & ")} · ${speaker ? speaker.bubble : meeting.spec.activity.toLowerCase()}`
+    : "A quiet morning · neighbours are out and about";
+  if (caption.textContent !== summary) caption.textContent = summary;
+}
 export function facing(dx, dy) {
   return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 2 : 0) : dy > 0 ? 3 : 1;
 }
