@@ -49,3 +49,47 @@ The requested first-five-minute sequence is a target. No artificial wait was add
 Regression checks cover contextual quantities for all nine quests across three difficulties, old saves, checkpoint restoration, wrong-answer recovery, all story rewards and duplicate submissions. Existing suites still cover routes, collisions, companions, wardrobe, online model, practice and runtime pause/culling behavior.
 
 Before/after screenshots and production-browser results are recorded in the delivered evidence report. Physical touch devices, real network multiplayer, independent human playtest feedback and Stardance eligibility remain separate checks. No human playtest feedback has been invented.
+
+
+## Executed verification
+
+- Baseline: 40 game tests passed; Mira was completed through the actual compiled UI before edits. Journal, wardrobe, map and 390 × 844 map views were inspected and captured.
+- Final: 44 game tests passed, including 2,700 independently checked contextual questions and an all-nine-quest progression test preserving 340 coins / 490 XP.
+- 18 historical engine tests passed. All six deterministic stress scenarios passed (240,000 arena equations, 1,000 story/save runs, 2,000 paths, 100,000 movement steps, 1,000 room simulations and 10,000 malformed-data cases).
+- A clean npm ci in an isolated source copy installed 20 packages with zero reported vulnerabilities. The original dependency folder was then restored from that matching lockfile without stopping the existing server.
+- Production builds passed in both the clean copy and actual checkout using the local licensed crops. Packaging excluded raw PNG sheets and source-manifest verification passed. Vite still warns about the artwork-bearing main chunk exceeding 500 kB; that is a warning, not a failed build.
+- Production browser: Mira, Bram and Fern were completed using visible problem text and normal UI inputs. After reload the journal showed 3 / 9, Ada available, and 65 coins / 130 XP. A save from the baseline build retained Mira's completion and its original next objective.
+- A wrong Mira answer did not advance the task. A saved checkpoint resumed at 2 / 3 after reload. Partial saves display Continue. Pause/resume preserved a typed 16. Invalid input stayed on the same task and showed the numeric-input method.
+- The basket screen at 390 × 844 had document width 390 and dialog width about 356 px, with no horizontal overflow. Map, wardrobe, companion and practice access were checked. Practice still renders an arena challenge rather than a quest scene.
+- No independent human testers were available. Five-minute learnability/enjoyment, physical phone keyboards/multi-touch and real network WebRTC matches have not been certified by these checks. Later quests have automated mechanic coverage but were not all manually completed in a browser.
+- No merge, production deployment or Stardance resubmission was performed.
+
+## Real production screenshots
+
+The baseline and final screenshots below show the same interface types at the same desktop viewport. Numbers vary because the challenges generate supplies.
+
+Before: disconnected arithmetic and a practice creature.
+
+![Baseline challenge](screenshots/last-lantern/before-challenge.jpg)
+
+After: repair stock, delivered pieces and the concrete supply question.
+
+![Contextual challenge](screenshots/last-lantern/after-challenge.jpg)
+
+Before: completion statistics.
+
+![Baseline completion](screenshots/last-lantern/before-completion.jpg)
+
+After: permanent world change, reward, unlock and next neighbour.
+
+![World result](screenshots/last-lantern/after-completion.jpg)
+
+Equal bread baskets and resolved water allocation:
+
+![Bread orders](screenshots/last-lantern/after-bakery.jpg)
+
+![Water distribution](screenshots/last-lantern/after-garden-distribution.jpg)
+
+Phone-width task layout:
+
+![Phone task](screenshots/last-lantern/after-mobile-bakery.jpg)
