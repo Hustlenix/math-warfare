@@ -15,24 +15,24 @@ import {
 } from "./adventure/battle-session.js";
 import { setupOnline } from "./adventure/online-ui.js";
 import { setupIntro } from "./adventure/intro.js";
+import { setupWorldPanels } from "./adventure/world-panels.js";
 import { openWardrobe } from "./adventure/wardrobe-ui.js";
 import { portraitStyle } from "./adventure/wardrobe.js";
 import artUrls from "virtual:licensed-art";
-import { QUESTS, SKILLS, SHOP, NPCS } from "./adventure/content.js";
+import { QUESTS, SKILLS, NPCS } from "./adventure/content.js";
 import {
-  fresh,
   load,
   save,
   finishQuest,
   available,
-  purchase,
   nextQuest,
 } from "./adventure/progress.js";
 import { World, blocked } from "./adventure/world.js";
 import { movementKey } from "./adventure/movement-input.js";
 import { AMBIENT } from "./adventure/village-life.js";
-import { LANDMARKS, dimensions, villagePath } from "./adventure/map-layout.js";
-import { petName, drawCompanion } from "./adventure/companion.js";
+import { LANDMARKS } from "./adventure/map-layout.js";
+import { petName } from "./adventure/companion.js";
+
 const $ = (id) => document.getElementById(id);
 mountIcons();
 let storage;
@@ -230,7 +230,7 @@ function interact(n) {
       `<p>${esc(n.copy)}</p><div class="button-row"><button id="place-action" class="primary">${n.skill ? "Practise " + SKILLS[n.skill].toLowerCase() : "Meet your companion"}</button><button id="back">Keep exploring</button></div>`);
     bindClose();
     $("back").onclick = close;
-    $("place-action").onclick = () => n.skill ? start({ mode: "practice", skill: n.skill, count: 10 }) : companions();
+    $("place-action").onclick = () => n.skill ? start({ mode: "practice", skill: n.skill, count: 10 }) : panels.companions();
     return;
   }
   if (AMBIENT.some((a) => a.id === n.id)) {
@@ -262,7 +262,7 @@ function interact(n) {
     return;
   }
   if (n.id === "shop") {
-    collection();
+    panels.collection();
     return;
   }
   if (n.id === "arena") {
@@ -522,124 +522,6 @@ function notes() {
         review: state.mistakes.map((q) => ({ ...q })),
       });
 }
-function companions() {
-  const unlocked = [state.completed.includes("bakery") ? "cat" : null, state.completed.includes("garden") ? "frog" : null].filter(Boolean);
-  const kind = state.companion, hasPet = kind !== "none";
-  const name = petName(state.petNames[kind], kind);
-  const distance = hasPet ? Math.hypot(world.pet.x - state.player.x, world.pet.y - state.player.y) : 0;
-  open(modalHead("COMPANIONS", hasPet ? esc(name) : "Cat & frog") +
-    `<div class="pet-card"><canvas id="pet-preview" width="128" height="96" aria-label="${hasPet ? esc(name) : "Companion"} pixel art preview"></canvas><div><strong>${hasPet ? (kind === "cat" ? "Bram’s bakery cat" : "Fern’s pond frog") : "Earn a companion"}</strong><p>${hasPet ? `${world.pet.mode === "stay" ? "Waiting where you asked." : "Following your footsteps."} ${distance > 3 ? "A little way back on the trail." : "Close by and ready to explore."}` : "Help Bram to befriend Pixel the cat. Help Fern to unlock Pebble the frog."}</p></div></div><label class="field-label" for="pet-kind">Travelling companion</label><select id="pet-kind"><option value="none">A quiet solo walk</option>${unlocked.map((k) => `<option value="${k}">${esc(petName(state.petNames[k], k))} · ${k}</option>`).join("")}</select>` +
-    (hasPet ? `<form id="pet-name-form"><label class="field-label" for="pet-name">Give your friend a name</label><div class="pet-name-row"><input id="pet-name" maxlength="18" value="${esc(name)}" autocomplete="off"><button type="submit">Save name</button></div></form><div class="pet-commands"><button id="pet-scratch" ${distance > 2.2 ? "disabled" : ""}>Give a scratch ♥</button><button id="pet-stay">Stay here</button><button id="pet-recall" class="primary">Recall / follow</button></div><p class="muted">Click your pet when nearby to give it a scratch. It uses paths around water, beds and buildings. After seven quiet seconds, it rests. Stay lasts until you recall it, change maps or reload.</p>` : `<button id="pet-unlock" class="primary">${unlocked.length ? "Choose a friend above" : "Meet " + (available(state, "bakery") ? "Bram" : "Mira") + " →"}</button>`));
-  bindClose();
-  $("pet-kind").value = kind;
-  $("pet-kind").onchange = () => {
-    state.companion = $("pet-kind").value;
-    world.petKind = state.companion;
-    world.pet.reset(state.player);
-    refresh();
-    companions();
-  };
-  const canvas = $("pet-preview"), ctx = canvas.getContext("2d");
-  const preview = (t) => {
-    if (!panel.open || $("pet-preview") !== canvas) return;
-    ctx.clearRect(0, 0, 128, 96);
-    ctx.fillStyle = "#d8c798"; ctx.fillRect(0, 0, 128, 96);
-    if (hasPet) {
-      ctx.save(); ctx.scale(2, 2); ctx.imageSmoothingEnabled = false;
-      drawCompanion(ctx, { x: 1, y: 1.3, dir: 2, moving: !state.reducedMotion, idle: 0, affection: 0 }, kind, art, t / 1000, state.reducedMotion);
-      ctx.restore();
-    }
-    requestAnimationFrame(preview);
-  };
-  requestAnimationFrame(preview);
-  if (hasPet) {
-    $("pet-name-form").onsubmit = (e) => {
-      e.preventDefault(); state.petNames[kind] = petName($("pet-name").value, kind); refresh(); companions(); toast("Your companion’s name is saved.");
-    };
-    $("pet-scratch").onclick = () => { close(); world.petAnimal(); };
-    $("pet-stay").onclick = () => { world.pet.stay(); close(); toast(`${name} will wait right here.`); };
-    $("pet-recall").onclick = () => { world.pet.recall(state.player); close(); toast(`${name} is finding the path back to you.`); };
-  } else $("pet-unlock").onclick = () => {
-    if (unlocked.length) return;
-    close(); world.go(available(state, "bakery") ? "bakery" : "welcome");
-  };
-}
-function countryMap() {
-  const places = state.zone === "village" ? LANDMARKS : NPCS.cave;
-  open(modalHead("COUNTRY MAP", state.zone === "village" ? "Numberglen" : "Lantern Hollow") +
-    `<canvas id="country-map" width="560" height="410" aria-label="World map. White marks your position; gold marks destinations."></canvas><p class="muted">White: you · pink: companion · gold: destinations. Choose a trail below to walk there.</p><div class="map-destinations">${places.map((p) => `<button data-place="${p.id}">${esc(p.name)} <span>Walk there ↗</span></button>`).join("")}</div>`);
-  bindClose();
-  const c = $("country-map").getContext("2d"), bounds = dimensions(state.zone), sx = 560 / bounds.width, sy = 410 / bounds.height;
-  for (let y = 0; y < bounds.height; y++) for (let x = 0; x < bounds.width; x++) {
-    c.fillStyle = blocked(state.zone, x, y, state) ? "#365348" : state.zone === "village" ? (villagePath(x, y) ? "#d3b280" : "#93a371") : "#9e92a4";
-    c.fillRect(x * sx, y * sy, Math.ceil(sx), Math.ceil(sy));
-  }
-  const mark = (x, y, color, size = 6) => { c.fillStyle = color; c.fillRect(x * sx - size / 2, y * sy - size / 2, size, size); };
-  places.forEach((p) => mark(p.x + 0.5, p.y + 0.5, "#ffe29d"));
-  if (state.companion !== "none") mark(world.pet.x, world.pet.y, "#efacaa");
-  mark(state.player.x, state.player.y, "#fff", 8);
-  document.querySelectorAll("[data-place]").forEach((button) => button.onclick = () => { close(); world.go(button.dataset.place); });
-}
-function collection() {
-  open(
-    modalHead("SUPPLY BENCH", "Village supplies") +
-      `<p>You have <strong>${state.coins} coins</strong>. Upgrades are decorations, and maths rewards are the same for everyone.</p><div class="shop-list">${SHOP.map((s) => `<article><div><strong>${s.name}</strong><p>${s.description}</p></div><button data-buy="${s.id}" ${state.upgrades.includes(s.id) || state.coins < s.price ? "disabled" : ""}>${state.upgrades.includes(s.id) ? "Added ✓" : s.price + " coins"}</button></article>`).join("")}</div><label class="field-label" for="companion">Travelling companion</label><select id="companion"><option value="none">A quiet solo walk</option>${state.completed.includes("bakery") ? '<option value="cat">Pixel · the apologetic cat</option>' : ""}${state.completed.includes("garden") ? '<option value="frog">Pebble · the picky frog</option>' : ""}</select><p class="muted">Earn companions through Bram’s and Fern’s quests.</p>`,
-  );
-  bindClose();
-  $("companion").value = state.companion;
-  $("companion").onchange = () => {
-    state.companion = $("companion").value;
-    world.petKind = state.companion;
-    world.pet.reset(state.player);
-    refresh();
-  };
-  const petButton = document.createElement("button");
-  petButton.textContent = "Name & care for your companion →";
-  petButton.onclick = companions;
-  content.append(petButton);
-  document.querySelectorAll("[data-buy]").forEach(
-    (el) =>
-      (el.onclick = () => {
-        if (purchase(state, el.dataset.buy)) {
-          refresh();
-          collection();
-          chime();
-          toast("Your village upgrade is ready. Go take a look!");
-        }
-      }),
-  );
-}
-function settings() {
-  open(
-    modalHead("", "Settings") +
-      `<label class="setting-row"><input id="mute-setting" type="checkbox" ${state.muted ? "checked" : ""}>Mute game sounds</label><label class="setting-row"><input id="motion-setting" type="checkbox" ${state.reducedMotion ? "checked" : ""}>Reduce motion</label><p class="muted">Solo progress stays in this browser. Online room scores disappear when the host leaves. No account is required.</p><button id="settings-fullscreen">Toggle fullscreen</button> <button id="settings-about">About & credits</button><hr><button id="reset-save">Start a new adventure</button><div id="reset-confirm" hidden><p>This clears adventure progress, coins and learning notes on this device. Your old MATH-Warefare scores are untouched.</p><button id="reset-yes">Clear this adventure</button> <button id="reset-no">Keep my save</button></div>`,
-  );
-  bindClose();
-  $("settings-fullscreen").onclick = fullscreen;
-  $("settings-about").onclick = about;
-  $("mute-setting").onchange = () => {
-    state.muted = $("mute-setting").checked;
-    refresh();
-  };
-  $("motion-setting").onchange = () => {
-    state.reducedMotion = $("motion-setting").checked;
-    refresh();
-  };
-  $("reset-save").onclick = () => {
-    $("reset-confirm").hidden = false;
-  };
-  $("reset-no").onclick = () => {
-    $("reset-confirm").hidden = true;
-  };
-  $("reset-yes").onclick = () => {
-    Object.assign(state, fresh());
-    world.path = [];
-    world.pet.reset(state.player);
-    refresh();
-    close();
-    toast("A new adventure begins. Mira is waiting.");
-  };
-}
 function wardrobe() {
   openWardrobe({ art, state, open, close, refresh, toast });
 }
@@ -650,6 +532,21 @@ function about() {
   );
   bindClose();
 }
+const panels = setupWorldPanels({
+  state,
+  getWorld: () => world,
+  art,
+  content,
+  open,
+  close,
+  refresh,
+  toast,
+  chime,
+  modalHead,
+  bindClose,
+  fullscreen,
+  about,
+});
 panel.addEventListener("cancel", (e) => {
   e.preventDefault();
   battle ? pause() : close();
@@ -674,10 +571,10 @@ document.addEventListener("keydown", (e) => {
     p: arena,
     o: () => online.open(),
     c: wardrobe,
-    b: companions,
-    m: countryMap,
+    b: panels.companions,
+    m: panels.countryMap,
     f: fullscreen,
-    Escape: settings,
+    Escape: panels.settings,
   }[e.key === "Escape" ? e.key : e.key.toLowerCase()];
   if (shortcut && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey) {
     e.preventDefault();
@@ -729,10 +626,10 @@ $("help-route").onclick = $("next-quest").onclick = route;
 $("practice").onclick = arena;
 $("daily").onclick = daily;
 $("mistakes").onclick = notes;
-$("collection").onclick = collection;
-$("pet-open").onclick = companions;
-$("map-open").onclick = countryMap;
-$("settings").onclick = settings;
+$("collection").onclick = panels.collection;
+$("pet-open").onclick = panels.companions;
+$("map-open").onclick = panels.countryMap;
+$("settings").onclick = panels.settings;
 $("journal-open").onclick = $("menu-open").onclick = openJournal;
 $("journal-close").onclick = () => {
   closeJournal();
