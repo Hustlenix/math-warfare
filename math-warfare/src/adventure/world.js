@@ -6,6 +6,7 @@ import {
   advanceResident,
   facing,
   spriteFrame,
+  routeStops,
 } from "./village-life.js";
 import { drawCountryside, villagePath } from "./countryside.js";
 import { heroFrame } from "./wardrobe.js";
@@ -387,36 +388,7 @@ export class World {
         a.wait -= dt;
         if (a.wait <= 0) {
           a.wait = 9 + (this.residents.indexOf(a) % 3);
-          const stops = a.stops ??
-            a.id === "hazel"
-              ? [
-                  [10, 17],
-                  [12, 14],
-                  [11, 11],
-                ]
-              : a.id === "jun"
-                ? [
-                    [18, 18],
-                    [19, 14],
-                    [23, 14],
-                  ]
-                : a.id === "chemist"
-                  ? [
-                      [20, 20],
-                      [18, 18],
-                      [20, 20],
-                    ]
-                  : a.id === "deputy"
-                    ? [
-                        [28, 16],
-                        [24, 14],
-                        [18, 19],
-                      ]
-                    : [
-                        [28, 11],
-                        [29, 15],
-                        [26, 22],
-                      ];
+          const stops = routeStops(a);
           a.stop = ((a.stop ?? -1) + 1) % stops.length;
           route(a, ...stops[a.stop]);
           a.activity = "Taking a village stroll";

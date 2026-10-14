@@ -9,7 +9,25 @@ import {
   advanceResident,
   facing,
   MEETINGS,
+  AMBIENT,
+  AMBIENT_ROUTES,
+  routeStops,
 } from "../src/adventure/village-life.js";
+
+test("farmers and ranchers keep their configured village routes", () => {
+  for (const id of ["farmer", "rancher"]) {
+    const actor = AMBIENT.find((resident) => resident.id === id);
+    assert.ok(actor?.stops?.length);
+    assert.strictEqual(routeStops(actor), actor.stops);
+  }
+});
+
+test("Hazel uses Hazel's fallback route, not a configured farmer route", () => {
+  const hazel = AMBIENT.find((resident) => resident.id === "hazel");
+  const farmer = AMBIENT.find((resident) => resident.id === "farmer");
+  assert.deepEqual(routeStops(hazel), AMBIENT_ROUTES.hazel);
+  assert.notDeepEqual(routeStops(farmer), AMBIENT_ROUTES.hazel);
+});
 
 test("left/right/up/down choose distinct normalized strips, and idle stops the walk cycle", () => {
   assert.equal(facing(-1, 0), 0);

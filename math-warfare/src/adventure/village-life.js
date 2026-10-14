@@ -140,6 +140,17 @@ export const AMBIENT = [
     ],
   },
 ];
+export const AMBIENT_ROUTES = {
+  chemist: [[20, 20], [18, 18], [20, 20]],
+  deputy: [[28, 16], [24, 14], [18, 19]],
+  hazel: [[10, 17], [12, 14], [11, 11]],
+  jun: [[18, 18], [19, 14], [23, 14]],
+  sage: [[28, 11], [29, 15], [26, 22]],
+};
+const DEFAULT_AMBIENT_ROUTE = [[28, 11], [29, 15], [26, 22]];
+export function routeStops(actor) {
+  return actor.stops ?? AMBIENT_ROUTES[actor.id] ?? DEFAULT_AMBIENT_ROUTE;
+}
 export function facing(dx, dy) {
   return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 2 : 0) : dy > 0 ? 3 : 1;
 }
