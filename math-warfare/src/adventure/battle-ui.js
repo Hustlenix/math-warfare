@@ -29,7 +29,7 @@ export function battleMarkup(battle, art, appearance) {
   const hearts = "♥".repeat(battle.hearts) + "♡".repeat(3 - battle.hearts);
 
   return `<div class="battle-header"><span class="eyebrow">${escapeHtml(title)}</span><button class="close-panel" aria-label="Pause challenge">${icon("pause")}</button></div>
-  <div class="battle-stage ${battle.quest ? "quest-task-stage" : ""} ${battle.quest?.boss ? "boss-stage" : ""}">
+  <div class="battle-stage ${battle.mode === "quest" ? "quest-task-stage" : ""} ${battle.quest?.boss ? "boss-stage" : ""}">
     <div class="battle-land"><span class="battle-hero hero-face" role="img" aria-label="Your adventurer" style="${portraitStyle(art, appearance.id, 3)}"></span><div class="battle-beam"></div><img class="battle-monster" src="${art[monster].src}" alt="${battle.quest?.boss ? "The Fungus King" : "Practice creature"}"></div>
     <div class="battle-status"><span id="hearts">${hearts}</span><span id="clock">${battle.mode === "sprint" ? "60s" : "0s"}</span><span id="score">${battle.score} points</span></div>
   </div>

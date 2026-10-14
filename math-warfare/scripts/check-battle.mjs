@@ -1,11 +1,23 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { battleMarkup } from "../src/adventure/battle-ui.js";
 import {
   advanceBattle,
   answerBattle,
   createBattle,
   elapsedBattle,
 } from "../src/adventure/battle-session.js";
+
+test("neighbour practice retains the arena HUD while quests use task scenes", () => {
+  const art = Object.fromEntries(["heroFaces", "slime"].map(name => [name, { src: "test.png" }]));
+  const options = { quest: { id: "welcome", title: "Mira" }, skill: "add", count: 3 };
+  const practice = createBattle({ ...options, mode: "practice" }, 1);
+  const quest = createBattle({ ...options, mode: "quest" }, 1);
+  const appearance = { id: "hero-000" };
+  assert.doesNotMatch(battleMarkup(practice, art, appearance), /quest-task-stage|class="task-scene"/);
+  assert.match(battleMarkup(quest, art, appearance), /quest-task-stage/);
+  assert.match(battleMarkup(quest, art, appearance), /class="task-scene"/);
+});
 
 test("daily challenges seed their questions from the supplied UTC date", () => {
   const options = { mode: "daily", skill: "mixed", count: 10 };

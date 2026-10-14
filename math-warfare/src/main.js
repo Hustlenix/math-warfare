@@ -278,7 +278,7 @@ function interact(n) {
                 .map((id) => QUESTS.find((v) => v.id === id).title)
                 .join(", ") +
               ".",
-      )}</p></div><p class="quest-objective"><strong>Your task:</strong> ${esc(QUEST_EFFECTS[q.id].objective)}</p><div class="quest-stamp"><span>${state.questWork[q.id] ?? 0} / ${q.count} tasks checked · no time limit</span><strong>${done ? "Already rewarded" : `${q.reward} coins + ${q.count * 10} XP`}</strong></div><div class="button-row">${ready ? `<button id="start-quest" class="primary">${done ? "Practise this skill" : "Let’s help →"}</button>` : ""}<button id="back">Keep exploring</button></div>`,
+      )}</p></div><p class="quest-objective"><strong>${done ? "Your help:" : "Your task:"}</strong> ${esc(done ? QUEST_EFFECTS[q.id].change : QUEST_EFFECTS[q.id].objective)}</p><div class="quest-stamp"><span>${done ? q.count : state.questWork[q.id] ?? 0} / ${q.count} tasks checked · no time limit</span><strong>${done ? "Already rewarded" : `${q.reward} coins + ${q.count * 10} XP`}</strong></div><div class="button-row">${ready ? `<button id="start-quest" class="primary">${done ? "Practise this skill" : "Let’s help →"}</button>` : ""}<button id="back">Keep exploring</button></div>`,
   );
   bindClose();
   $("back").onclick = close;
